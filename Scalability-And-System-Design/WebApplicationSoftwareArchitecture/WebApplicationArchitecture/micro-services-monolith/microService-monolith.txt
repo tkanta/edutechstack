@@ -1,0 +1,68 @@
+
+Monolith and Microservices:
+---------------------------
+	- Also, every microservice ideally has a separate database. This eliminates single points of failure and system bottlenecks.
+	- single responsibility and the separation of concerns principles
+	- cleaner app maintenance, feature development, testing, and deployment of individual modules
+	-pros:
+		- no single point failure
+		- laverage heterogenious technology
+		- independent and continuous deployment  		
+	-cons:
+		- Management complexity
+		- Eventual consistent
+
+    - The microservice architecture fits best for complex use cases; for apps that need to expand quick from adding new features standpoint			
+    - Monolith vs Microservice
+    	- Fault isolation
+    	- Developement team autonomy
+    - Moving back to monolith from micro-service
+    	- Segment integrates data from many different data providers into their systems. As the business gained traction, they integrated more data providers into their system, creating a separate microservice for every data provider. The increase in the number of microservices led to a significant increase in the complexity of their architecture, subsequently taking a toll on their productivity.
+    - Rate Limit
+    	- 429 HTTP Header (rate limit exceeded).
+
+    - Across Kafka, SQS, RabbitMQ, NSQ, or Kinesis. 
+    	- SQS is the only queue we’ve found which manage to ssupport that level of cardinality with simple scaling primitives
+    		
+    ============= centrifuse analysis? when not to do microservices ?==================
+    	- https://segment.com/blog/goodbye-microservices/
+    	- https://segment.com/blog/introducing-centrifuge/ (centrifuse architecture) *******
+    	- https://blog.christianposta.com/microservices/istio-as-an-example-of-when-not-to-do-microservices/
+    	- UUID: 
+    		https://segment.com/blog/a-brief-history-of-the-uuid/
+    	- Consul:
+    		https://www.consul.io/docs/dynamic-app-config/sessions
+    	- golang
+    		https://go.dev/blog/pprof
+    	- Amazon Service Auto scaling
+    		https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-auto-scaling.html
+
+    
+    ========================== istio (service mesh) ==========================================
+    - https://istio.io/
+    - https://istio.io/latest/about/service-mesh/#what-is-a-service-mesh
+    - https://blog.christianposta.com/microservices/istio-as-an-example-of-when-not-to-do-microservices/
+    - https://docs.google.com/document/d/1v8BxI07u-mby5f5rCruwF7odSXgb9G8-C9W5hQtSIAg/edit# (Istio design)
+
+    ( istio - linkerd - consul):
+    - https://platform9.com/blog/kubernetes-service-mesh-a-comparison-of-istio-linkerd-and-consul/ 
+    	- Service Mesh often integrates out-of-the-box with monitoring and tracing tools (such as Prometheus and Jaeger in the case of Kubernetes) to allow you to discover and visualize dependencies between services, traffic flow, API latencies, and tracing.
+
+
+     Questionaire ?
+     ------------------
+     
+     Which architecture has single points of failure?
+     	- Monolithic applications have single points of failure. In case any of the layers has a bug, it has the potential to take down the entire application.
+     
+     Why is generally a monolithic architecture not cloud ready?
+     	- enerally, a monolithic architecture holds a lot of application state in the static variables, and an application to scale inherently on the cloud needs to be stateless.
+     
+     When should we use a microservices architecture for our project? Which of the following option(s) are correct?
+     	- When our application has a lot of features and implementing all the features in a single codebase would make maintenance and adding of new features in the future difficult
+     	- When we expect exponential growth right after launch and we need to scale fast
+     	- When we need to use different technologies to implement different features of the app
+     
+     When should we use a monolithic architecture for our project? Which of the following option(s) are correct?	
+     	- When our project requirements are simple, the application is not that complex from a features standpoint. For instance, an organization’s internal tax calculation app or a similar public tool
+     	- When the entire backend of the project can be easily implemented with a single technology and when we do not need to leverage heterogeneous technologies for our project

@@ -1,0 +1,162 @@
+
+
+================= System Python ===================
+
+C:\Python\Python37-32
+
+============================== pycharm IDE ============================================
+
+Create Python Project:
+	- https://www.jetbrains.com/pycharm/ (download community edition of Jetbrain PyCharm)
+	- https://www.jetbrains.com/help/pycharm/creating-and-running-your-first-python-project.html#summary
+	- https://www.simplilearn.com/tutorials/python-tutorial/pycharm#:~:text=To%20install%20NumPy%20on%20PyCharm,package%20and%20click%20Install%20Package.
+
+Virtual ENV:
+	- venv (for Python 3) and virtualenv (for Python 2) allow you to manage separate package installations for different projects. They essentially allow you to create a “virtual” isolated Python installation and install packages into that virtual installation
+	- virtualenv avoids the need to install Python packages globally. When a virtualenv is active, pip will install packages within the environment, which does not affect the base Python installation in any way.
+	- https://stackoverflow.com/questions/41972261/what-is-a-virtualenv-and-why-should-i-use-one ****
+
+project setup:
+	- select new project (project name is folder name)
+	- select path for project folder
+	- select path for venv
+	- select default python runtime
+	- create project
+
+
+======================= Module 1: Python Fundamentals ==========================
+
+
+------------- Datatype and variables ------------
+Intro:
+	- use end="" in print statement to combine multiple print in one line
+	* # is used to comment a line
+	* """------ """ multilent doc comment
+
+function:
+	print:
+		print("Tarini", end=" ")
+		print("Kanta Negi")
+		* end is used to combine to prints, that will not print new line
+
+DataTypes and variables:
+
+	DataTypes : (Numbers, Strings, Boolean)
+		- Unlike many other languages, Python does not place a strong emphasis on defining the data type of an ob
+
+	Numbers:
+		- Integer : positive and negative whole numbers.The amount of memory an integer occupies depends on its value. For example, 0 will take up 24 bytes whereas 1 would occupy 28 bytes
+			* Note: In Python, all negative numbers start with the (-) symbol.
+
+		- Floating point Numbers: 
+			* A float occupies 24 bytes of memory and refer to positive and negative decimal numbers.
+			
+
+		- Complex Number : A complex number usually takes up 32 bytes of memory. It is a combination of (real+imaginary+integer+floating+negetive+positive)
+			* Note: In normal mathematics, the imaginary part of a complex number is denoted by i. However, in the code above, it is denoted by j. This is because Python follows the electrical engineering convention which uses j instead of i. Don’t let that confuse you.
+			* A complex number usually takes up 32 bytes of memory.	
+    
+    Boolean:
+    	* The Boolean (also known as bool) data type allows us to choose between two values: true and false.
+    	* In Python, we can simply use True or False to represent a bool:(True, False)
+    	* Note: The first letter of a bool needs to be capitalized in Python.
+
+    String:
+    	- A string is a collection of characters closed within single, double or triple quotation marks.
+    	
+    	- String forward indexing starts from '0' and reverse indexing starts from '-1'
+    	
+    	- functions : len(), id()
+    		* print(len(random_string))
+
+    	- reverse indexing
+    		batman = "Bruce Wayne"
+			print(batman[-1])  # Corresponds to batman[10]
+
+    	- String are immutable, can be verified by function 'id', that shows the variable address.
+    		str1 = "hello"
+			print(id(str1))
+
+
+    	- python 3.x : all strings are unicode
+    		* Older versions of Python (Python 2.x) support only ASCII characters. To use unicode in Python 2.x, preceding the string with a u is must. For example: string = u"This is unicode"
+
+    	- String slicing str[x:y:z] (string[start:end:step])
+    		* start index at x (start index starts with 0)
+    		* end index at y is start with 1 ( both forward/reverse)
+    		* with increment of z, default is 1 
+    			e.g if z=2, 
+    				* start with first char and skip 1,2 char and print 3 char
+    				* than skip 3,4 char and print 5th char 
+    			sample:
+    				my_string = "This is MY string!"
+					print(my_string[0:7])  # A step of 1
+					print(my_string[0:7:2])  # A step of 2
+					print(my_string[0:7:5])  # A step of 5	
+					This is
+					Ti s
+					Ti
+
+------------- Operators ------------					
+
+- binary and unary operators
+- The 5 main operator types in Python are:
+	arithmetic operators
+	comparison operators
+	assignment operators
+	logical operators
+	bitwise operators
+
+Arithmetic Operator:
+	Adition:
+		Python automatically converts the integer to a floating-point number. This applies to all arithmetic operations.	
+
+	Floor div:
+		Unlike normal division, floor division between two integers results in an integer.
+
+	Modulo with -ve number:
+		https://www.omnicalculator.com/math/modulo-of-negative-numbers#:~:text=familiar%20with%20it.-,When%20both%20the%20divisor%20and%20dividend%20are%20negative,9%2F4)%20%3D%202%20.
+
+	Division:
+		A division operation always results in a floating-point number.	
+
+comparison operator:
+	The == and != operators compare the values of both operands. However, the identity operators, is and is not, check whether the two operands are the exact same object. The same numeric value is same object even if assigned to different variable.
+
+	num2 = 10
+	num3 = 10
+	num2 is num3 -> True
+
+Assignment Operators:
+	One thing to note is that when a variable, first, is assigned to another variable, second, its value is copied into second. Hence, if we later change the value of first, second will remain unaffected:	
+
+	first = 20
+	second = first
+	first = 35  # Updating 'first'
+	print(first, second)  # 'second' remains unchanged
+
+Logical Operator:
+	and, or, not
+	In bit terms, the value of True is 1. False corresponds to 0:	
+
+Bitwise Operator:
+
+String Operation:
+	Strings are compatible with the comparison operators. Each character has a Unicode value.This allows strings to be compared on the basis of their Unicode values.When two strings have different lengths, the string which comes first in the dictionary is said to have the smaller value.		
+	 house = "Gryffindor"
+	 house_copy = "Gryffindor"
+	 new_house = "Slytherin"
+	 	print(new_house >= house)		
+	 full_name = first_half + second_half
+	 	print(full_name)
+	 print("ha" * 3)
+	 print('random' in random_string)  # 'random' exists!
+
+Grouping Values:
+	my_list = [1, 2.5, "A string", True]
+	print(my_list)	 
+
+
+------------- Conditional statement ------------
+
+	

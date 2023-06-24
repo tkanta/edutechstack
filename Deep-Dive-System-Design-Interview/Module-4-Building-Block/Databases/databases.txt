@@ -1,0 +1,21 @@
+
+- Note: According to a source, the World Data Center for Climate (WDCC) is the largest database in the world. It contains around 220 terabytes of web data and 6 petabytes of additional data.
+
+
+
+-------------- SQL DB ---------------------------
+
+Cons:
+	- predetermined schema
+	- Impedance mismatch is the difference between the relational model and the in-memory data structures. The relational model organizes data into a tabular structure with relations and tuples. The case is different for in-memory, where a complex data structure can be stored. To make the complex structures compatible with the relations, we would need a translation of the data in light of relational algebra
+
+--------------- NSQL DB ------------------------
+
+- dynamic schema
+-  Google’s Cloud Spanner is one such database that’s geo-replicated with automatic horizontal sharding ability and high-speed global snapshots of data.
+
+
+-------------- Data Replication ----------------------
+
+
+

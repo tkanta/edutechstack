@@ -1,0 +1,27 @@
+
+==================== How to pick server side for use cases =========================
+
+Real-time data interaction:
+	- your app could be a messaging application, a real-time browser-based massively multiplayer game, a real-time collaborative text editor, or an audio-video streaming app like Spotify, Netflix, etc. Some of the popular technologies that enable us to write these apps are NodeJS, Python’s Tornado framework. If you are working in the Java ecosystem, you can look into Spring Reactor, Play, and Akka.
+
+Peer-to-peer web application:
+	- a P2P distributed search engine or a P2P Live TV radio service, something similar to LiveStation by Microsoft. look into JavaScript protocols like DAT and IPFS. Also, checkout FreedomJS, which is a framework for building P2P web apps that work in modern web browsers.
+
+CRUD-based regular application:
+	- tax filing app, employee management, employee attendance systems. Some of the popular technologies that help us implement these use cases are Spring MVC, Python Django, Ruby on Rails, PHP Laravel, and ASP .NET MVC.
+
+Simple, small scale applications:
+	- blog, a wordpress plugin. PHP is ideally used in these kinds of scenarios. We can also consider other web frameworks, like Spring boot and Ruby on Rails, that cut down the verbosity, configuration, and development time by notches and facilitate rapid development. However, PHP hosting will cost much less compared to hosting other technologies. It is ideal for very simple use cases.
+
+CPU and memory intensive applications:
+	- Data processing, parallel processing, and running monitoring and analytics on quite a large amount of data?. Java, Scala, and Erlang are also good picks. Most of the large-scale enterprise systems are written in Java. Elasticsearch is an open-source real-time search and analytics engine is written in Java.
+
+
+========================= key things for Picking the Tech stack ==============================
+
+	- Be thorough with the requirements
+	- See if what we already know fits the requirements
+	- Does the tech we have picked has an active community? How is the documentation and the support?
+	- Is the tech being used by big guns in production ?
+	- Check the license. Is it open source?
+	- Availability Of skilled resources on the tech

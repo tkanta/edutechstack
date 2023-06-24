@@ -1,0 +1,56 @@
+
+Horizontal Layers in Networks:
+	- Note that each layer at the sending end has a parallel in the receiving end
+
+Independent Evolution in Networks:
+	- Any lower layer in this model provides certain services that the upper layer can build other services upon
+
+Encapsulation & Decapsulation:	
+	- Each layer adds its own header to the message coming from above and the receiving entity on the other end removes it.
+
+
+---------------- Application Layer -----------------------
+	
+http vs websocket : 
+	- https://stackoverflow.com/questions/16945345/differences-between-tcp-sockets-and-web-sockets-one-more-time. 
+		* WebSocket is basically an application layer protocol like http (with reference to the ISO/OSI network stack), message-oriented, which makes use of TCP as transport layer.
+	- https://levelup.gitconnected.com/comparing-java-websockets-jetty-vs-netty-ba128ddca313 (netty websocket server)
+
+
+Push based mechanism	
+	- Ajax polling (pull and push)
+	- Ajax Long polling (Bayeux Protocol)
+	- websocket
+	- Html5 Event source and Server send event		
+	- Streaming over http 
+		* This is made possible with HTML5 and a JavaScript Stream API
+		* https://developer.mozilla.org/en-US/docs/Web/API/Streams_API/Concepts
+
+process communication:
+	Furthermore, server processes need to have well defined and fixed port numbers so that clients can connect to them in a systematic and predictable way. However, clients don’t need to have reserved ports. They can use ephemeral ports. Servers can also use ephemeral ports in addition to the reserved ones. For instance, a client makes the initial connection to the server on a well-known port and the rest of the communication is carried out by connecting to an ephemeral port on the server.
+
+Curl main page:
+	https://curl.se/docs/manpage.html
+	What is cURL? A command line tool for transferring data based on various protocols
+	What does cURL stand for? Client URL
+
+Etag: 
+	This mechanism allows caches to be more efficient and saves bandwidth, as a Web server does not need to send a full response if the content has not changed. ETags can also be used for optimistic concurrency control[1] to help prevent simultaneous updates of a resource from overwriting each other.	
+
+Developer Tools:
+	https://developer.chrome.com/docs/devtools/
+
+root servers:
+	https://root-servers.org/
+
+find host name server:
+	host -t ns google.com
+	https://linux.die.net/man/1/host		
+
+find local DNS(ISP) server:
+	nslookup <google.com>
+	https://www.top10vpn.com/tools/what-is-my-dns-server/	
+
+DNS Records:
+	RRs : Resource records
+	TTL : Time To Live	

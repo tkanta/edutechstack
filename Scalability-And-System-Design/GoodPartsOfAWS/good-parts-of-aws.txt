@@ -1,0 +1,183 @@
+
+
+=================== Dynamo DB ================================
+
+Partition B-Tree:
+	- https://accu.org/journals/overload/16/86/golodetz_1506/
+	- https://subs.emis.de/LNI/Proceedings/Proceedings26/GI-Proceedings.26-47.pdf
+	- https://www.youtube.com/watch?v=aZjYr87r1b8
+
+	learning:
+		* index, multi level index(sparce index)
+		* m-way search tree
+		* B-tree is m-way tree with condition
+			- Every node must fill atleast [m/2] children
+			- root can have minimum 2 children
+			- All leaf at same level
+			- Bottom up approach for filling
+		* B+ tree is B-tree with few changes
+			- all keys will be present at leaf nodes and points to record node
+			- all none leaf node does not point to record node
+			- all leaf node creates a link list that represents a dense index and none leaf node represent sparse index	
+
+1. DynamoDB is much more similar to a Redis than it is to a MySQL. But, unlike Redis, it is immediately consistent and highly-durable, centered around that single data structure. If you put something into DynamoDB, you’ll be able to read it back immediately and, for all practical purposes, you can assume that what you have put will never get lost.
+
+2. Query Processing : In Dynamo DB we can't do any processing near to data side, we have to load data and do the processing at client appication.	
+
+3. Storage cost is high 
+	 - Approxmitily 12 times higher than S3
+	 - $256/month vs $23.55/month
+
+4. On demand vs provisioning capacity
+	- By default, you should start with DynamoDB’s on-demand pricing and only consider the provisioned capacity as cost optimization
+	- With on-demand pricing, the capacity you get is not perfectly on-demand. Behind the scenes, DynamoDB adjusts a limit on the number of reads and writes per second, and these limits change based on your usage. However, this is an opaque process and, if you want to ensure that you reserve capacity for big fluctuations in usage, you may want to consider using provisioned capacity for peace of mind.
+	
+	- In general: You will almost always want to start with on-demand pricing (no capacity management burden).
+	Then, if your usage grows significantly, you will almost always want to consider moving to provisioned capacity (significant cost savings).
+
+	- on demand price is 10 times more costlier than provisioned
+	- On-demand costs $1.25 per million writes, and $0.25 per million reads
+	- provisioned serve 1 million pages would only cost $0.14/day with
+
+5. Local vs Global Indexes
+	- The only advantage of local indexes is that they’re immediately consistent, but they do come with a very insidious downside.Local indexes come with the constraint that all the records that share the same partition key need to fit in 10 GB, and once that allocation gets exhausted, all write operations with that partition key will start failing.
+
+	- On the other hand, global indexes don’t constrain your table size in any way, but reading from them is eventually consistent (although the delay is almost always unnoticeable).DynamoDB has an internal queue-like system between the main table and the global index, and this queue has a fixed (but opaque) size. Therefore, if the provisioned throughput of a global index happens to be insufficient to keep up with updates on the main table, then that queue can get full. When that happens, disaster strikes: All write operations on the main table start failing. We have to monitor the throttled request count on all your global indexes, and then to react quickly to any throttling by provisioning additional capacity on the affected indexes
+
+
+
+========================= S3 ================================
+
+
+- One limitation of S3 is that you cannot append to objects.
+- If you have something that’s changing rapidly (such as a log file), you have to buffer updates on your side for a while, and then periodically flush chunks to S3 as new objects. This buffering can reduce your overall data durability because the buffered data will typically sit in a single place without any replication.
+- Bucket names are globally unique across all AWS customers and across all AWS regions
+	* A common mitigation is to always add your AWS account ID to the bucket name, which makes conflicts much less likely.
+
+
+
+================================ EC2 ===================================
+
+Pricing models:
+	Reserved Instances
+	Spot Instances
+	Saving Plan
+		- However, a recently released option called savings plans offers equivalent cost savings with some additional flexibility in switching instance types during the period under contract.
+
+EC2 security:
+	The security group
+		- You can think of security groups as individual firewalls for your instances. With security groups, you can control what goes in and out of your instances
+	The VPC ACL 
+		- You can think of VPC ACL as a network firewall. With the VPC ACL, you can control what goes in and out of your network.
+
+when to use EC2 autoscaling:
+	want to maintain capacity headroom: 
+		- When you decide the capacity headroom for EC2 instances for meeting unusual demand, then we can configure using auto-scaling.
+
+When not to use EC2 autoscaling:
+	Demand fluctuation : 
+		- When demand fluctuation is not significant and abrupt
+	cost usage ratio   : 
+		- When reduction doesn't make much difference on the cost usage ratio
+
+Secondary features of Auto Scaling:
+	replace unhealthy instances
+		- One of these features is a setting that allows Auto Scaling to automatically replace an instance if it becomes unhealthy.
+	Ease of adding removing instances. Auto Scaling becomes a launch template for your EC2 instances
+		- The other nice thing that comes with Auto Scaling is the ability to simply add or remove instances just by updating the desired capacity setting
+
+======================= Lambda ==============================================
+
+
+
+
+Lambda as a plugin service for other AWS services:
+	
+	- using lambda for resizing image for S3
+	
+	- ALB can send image with help of S3
+	
+	- CloudFront can rewrite request URL based on request cookies(A/B testing)	
+		
+		URL rewriting:
+			- https://www.smashingmagazine.com/2011/11/introduction-to-url-rewriting/
+		
+		A/B testing
+			- What is A/B testing? A/B testing (also known as split testing or bucket testing) is a method of comparing two versions of a webpage or app against each other to determine which one performs better.
+			- https://blog.hubspot.com/marketing/how-to-do-a-b-testing
+
+		TinyURL Vs URL rewriting:
+			URL rewriting is done at server side by replacing request url with actual path
+			Tiny URL is about shorting the actual url and on click redirect to actual URL
+
+	- Cloudwatch can support regex based alerting on application logs with few lines of lambda code
+	
+	- Kinesis doesn't come with API to filter record and write them to DynamoDB, it is easy to do with lambda
+	
+	- We can add the capability to cloudformation to validate TLS certificate from AWS certificate manager
+
+Limitation:
+	- cold start
+	- code bundle limitation (250 MB for your code bundle, including all your dependencies)
+	- limited network bandwidth
+	- stateless			
+
+========================= Networking and content delivery : ELB ============================
+
+- ELB(elastic load balancer)
+	- classic (with classic we can run EC2 outside of VPC)
+	- ALB
+	- NLB
+
+- Both ALB/NLB supports TLS/HTTPS
+- Only NLB supports TCP passthrough if you want to use certificate in application directly instead of Load balancer
+- NLB is cost effective than its counterpart ALB
+
+
+========================= Networking and content delivery : Route 53 ============================
+
+- Route 53 is a DNS service. It lets you translate domain names to IP addresses.
+
+- There is a significant benefit in having CloudFormation automatically set up your load balancer together with the DNS records for your custom domain. Route 53 makes this possible, whereas if you were to use a different DNS provider, you’d likely have to manage your DNS records manually.
+
+
+======================== Mgmt & govt. : CloudFormation (infrastructure-as-code) =============================================
+
+- CloudFormation lets you create and update the things you have in AWS without having to click around on the console or write fragile scripts.
+
+- Even for development, the ability to tear down everything cleanly and recreate your AWS set up in one click is extremely valuable
+
+- With cloudformation:
+	* You define your AWS resources as a YAML script (or JSON, but we find YAML to be much easier to read and modify).
+	* Then you point CloudFormation to your AWS account, and it creates all the resources you defined.
+	* If you run the script again without making any changes, CloudFormation won’t do anything (it’s idempotent).
+	* If you make a change to one resource, it will change only that resource, plus any other resources that depend on the modified one (if necessary).
+	* If you change your mind about an update, you can safely tell CloudFormation to roll it back.
+	* You can also tell CloudFormation to tear down everything it created, and it will give you your AWS account back in the original state (with a few * exceptions).
+
+- Things to avoid in CF:
+	When you’ve touched something manually, and you run your CloudFormation script again, it will often try to revert your changes back to how they were. Sometimes it will manage to do so, but you wouldn’t have wanted it to. Sometimes it will try to reconcile but become stuck in an endless loop.	
+
+
+======================== Application Integration : SQS ============================================
+
+- SQS is a highly durable queue. 
+
+- In SQS, there is no strict ordering because SQS queue is actually a bunch of queues behind the scenes and duplicate messages can emerge within SQS too.
+	* There is no limit on the rate of messages enqueued or consumed, and you don’t have to worry about any throttling limits.
+	The number of messages stored in SQS (the backlog size) is also unlimited.
+
+- It doesn't gurantee ordering and duplicate might come. For strict ordering and no duplicates we can convert queue to a FIFO, but throughput limit restricted to 300 messages/sec
+
+- As long as you can tolerate the lack of strict ordering and the possibility of duplicates, this property makes SQS a great default choice for dispatching asynchronous work.
+
+
+=========================== Media Service : Kinesis ==================================================
+
+- You can think of a Kinesis stream as a highly-durable linked list in the cloud
+
+- The use cases for Kinesis are often similar to those of SQS—you would typically use either Kinesis or SQS when you want to enqueue records for asynchronous processing.
+
+Not easy to use:
+	On the other hand, Kinesis is not as easy to use as SQS. While with SQS you can simply enqueue as many messages as you want without having to worry about capacity or throttling limits, a Kinesis stream is made up of slices of capacity called shards, and it’s up to you to figure out how many shards you need, monitor shard utilization, add shards, and figure out the best way to route records to shards so that they get approximately an equivalent amount of traffic. And unfortunately, all of this is a significant operational burden.
+	That said, Kinesis can still be much easier to use when compared to other self- hosted technologies that provide the same streaming properties.

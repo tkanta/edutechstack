@@ -1,0 +1,22 @@
+
+=================== Project Description For Netflix =================================
+
+1. grouping similar title (Anagrams)
+	- ASCII Table : https://www.cs.cmu.edu/~pattis/15-1XX/common/handouts/ascii.html
+	- Create a Map key of size 26 alphabets with # and count of letters of a word. Use this key, to save different anagrams of words
+
+
+2. Fetch top movies:
+	- Create Individual LinkedList of regional movies
+	- Create Intermidiate LinkedList to connect movie with higher rank among list of movies, 2 pair at a time
+	- return Intermediate LinkedList each time
+	- Final Intermediate LinkedList will contains all movies in the order of their rank
+
+3. Find Median Age:
+	- If size of ages is even than (largest of smaller list + smaller of large list) / 2
+	- If size of ages is odd, create the smaller heap such that it will contain 1 more element than large list, so that large number of the smaller list is the answer.
+
+4. Popularity Analysis
+
+5. Fetch most recently watched Titles
+6. Browse Ratings

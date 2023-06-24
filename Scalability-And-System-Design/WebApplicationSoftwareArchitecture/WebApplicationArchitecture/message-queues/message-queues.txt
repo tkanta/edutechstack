@@ -1,0 +1,62 @@
+
+
+======================== Message Queue ===========================
+
+* A message queue, as the name says, is a queue that routes messages from the source to the destination or the sender to the receiver following the FIFO (First in, first out) policy.
+
+* While routing messages through the queue, we can define several rules based on our business requirements. Adding priority to the messages is one that I pointed out
+
+
+======================= Pub-Sub Message Models ===============
+
+* A publish-subscribe model, aka pub-sub, is a model that enables a single or multiple producers to broadcast messages to multiple consumers.
+* There are different types of exchanges available in message queues, some of which are: direct, topic, headers, and fanout. Each exchange type has specific functionality and a use case
+* The relationship between the exchange and the queue is known as binding.
+* The fanout exchange will fit best for implementing a pub-sub pattern. It will push the messages to the queue and the consumers will receive the message broadcast
+
+
+======================= Point-to-Point Model ===================
+
+- There are two popular protocols when working with message queues: AMQP Advanced Message Queue Protocol and STOMP Simple or Streaming Text Oriented Message Protocol.
+
+- Every messaging technology, RabbitMQ, ActiveMQ, Apache Kafka, will have its own implementations of these protocols.
+
+
+================ Notification system and Real time feed using Message Queue  =====================
+
+LinkedIn Real-Time Presence Platform
+------------------------------------
+- https://scaleyourapp.com/linkedin-real-time-architecture-how-does-linkedin-identify-its-users-online/
+- https://scaleyourapp.com/best-resources-to-learn-software-architecture-system-design/
+- https://akka.io/
+	* Akka is a toolkit for building highly concurrent, distributed, and resilient message-driven applications for Java and Scala.
+
+
+Reactive Model:
+	is an implementation of the reactive programming principles to
+	https://reactivex.io/
+
+Backend Reactive:
+
+	AKKA platform: 
+		* https://akka.io/
+		* Play framwork buuild on AKKA
+
+	Spring Reactive platform: (server side skill)
+		* https://dzone.com/articles/5-things-to-know-about-reactive-programming
+			- https://vertx.io/
+			- https://developers.redhat.com/promotions/building-reactive-microservices-in-java
+		* https://github.com/ReactiveX/RxJava
+
+Frontend reactive:
+	https://rxjs.dev/
+	http://baconjs.github.io/	
+
+
+================== Handling concurrent request with Queue ==================
+
+- https://engineering.fb.com/2015/12/03/ios/under-the-hood-broadcasting-live-video-to-millions/
+
+Transcoding is the process of converting an audio or video file from one encoding format to another in order to increase the number of compatible target devices a media file can be played on.
+
+HLS(pull model), RTMP(push model, persistent TCP)

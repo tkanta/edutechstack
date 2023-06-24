@@ -1,0 +1,64 @@
+
+https://www.educative.io/courses/data-structures-coding-interviews-java
+
+Heap:
+	- A heap must be  a complete binary tree, where nodes at the last level must be structured in such a way that the left side is never empty.
+	- A Complete Binary Tree is a tree where each node has a max of two children and nodes at all levels are completely filled (except the leaf nodes)
+	- The nodes must be ordered according to the Heap Property.
+	- A heap is not sorted but the root element is largest/smallest than all other elements as per maxheap/minheap rule.
+	- In Array of complete BTree, (HeapSize-1)/2 is equal to number of all parent nodes
+	- In Array of complete BTree, nodeIndex*2+1 = left Child, nodeIndex*2+2 = Right Child.
+
+Differernt Types of Heaps:
+	- Binary Heaps
+	- Binomial Heaps
+	- Fibonacci	Heaps
+
+Reason for using Heap:
+	- used in (Graph, Priority Queue, Heapsort)
+	- Heap is space efficient as it uses Array
+	- To find the top K smallest and largest elements in an Array.
+	- Priority queues can be efficiently implemented using Binary Heaps
+	- Heap-implemented priority queues are used in Graph algorithms like Prim’s Algorithm and Dijkstra’s algorithm
+	- Heap is also used in Graph
+	- Heap is used in Heapsort
+		* Heapsort worst case (insert/delete) is better than Treesort worst case.
+		* HeapSort is especially useful for sorting arrays because Heaps, unlike almost all other types of trees - are usually implemented in arrays, not as linked data structures!
+		* Each insert() and delete() operation is O(logN). At the very worst - the heap does not always have all N values in it, so the complexity is certainly no greater than O(NlogN). This is better than the worst-case for TreeSort, which–because you might build a degenerate Binary Search Tree-- is O(N*N)
+
+Priority Queue:	
+	- What is priority QUeue
+		* https://www.programiz.com/dsa/priority-queue#:~:text=A%20priority%20queue%20is%20a,their%20order%20in%20the%20queue.
+	- Priority Queue vs Queue
+		* In a queue, the first-in-first-out rule is implemented whereas, in a priority queue, the values are removed on the basis of priority. The element with the highest priority is removed first.
+	- Priority Queue Applications
+		Some of the applications of a priority queue are:
+			Dijkstra's algorithm (shortest paths between nodes in a graph)
+			for implementing stack
+			for load balancing and interrupt handling in an operating system
+			for data compression in Huffman code	
+
+Full Binary Tree Vs Complete Binary Tree : 
+	- https://web.cecs.pdx.edu/~sheard/course/Cs163/Doc/FullvsComplete.html
+ 
+
+
+--------------- Conver MaxHeap to MinHeap --------------
+
+MaxHeap : [9,4,7,1,-2,6,5];
+
+MinHeap : [-2,1,5,9,4,6,7]
+
+
+------------------- MinHeap ---------------------------
+
+- A Min Heap follows the Min Heap property, which means the key at the parent node is always smaller than keys at both children nodes.
+- The overall time complexity of building the Heap in a Min Heap is the same in as a Max Heap: O(n)- Priority Queue vs Queue
+	* In a queue, the first-in-first-out rule is implemented whereas, in a priority queue, the values are removed on the basis of priority. The element with the highest priority is removed first.
+Priority Queue Applications
+Some of the applications of a priority queue are:
+
+Dijkstra's algorithm
+for implementing stack
+for load balancing and interrupt handling in an operating system
+for data compression in Huffman code	

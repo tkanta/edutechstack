@@ -1,0 +1,73 @@
+
+
+
+======================= Event Driven Architecture ===========================
+
+- In an event-driven system, everything is treated as a stream
+
+- Spring Framework added the Spring Reactor module to the core Spring repo. Developers wrote NodeJS, Akka, Play, etc
+
+- NodeJS is not fit for CPU-intensive tasks. CPU-intensive operations are operations that require a good amount of computational power like for graphics rendering, running ML algorithms, handling data in enterprise systems, etc. It would be a mistake to pick NodeJS for these purposes
+
+- LinkedIn uses the Play framework for identifying the online status of its users.
+	* https://scaleyourapp.com/linkedin-real-time-architecture-how-does-linkedin-identify-its-users-online/
+
+================= Webhooks ==================================================
+
+To use the Webhooks, consumers register an HTTP endpoint with the service with a unique API Key, that will be invoked by the API service when event occures
+
+================= shared nothing architecture ==============================
+
+Shared-nothing architecture means eliminating all single points of failure. Every module has its own memory and disk. 
+
+
+================== Hexagonal Architecture ==================================
+
+The hexagonal pattern makes its stance pretty clear: there is an inside component, which holds the business logic, then the outside layer, and the ports and the adapters, which involve the databases, message queues, APIs, and everything.
+
+
+====================== Question Architecture part-1 ===============================
+
+When should we use a non-blocking approach to implement a particular feature in our web application?
+	- When the feature is IO intensive, there are a large number of events that occur over a period of time.
+
+
+What kind of applications have an event-driven architecture? Which of the following option(s) are correct?
+	- Applications handling a large number of events and concurrent connections with minimal resource consumption
+	- Applications with an implementation that reacts to the events occurring as opposed to sequentially moving through the lines of code
+
+When should we use Webhooks in our application?
+	- When there are a lot of unwanted client requests on the backend server, polling for unavailable data, every now and then	
+
+Which of the following statements are true in the context of shared-nothing architecture?
+	- A shared-nothing architecture makes the system more scalable.
+	- A shared-nothing architecture eliminates all single points of failure in the system.
+
+
+What is the use of ports in a hexagonal architecture?
+	- Ports form the outer layer of the architecture. They act as an interface, an API to all the external requests. They prevent any external request to have any sort of direct interaction with an application resource.		
+
+====================== Peer to Peer Architecture ===================================
+
+- Peer-to-peer (P2P) decentralized architecture is the base of blockchain tech =
+- We can use a P2P protocol like BitTorrent for it. BitTorrent is the most commonly used P2P protocol for distributing data and large electronic files over the internet. It has approx. 25 million concurrent users at any point in time.	
+
+Downside of centralized system:
+	- First, the central server has access to all your messages. There can be data breach
+	- Second, with centralized systems, we are stranded in case of natural disasters
+	- let’s say you start creating content on social media and they can delete at any point
+
+- The data is exchanged over TCP IP, just like it happens over the HTTP protocol in a client-server model. The P2P design has an overlay network over TCP IP, which enables the users to connect directly. It takes care of all the complexities and the heavy lifting. Nodes/peers are indexed and discoverable in this overlay network.A large file is transferred between the nodes by being divided into chunks of equal size in a non-sequential order.
+
+====================== Decentralized social network ==================================
+
+- Bring your own data
+- Ensuring the safety of our data
+- Economic Compensation to the parties involved in the network
+- Infrastructure ease
+
+
+====================== Federated Architecture  ========================================
+
+- Federated architecture is an extension of decentralized architecture. It powers social networks like Mastodon, Minds, Diaspora, etc
+- As shown in the illustration below, a federated network has entities called servers or pods. A large number of nodes subscribe to the pods. There are several pods in the network that are linked to each other and share information.

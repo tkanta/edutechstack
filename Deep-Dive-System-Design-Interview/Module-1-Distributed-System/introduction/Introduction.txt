@@ -1,0 +1,61 @@
+
+- A distributed system is a system whose components are located on different networked computers, which communicate and coordinate their actions by passing messages to one another
+
+- 3 pillars of distributed system:
+	
+	- performance 
+		* lower latency per request or higher throughput.We can achieve the same performance with two or more low-spec computers as with a single, high-end computer. So, distributed systems allow us to achieve better performance at a lower cost
+	
+	- scalability 
+		* Scalability is the capability of a system, network, or process to handle a growing amount of work, or its potential to be enlarged to accommodate that growth to handle more traffic and store large amount of data.If we build a distributed system, we can split and store the data in multiple computers, and distribute the processing work
+
+	- availability 
+		* probability of a system to work as required during a mission.Redundancy is one of the widely used mechanisms to achieve higher availability. It refers to storing data into multiple, redundant computers.So, when one computer fails, we can efficiently switch to another one
+
+- In programming language design, a first-class citizen (also type, object, entity, or value) in a given programming language is an entity which supports all the operations generally available to other entities.
+
+- Fallacies of distributed computing:
+	- Network is reliable and secure
+	- latency is zero
+	- bandwidth is infinite
+	- topology does not change
+	- Global clock		
+
+- Network asynchrony, partial failures, and concurrency are the major contributors to complexity in the field of distributed systems. So, we should keep them in mind when we build distributed systems in real life. Doing so would help us anticipate edge cases and handle them appropriately
+
+- Measures of Correctness
+	The correctness measures for distributed systems are the two properties they must satisfy. These are the following:
+
+	Safety property
+	Liveness property
+
+System Models:
+	- Synchronous
+	- Asynchronous (distributed system)
+
+
+Types of failures:
+	- fail stop
+	- Crash
+	- Omission
+	- Byzantine : Byzantine failures occur when a node does not behave according to its specific protocol or algorithm. This usually happens when a malicious actor or a software bug compromises the node.
+
+Exactly once symantics:
+	- Delivery symantics
+		* exactly once (It is possible to have exactly-once processing in a distributed system, but not exactly-once delivery.)
+		* at-most once
+		* at-least once
+
+	- Avoiding multiple deliveries of a message
+		* Idempotent operations approach
+		* De-duplication approach
+
+	- We can achieve the at-most-once delivery when we send every message only one time, no matter what happens. Meanwhile, we can achieve the at-least-once delivery when we send a message continuously until we get an acknowledgment from the recipient.	
+
+Failure in the World of Distributed Systems:
+	- Failure detector: A perfect failure detector is the one with the strongest form of completeness and accuracy. That is, it is one that successfully detects every faulty process without ever assuming a node has crashed before it actually does.As expected, it is impossible to build a perfect failure detector in purely asynchronous systems. Still, we can even use imperfect failure detectors to solve difficult problems. One such example is the problem of consensus.
+
+Stateless and Stateful Systems:	
+	- 	The main advantage of stateless is that we consider all the nodes (e.g., servers) of a stateless system identical. This makes it a lot easier for us to balance traffic between them, and scale by adding or removing servers.
+
+	- However, stateful systems present many more challenges. As different nodes can hold different pieces of data, they require additional work. They need to direct traffic to the right place and ensure each instance is in sync with the others.

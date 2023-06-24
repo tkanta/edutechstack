@@ -1,0 +1,53 @@
+
+
+- install k8s cluster using kind
+	* kind create cluster
+
+- install helm
+	* curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+	* ./get_helm.sh
+
+- create image using Docker
+	* docker build -t tarinikanta/ror-learning-edu:0.0.1 .
+
+- create helm chart
+	* helm create multiple-deployment
+	* delete files and folders 
+		- templates/hpa.yaml
+		- templates/ingress.yaml
+		- templates/serviceaccount.yaml
+		- templates/tests
+	* Delete content
+		- values.yaml
+		- templates/deployments.yaml
+		- templates/NOTES.txt
+		- templates/_helpers.tp	
+
+- find postgres helm chart
+	https://artifacthub.io/
+	https://artifacthub.io/packages/helm/bitnami/postgresql
+
+commands:
+	helm lint ./helm_folder
+	helm instll <release-name> ./helm_folder
+	helm dependency update
+	helm search hub postgresql
+	helm create <helm-chart-name>
+	helm --help		
+
+helm sequence of execution:
+	https://github.com/helm/helm/issues/1780
+	https://helm.sh/docs/topics/charts/#operational-aspects-of-using-dependencies
+	Install order of k8s type:
+		https://github.com/helm/helm/blob/484d43913f97292648c867b56768775a55e4bba6/pkg/releaseutil/kind_sorter.go
+
+Uninstalling the Chart:
+	To uninstall/delete the my-release deployment:
+
+	helm delete my-release
+	The command removes all the Kubernetes components but PVC's associated with the chart and deletes the release.
+
+	To delete the PVC's associated with my-release:
+
+	kubectl delete pvc -l release=my-release
+	Note: Deleting the PVC's will delete postgresql data as well. Please be cautious before doing it.		

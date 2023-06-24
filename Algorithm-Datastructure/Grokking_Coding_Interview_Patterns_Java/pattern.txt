@@ -1,0 +1,20 @@
+
+
+Create Maven project:
+----------------------
+mvn archetype:generate -DgroupId=com.algods -DartifactId=pattern -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+
+
+
+pattern repo for educative
+-------------------------------------
+https://github.com/tkanta/algo-ds-pattern
+
+
+Topics:
+---------------
+
+* two pointers
+	* Reverse words in a String
+		String split by one/multile space (https://www.tutorialkart.com/java/how-to-split-a-string-with-space-as-delimiter-in-java/)
+			String parts[] = str.split(" ");	

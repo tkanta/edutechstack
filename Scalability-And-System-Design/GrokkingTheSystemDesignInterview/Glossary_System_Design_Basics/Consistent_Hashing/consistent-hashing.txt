@@ -1,0 +1,18 @@
+
+===================== consistent hashing ================================
+
+- https://dl.acm.org/doi/10.1145/258533.258660 ( paper )
+- https://www.quora.com/What-is-the-difference-between-consistent-hashing-and-sharding-in-a-distributed-system
+
+
+* Consistent hashing is another approach to distributing data. This technique is widely used in NoSQL systems and allows us to extend clusters in a more flexible way. However, the same technique can be used for PostgreSQL, of course
+
+* Amazon’s Dynamo and Apache Cassandra use Consistent Hashing to distribute and replicate data across nodes.
+
+* consistent hashing for postgres DB:
+	- https://subscription.packtpub.com/book/big_data_and_business_intelligence/9781783550609/1/ch01lvl1sec10/using-sharding-and-data-distribution#:~:text=Consistent%20hashing%20is%20another%20approach,used%20for%20PostgreSQL%2C%20of%20course.&text=Each%20value%20shows%20up%20multiple%20times.
+
+
+============================= Hashing ====================================
+MD5 hashing:
+	https://www.avast.com/c-md5-hashing-algorithm#:~:text=What%20is%20MD5%3F,person%20you%20sent%20it%20to.	

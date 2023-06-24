@@ -1,0 +1,20 @@
+
+- System design problems usually have some similarities, though specific details are often unique. We have extracted these similarities across design problems as the basic building blocks we’ll be covering
+
+We’ll discuss the following building blocks in detail::
+	- Domain Name System
+	- Load Balancers
+	- Databases:
+	- Key-Value Store:
+	- Content Delivery Network:
+	- Sequencer:
+	- Service Monitoring: 
+	- Distributed Caching:
+	- Distributed Messaging Queue:
+	- Publish-Subscribe System:
+	- Rate Limiter:
+	- Blob Store: 
+	- Distributed Search: 
+	- Distributed Logging:
+	- Distributed Task Scheduling:
+	- Sharded Counters:

@@ -1,0 +1,8 @@
+
+- A trie is a tree of characters.
+
+- Trie is a tree data structure used for storing and locating keys from a set. The keys are usually strings that are stored character by character—each node of a trie corresponds to a single character rather than the entire key.
+
+- To understand how tries are more efficient for storing and searching strings, consider a binary tree. The time complexity of a binary tree is O(logn)
+, where we talk in terms of base 2. Instead, think of a quaternary tree, where every node has a fan-out of four, so each node can have four children. The time complexity of this tree is still O(logn). However, now we’re talking in terms of log with base 4. That’s an improvement in the performance even if it’s by a constant factor. As our trees become wider and shorter, the operations become more efficient. This is because we don’t have to traverse as deep.
+

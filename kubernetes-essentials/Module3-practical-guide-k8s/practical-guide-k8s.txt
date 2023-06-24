@@ -1,0 +1,10 @@
+
+----------------- Ingress -------------------------
+
+- Ingress objects manage external access to the applications running inside a Kubernetes cluster.
+
+- Ingress provides forwarding rules based on paths and domains, SSL termination and a number of other features.
+
+- In a more traditional setup, we’d probably use an external proxy and a load balancer. Ingress provides an API that allows us to accomplish these things, in addition to a few other features we expect from a dynamic cluster.
+
+

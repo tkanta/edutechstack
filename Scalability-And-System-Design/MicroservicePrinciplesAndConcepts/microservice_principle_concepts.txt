@@ -1,0 +1,22 @@
+
+
+
+------------------ Modernization of legacy systems with microservices -------------------------
+
+
+https://www.innoq.com/de/talks/2015/11/javaday-kyiv-modernization-legacy-systems-microservices-hystrix/
+
+- I will demonstrate how two open libraries from Netflix can support this process. Hystrix will help us to improve the overall stability of the system and RxJava will help us to handle asynchronous processes in a more elegant way.
+
+
+Build/Operation/Organization:
+	- Technologies and approaches must be introduced to enable automated build, deployment and operation of micro-service
+	- A suitable test strategy must be established. This also requires the automated setup of test environments and the assurance that the tests are independent
+
+
+Bounded context in micro-service:
+	Bounded Context represents a boundary around a set of functional features (user stories / use cases). For example, everything that is related to customer management in an insurance scenario: create customer, update customer, update customer address, etc.
+
+The following approach is suitable for a migration based on domain criteria:
+	- Split the system into bounded contexts.
+	- Which of the bounded contexts will you migrate first? Why? Reasons can be the simple migration of the bounded context or many planned changes in the bounded context. Consider the different scenarios.	

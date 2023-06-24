@@ -1,0 +1,88 @@
+
+===================================== Cassandra =========================================
+
+
+Pros:
+------
+*. Cassandra is a distributed, decentralized, scalable, and highly available NoSQL database
+*. Cassandra is typically classified as an AP (i.e., available and partition tolerant) system
+*. Cassandra combines the distributed nature of Amazon’s Dynamo which is a key-value store and the data model of Google’s BigTable which is a column-based data store
+*. Cassandra uses peer-to-peer architecture, with each node connected to all other nodes
+*. Each Cassandra node performs all database operations and can serve client requests without the need for any leader node
+*. Optimized for high throughput and faster writes
+	- cassandra is especially suited for write-intensive applications such as time-series streaming services, sensor logs, and Internet of Things (IoT) applications
+*. High Availability
+*. Time series data model
+	- Due to its data model and log-structured storage engine, Cassandra benefits from high-performing write operations
+	- This also makes Cassandra well suited for storing and analyzing sequentially captured metrics (i.e., measurements from sensors, application logs, etc.)
+
+Cons:
+----
+*. Cassandra can be tuned with replication-factor and consistency levels to meet strong consistency requirements, but this comes with a performance cost	
+
+
+High level Architecture:
+------------------------
+* Cassandra Row key = partition key(used for node finding) + clustering key (used for sorting)
+* Partitioner is the component responsible for determining how data is distributed on the Consistent Hash ring
+	- By default, Cassandra uses the Murmur3 hashing function
+* A client may connect to any node in the cluster to initiate a read or write query. This node is known as the coordinator node. The coordinator identifies the nodes responsible for the data that is being written or read and forwards the queries to them.
+	- All Cassandra nodes learn about the token assignments of other nodes through gossip.
+
+Replication:
+------------
+* Replication depends on two factor
+	- Replication factor
+		* Each keyspace in cassandra can have different replication factor.
+	- Replication Strategy
+		* Simple Strategy
+		* Network Topology Strategy
+
+
+Cassandra Consistency Levels:
+----------------------------
+* Read and write consistency levels
+
+* Hinted handsoff
+	- storing data at coordinator temporarily, when nodes are not up, and eventually send to target node when they are online.
+	- Use Gossiper to track nodes for which it is holding the hint
+
+* snitch 
+	- determine the faster node by proximity and latency of nodes
+	- Used during request handling and spreading replicas
+
+* Read Repair sync
+	- during read request cassandra does a parallel read from replica nodes and sends the latest data to client and does a read repair for the nodes that are belind the latest nodes 
+
+Gossiper:
+------------
+* gossip protocol 
+* Generation number - generation number which is incremented every time a node restarts
+* Seed nodes - Cassandra designates a list of nodes as the seeds in a cluster. The seed node designation has no purpose other than bootstrapping the gossip 	process for new nodes joining the cluster
+* Phi Accrual Failure Detector - This algorithm uses historical heartbeat information to make the threshold adaptive.
+
+Anatomy of Cassandra's Write Operation:
+----------------------------------------
+* Commit Log
+* MemTable
+* SSTable
+	- Once a MemTable is flushed to disk as an SSTable, it is immutable and cannot be changed by the application
+* Hints
+
+Anatomy of Read OPeration:
+--------------------------
+* Row Cache
+* Key cache
+	Bloom Filter
+	Partition index summary file
+* MemTable
+
+Compaction:
+-----------
+During compaction, the data in SSTables is merged: the keys are merged, columns are combined, obsolete values are discarded, and a new index is created. On compaction, the merged data is sorted, a new index is created over the sorted data, and this freshly merged, sorted, and indexed data is written to a single new SSTable.
+
+Tombstones:
+-------------
+it is a soft delete.Tombstones are removed as part of compaction. During compaction, any row with an expired tombstone will not be propagated further
+It makes write faster
+If more tombstones, It makes read slow and consumes space

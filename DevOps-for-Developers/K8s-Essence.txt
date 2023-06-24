@@ -1,0 +1,97 @@
+
+------------------- docs ------------------------
+
+k8s podSpec guide:
+	https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.24/#pod-v1-core
+	https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.24/#podspec-v1-core
+
+	** Containers are only ever created within the context of a Pod. This is usually done using a Controller. See Controllers: Deployment, Job, or StatefulSet
+	deployement controller:
+		https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.24/#deployment-v1-apps
+
+Replicaset Guide:
+	https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.24/#replicaset-v1-apps
+
+	
+------------------- Commands: --------------------
+
+Run / Delete POD:
+	kubectl run db --image mongo
+	kubectl delete pod db
+	kubectl delete -f go-demo-2.yml --cascade=orphan (delete only replica set not the pods)
+	kubectl delete $POD_NAME
+
+POD details:
+	kubectl create -f db.yml
+	kubectl get pods
+	kubectl get pods -o wide
+	kubectl get pods -o json
+	kubectl get pods -o yaml
+	kubectl describe pod db	
+	kubectl get events
+	kubectl get -f go-demo-2.yml -o jsonpath="{.spec.containers[*].name}"
+	kubectl get -f go-demo-2.yml -o json
+
+POD run / delete:
+	kubectl describe -f db.yml
+	kubectl exec db -- ps aux (short lived command execution)
+	kubectl exec -it db -- sh (long lived command execution)
+		echo 'db.stats()' | mongo localhost:27017/test
+		exit
+	kubectl logs -f db (-f : followup logs)
+	kubectl exec db --  pkill mongod
+	kubectl get pods
+	kubectl delete -f db.yml 
+	kubectl get pods	
+
+POD describe:
+	kubectl describe -f db.yml
+	kubectl describe pod <podName>
+	kubectl exec db -- ps aux (run onetime command in containers of pod)
+	echo 'db.stats()' | mongo localhost:27017/test (execute mongodb stats after connecting to mongo)
+
+POD label:
+	POD_NAME=$(kubectl get pods -o name | tail -1)
+	kubectl label $POD_NAME service-	      (delete label)
+	kubectl label $POD_NAME service=go-demo-2 (add label)
+	kubectl get pods --show-labels
+
+replicaset:
+	kubectl get rs (get replicate sets)	
+
+service:
+	exposing replicaset as service:
+		kubectl expose rs go-demo-2 \
+	    --name=go-demo-2-svc \
+	    --target-port=28017 \
+	    --type=NodePort
+	describe service:
+		kubectl describe svc/go-demo-2-svc
+		kubectl get svc go-demo-2-api -o yaml
+
+Pod Name:
+	* POD_NAME=$(kubectl get pod \
+    --no-headers \
+    -o=custom-columns=NAME:.metadata.name \
+    -l type=db,service=go-demo-2 \
+    | tail -1)	
+
+Update image:
+	kubectl set image -f go-demo-2-db.yml db=mongo:3.4 --record (update image name db with new version)
+
+rolling update:
+	kubectl create -f go-demo-2-api.yml --record
+	kubectl set image -f go-demo-2-api.yml api=vfarcic/go-demo-2:2.0
+	kubectl rollout status -w -f go-demo-2-api.yml
+	kubectl rollout history -f go-demo-2-api.yml
+
+endpoint:
+	kubectl get ep go-demo-2 -o yaml (describe endpoint)
+
+port forwarding to service:
+	kubectl port-forward service/go-demo-2-svc 3000:28017 --address 0.0.0.0	
+	nohup kubectl port-forward service/go-demo-2-api --address 0.0.0.0  3000:8080 > /dev/null 2>&1 &	    
+
+Difference:
+	apply vs create:
+		- The apply command automatically saves the configuration so that we can edit it later on. The create command does not do such thing by default so we had to save it with --save-config.	

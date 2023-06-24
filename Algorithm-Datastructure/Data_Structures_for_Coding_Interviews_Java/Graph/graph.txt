@@ -1,0 +1,27 @@
+
+
+Code Location:
+---------------
+D:\TechnologyStack\PROBLEM_SOLVING_SKILL\Patterns_Of_Coding_AlgoDs\workspace
+
+====================================== Graph DS =============================================
+
+Doubly Link List (DLL):
+	- https://www.softwaretestinghelp.com/doubly-linked-list-in-java/
+
+Single Link List (SLL):
+
+Java Graph Implementation:
+	- https://www.baeldung.com/java-graphs#:~:text=Java%20Universal%20Network%2FGraph%20(JUNG,clustering%2C%20decomposition%2C%20and%20optimization.	 
+
+
+Graph implementation can be done
+	- Adjacency Matrix ( efficient when dealing with vertices)
+	- Adjacency List (efficient when dealing with edges)
+
+
+Bipartite Graph:
+	 A Bipartite Graph is a special kind of Graph, in which the vertices can be divided into two disjoint sets U and V such that no vertex of U is adjacent to any other vertex in U and no vertex of V is adjacent to any other vertex in V. Vertices in U have edges that connect it to vertices in V	
+
+Graph Traversal Algorithms:
+	* Breadth First Search:

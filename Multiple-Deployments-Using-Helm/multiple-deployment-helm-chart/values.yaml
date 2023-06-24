@@ -1,0 +1,37 @@
+postgresql:
+  fullnameOverride: "postgres"
+  image:
+    tag: 15.1.0-debian-11-r20
+  postgresqlDatabase: elearning3_development
+  postgresqlUsername: postgres
+  postgresqlPassword: postgrespassword
+  databasePort: 5432
+
+configmap: 
+  name: postgres-configmap
+
+app:
+  project: helm-project
+  tier: application
+
+service:
+  type: NodePort
+  port: 31111         
+  nodePort: 31111
+  targetPort: 3000
+
+image:
+  repository: <your-image-name-here>
+  tag: <your-image-tag-here>
+
+deployments: 
+  name: app
+  containerPort: 3000
+  imagePullPolicy: Always
+
+initContainers:
+  name: check-db-ready
+  image: postgres:9.6.5
+  command: ['sh', '-c', 
+          'until pg_isready -h postgres -p 5432; 
+          do echo waiting for database; sleep 5; done;']

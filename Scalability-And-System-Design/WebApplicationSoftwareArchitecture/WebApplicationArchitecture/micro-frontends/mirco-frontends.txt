@@ -1,0 +1,60 @@
+
+
+------------------ Micro front ends -------------------
+
+Pros :
+	- Leverage different javascript languages.
+	- Betted team coordination as the team controls end-to-end service
+	- Better performance as services are independently deployed
+
+Cons:
+	- Cross platform performance and compatibility issues
+	- Additional code to combine heterogenious tech
+
+
+- Spotify Engineering Culture 
+	* https://engineering.atspotify.com/2014/03/spotify-engineering-culture-part-1/
+
+
+
+------------------ Client Side Micro frontend Integration ------------
+
+Iframes:
+	- Also, following this basic approach, the micro frontends that need to be integrated within a specific page can be done using Iframes.
+
+	- Using IFrames has several downsides: they can’t be bookmarked, they aren’t good from an SEO standpoint, they have stability and performance issues and so on. Besides, IFrames are an obsolete thing in the modern web dev landscape.
+
+
+Single SPA:
+	- A recommended way to integrate components on the client-side is by leveraging a technology called the Web Components and frameworks such as Single SPA.
+		* https://single-spa.js.org/
+		* https://single-spa.js.org/docs/getting-started-overview/
+		* https://single-spa.js.org/docs/examples/
+	- The components can be written in any language and just needs to be registered with SPA library and the start function should be called.Three things are working behind the scene (bootstrap, mount, unmount)	
+
+Webcomponents:	
+	- If you wish to know more on web components, this Google Chrome devs video is a good resource.	
+		* https://www.youtube.com/watch?v=YBwgkr_Sbx0 
+    - webcomponents are components extended from basic low level API, that can be used in any framework (Angular, React, Vue) or separately in HTML
+
+------------- Server Side Micro frontend Integration -------------------
+
+- When the UI components are integrated on the server, on the user request, the complete pre-built page of the website is delivered to the client from the server as opposed to sending individual micro frontends to the client and having them clubbed there.
+
+- Some of the popular frameworks that facilitate server-side integration of micro frontends are Project Mosaic, Open Components and Podium. Server Side Includes SSI is a server-side scripting language used for clubbing the content of multiple web pages on the webserver
+
+- https://www.youtube.com/watch?v=m32EdvitXy4
+- https://www.thoughtworks.com/talks/a-high-performmance-solution-to-microservice-ui-composition		
+
+zalando:
+	- www.mosaic9.org
+	- github.com/zalando/skipper (router service)
+	- github.com/zalando/tailore (layout service)
+	- github.com/zalando-incubator/tessellate (layout service
+	- https://github.com/zalando/innkeeper
+
+Autoscout24:
+	- https://github.com/Scout24/scout24-engineering-values-and-principles
+
+page speed analysis:
+		https://pagespeed.web.dev/		

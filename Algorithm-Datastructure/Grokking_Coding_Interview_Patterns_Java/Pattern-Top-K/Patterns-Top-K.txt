@@ -1,0 +1,46 @@
+
+====================== Pattern Top K =======================
+
+- We need to use a sorting algorithm like Timsort if we use Java’s Collection.sort()
+	* https://en.wikipedia.org/wiki/Timsort
+
+- Array sort with comparator
+	https://stackoverflow.com/questions/54126952/how-to-sort-integer-array-in-ascending-and-descending-order-using-lambda-only-in
+	https://stackoverflow.com/questions/21970719/java-arrays-sort-with-lambda-expression	
+	Integer[] arr2 = new Integer[] {54,432,53,21,43};
+	Arrays.sort(arr2, Comparator.reverseOrder());
+	
+- Logarithm rules
+	https://www.purplemath.com/modules/logrules.htm
+		Log Rules:
+
+			1) logb(mn) = logb(m) + logb(n)
+
+			2) logb(m/n) = logb(m) – logb(n)
+
+			3) logb(mn) = n · logb(m)
+
+- Intstream for range:
+	https://www.adam-bien.com/roller/abien/entry/java_8_from_ordinary_for
+	IntStream.range(0, 10).forEach(
+		nbr -> System.out.println(nbr)
+	);		
+
+- K largest number from a list of integer
+	* Use min Heap to store first K numbers, so root will be smallest number.
+	* Than iterate through rest of numbers and replace heap root with the larger number than the root
+	* At last the remaining heap contains K largest number
+
+- K smallest number from a list of numbers
+	* Create a maxheap and insert first K number
+	* Iterate the remaining list and replace with smaller number
+	* At last only K smallest numbers will remain and the root will be the Kth smallest number
+
+- Scheduling task
+	* You are given a list of tasks that need to be run, in any order, on a server. Each task will take one CPU interval to execute but once a task has finished, it has a cooling period during which it can’t be run again. If the cooling period for all tasks is ‘K’ intervals, find the minimum number of CPU intervals that the server needs to finish all tasks.
+
+- Frequency Stack (hard)
+	Design a class that simulates a Stack data structure, implementing the following two operations:
+
+	push(int num): Pushes the number ‘num’ on the stack.
+	pop(): Returns the most frequent number in the stack. If there is a tie, return the number which was pushed later.	

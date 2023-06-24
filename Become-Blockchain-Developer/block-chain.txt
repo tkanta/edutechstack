@@ -1,0 +1,64 @@
+
+- what is a block-chain ?
+	* Blockchain is a term used to describe DLT, or Distributed Ledger Technology. Blockchain is used to create a storage system for data in a distributed and immutable manner
+	* Advantages
+		- No Central Authority
+		- Immutability (designed to be immutable using cryptographic algorithms)
+		- Decentralized (The ledger is replicated and maintained by multiple hosts or peers or nodes)
+
+- Block-chain usecases:
+	* Lack of trust in System records in Automobile industry
+		- https://medium.datadriveninvestor.com/how-is-blockchain-technology-impacting-the-automotive-industry-728875a7c940
+	* Lack of trust in Supply chain
+	* Lack of trust in Land records management
+	* Financial Services
+	* Health care
+	* Deep Learning
+
+- Terminology:
+	* The data store that keeps all blockchain data is called a ledger. 
+	* Each entry in the ledger is called a transaction. 
+	* The transactions are timestamped and stored in groups of blocks.
+	* The ledger is replicated and maintained by multiple hosts or peers or nodes
+	* This is why its called DLT or Distributed Ledger Technology.
+
+- Technology Pre-requisite:
+	* cryptography concepts
+	* hash functions
+		* HASH(X) = Y (one to one mapping )
+		* X can be arbitrary, Y is fixed
+		* X can't be calculated from Y (one way conversion)
+		* SHA 256 produces a 256 bit (32 byte) hash value. How many possible hash values are there? 2 ^ 256
+		* Assume the following hash function, HASH(x) = sum(to_ascii(x)) % 1024 Which of the following properties does this hash function lack?
+			- Each input has unique hash value
+	
+	* Public Key Cryptography		
+		- If a person possesses a private key, the person can't generate the corresponding public key using a key-pair generator.
+		- Any key can lock or encrypt the data. To unlock or decrypt we need the other key. The only way to decrypt and make the data readable is by having the corresponding key
+		- Public key cryptography is a cryptographic system used for the encryption/decryption of data. It is not one way like a hash function, meaning that the data, once encrypted, can be decrypted if you have the required key.
+
+	* Secure Communication using Public Key Cryptography	
+		- message can be encrypted using either [public/private] key and can be decrypted using either [private/public] key. It is always better to encrypt using recipient public key, so that receipient can decrypt it using his/her private key.
+
+		- enc_bob_pub( enc_alice_pvt( HASH( msg ) ) + msg )
+
+		- A chain of trust is established between a Root CA and a set of Intermediate CAs as long as the issuing CA for the certificate of each of these Intermediate CAs is either the Root CA itself or has a chain of trust to the Root CA.
+
+- Blockchain data storage
+	* A timestamped log of transactions that is replicated on multiple peers.
+	* Suppose a user tries to add a block containing an incorrect prevHash value. What will happen? The block will be rejected by multiple peers and hence will not be made part of the blockchain
+	* THe hash will calculated out of all values in the block (previous hash, block no, data)
+	* block contains transaction
+	* Since multiple peers are adding transactions/blocks simultaneously, the consensus protocol along with the ledger implementation ensures “validity” and ordering of transactions in blocks forming the blockchain
+
+Understanding the value of blockchain (Bitcoin example):
+	* Each new block in bitcoin has “newly generated coins” awarded to, the person mining the new block.
+	* Each block in bitcoin has varied number of transactions
+	* Mining peers continuously receive new transactions submitted on the chain. In order for a transaction to be confirmed, it should be put in a block, that needs to be created.
+	* Mining a bitcoin essentially is: Finding the right value of nonce that satisfies the block hash to have set number of leading zeros
+	* Let’s say you have a list of transactions that you are mining a block for. And you are required to find a value for nonce that creates blockhash with 3 leading zeros
+	* It’s nothing physical. It’s just a digital, immutable, trustable log of transfer transactions. But all these properties give it great utility and therefore value!
+	* Bitcoin provides instant value transfer facilities which is not found in traditional currencies
+
+Hyperledger Fabric - Concepts:
+	* 	

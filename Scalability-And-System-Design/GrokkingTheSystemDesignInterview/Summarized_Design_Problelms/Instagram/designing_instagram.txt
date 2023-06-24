@@ -1,0 +1,49 @@
+
+
+
+----------------- Designing Database --------------------
+
+Tables:
+	- Photo
+	- UserPhoto 
+	- UserFollow
+
+	All the metadata related to photos can go to a table where the ‘key’ would be the ‘PhotoID’ and the ‘value’ would be an object containing PhotoLocation, UserLocation, CreationTimestamp, etc.
+
+	For the ‘UserPhoto’ table, the ‘key’ would be ‘UserID’, and the ‘value’ would be the list of ‘PhotoIDs’ the user owns, stored in different columns. We will have a similar scheme for the ‘UserFollow’ table.
+
+database NoSQL / Relational:
+	Cassandra or key-value stores, in general, always maintain a certain number of replicas to offer reliability. Also, in such data stores, deletes don’t get applied instantly; data is retained for certain days (to support undeleting) before getting removed from the system permanently.
+
+	We need to have two instances of Relational DB (MySQL) running with data replication
+
+Data size:
+	For a 500M users the total data size can be 3.7TB
+		User:32GB, Photo:1.88TB, UserFollow:1.82
+
+Component Design:
+	we can split reads and writes into separate services. We will have dedicated servers for reads and different servers for writes to ensure that uploads don’t hog the system
+
+Reliability and Redundancy:
+	- multiple load balance of (Image + Image Metadata) Service 	
+	- multiple Multiple Image storage with replication
+	- multiple database instance with replication
+		DB postgres replication (check comtech) ?
+
+Data Sharding:
+	- partition based on UserID or PhotoID ? 
+	- Partitioning based on PhotoID will resolve issues like 
+		- non-uniform distribution
+	
+	- PhotoID key can be generated using another DB Table or Keygen service
+	- How can we plan for the future growth of our system?
+		- https://hazelcast.com/glossary/sharding/#:~:text=Sharding%20and%20partitioning%20are%20both,within%20a%20single%20database%20instance.
+		- Since each database server can have multiple database instances running on it, we can have separate databases for each logical partition on any server. So whenever we feel that a particular database server has a lot of data, we can migrate some logical partitions from it to another server. We can maintain a config file (or a separate database) that can map our logical partitions to database servers
+		- We can call a DB table to get the database server for a partition key, where that partion was housed. So we can move parition to different database server.
+		
+
+Cache and Load balancing:
+	- 80-20 rule for cacheing certain photos
+	- Geographically distributed photo cache servers and use CDNs
+	- We can use Memcache to cache the data. Application servers before hitting the database can quickly check if the cache has desired rows
+		- Least Recently Used (LRU) can be a reasonable		

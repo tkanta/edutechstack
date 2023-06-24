@@ -1,0 +1,17 @@
+
+============================================ Big-O Notation ============================================================
+Simple for loop:
+	T(n) = (2n+2)+cn
+Nested For-loop With Index Modification:(i+2)
+	2, 3, 4, 5, 6
+	n(n+1)/2 - 1 
+	O(n2)
+
+Nested For-loop With Index Modification:(i*2)
+	2,4,6,8,10
+	2n-3 
+	O(n)
+
+
+
+

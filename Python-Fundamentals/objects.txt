@@ -1,0 +1,10 @@
+
+
+same value objects (string, number, boolean) -> Java, Python
+------------------------------------------------------------
+
+Unless we create new objects, same value assigned to different variable pass the same object test
+
+	num2 = 10
+	num3 = 10
+	num2 is num3 -> True

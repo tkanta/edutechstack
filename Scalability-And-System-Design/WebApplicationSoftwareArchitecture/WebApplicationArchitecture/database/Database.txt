@@ -1,0 +1,176 @@
+
+
+Types of Data:
+
+	- Structured
+		* An example of this type of data is the details of a customer stored in a database row
+
+	- Unstructured 
+		* IoT devices, social networks, web portals, industry sensors, etc., into the analytics system
+
+	- Semi-structured 	
+		* This data is often stored in data transport formats such as XML, JSON and handled as per the business requirements.
+
+	- User state
+		* The user typically browses through several product categories, sorts the products based on different parameters, clicks on recommended products, adds a few of them to the wishlist and the availability notification list, and so on.
+
+Relational DB:
+	- Relational
+	- Data Consistency
+	- ACID Transaction
+
+When to pick a Relational DB:
+	- You should pick a relational database if you need strong consistency, transactions, or relationships. Typical examples of apps needing strong consistency are stock trading, personal banking, etc., and relational data is common in apps like Facebook, LinkedIn, etc	
+
+Facebook Database:
+	- https://www.scaleyourapp.com/what-database-does-facebook-use-a-1000-feet-deep-dive/
+
+Pros NoSQL :
+	- Scalability
+	- Ability to run on cluster	
+	- Flexibility on Table design (without normalization, joins, relationship)
+
+Cons NoSQL :
+	- Data Inconsistency
+	- No support for ACID transaction
+		* Note: ACID transactions in distributed systems come with terms and conditions applied. 
+
+When to pick NoSQL ?
+	- Handling large no of read and write.
+	- Flexible data modelling
+	- Eventual consistency
+	- Running data analytics
+	- It’s hard to scale relational databases dynamically due to their design. Scaling a relational database is not a trivial process. On the contrary, NoSQL databases are designed to scale on the fly without any human intervention.
+	- Modern applications have a distributed backend, and NoSQL databases can easily run in a distributed environment, unlike relational databases.
+	- When we are writing an application expected to handle a large number of read-write operations and concurrent users. It’s alright if the data is eventually consistent, but the system should have the ability to scale fast.
+
+
+Realworld case studies ?
+	- (QUORA) https://www.quora.com/Why-does-Quora-use-MySQL-as-the-data-store-instead-of-NoSQLs-such-as-Cassandra-MongoDB-or-CouchDB-Are-they-doing-any-JOINs-over-MySQL-Are-there-plans-to-switch-to-another-DB
+
+
+Polyglot persistency:
+	- Relational Database
+		* MySQL
+		* Neo4J
+	- Key-Value
+		* Redis
+		* Memcache
+    - Wide column database
+    	* Cassandra
+    	* Hbase
+    - Document
+    	* Elasticsearch
+    	* Mongodb
+
+
+Multi-Model Databases:
+	- Some of the popular multi-model databases are ArangoDB, CosmosDB, OrientDB, Couchbase, etc    		
+
+CAP Theorem:
+	- https://stackoverflow.com/questions/12346326/cap-theorem-availability-and-partition-tolerance
+	- https://codahale.com/you-cant-sacrifice-partition-tolerance/
+
+	* CAP stands for consistency, availability, partition tolerance
+	*  Most of them state that amongst the three, consistency, availability, and partition tolerance, we can only pick two
+	* the design of the distributed systems (CAP theorem) forces us to choose one. We can’t have both availability and consistency at the same time
+	* Partition tolerance means that the cluster continues to function even if there is a "partition" (communication break) between two nodes (both nodes are up, but can't communicate).
+		All the combinations available are:
+
+		CA - data is consistent between all nodes - as long as all nodes are online - and you can read/write from any node and be sure that the data is the same, but if you ever develop a partition between nodes, the data will be out of sync (and won't re-sync once the partition is resolved).
+		CP - data is consistent between all nodes, and maintains partition tolerance (preventing data desync) by becoming unavailable when a node goes down.
+		AP - nodes remain online even if they can't communicate with each other and will resync data once the partition is resolved, but you aren't guaranteed that all nodes will have the same data (either during or after the partition)
+
+		You should note that CA systems don't practically exist (even if some systems claim to be so).
+
+Polyglot persistence:
+	- Polyglot persistence means using several different persistence technologies to fulfil different persistence requirements in an application.
+	- Multi-model databases reduce the operational complexity of using several different database models in an application by supporting multiple data models via a single API.
+
+Types of databases:
+-------------------
+	
+	Document-oriented database
+		- Some of the popular document-oriented stores used in the industry are MongoDB, CouchDB, OrientDB, Google Cloud Datastore, and Amazon DocumentDB.
+		- https://www.mongodb.com/blog/post/sega-hardlight-migrates-to-mongodb-atlas-simplify-ops-improve-experience-mobile-gamers
+		- https://blog.coinbase.com/scaling-connections-with-ruby-and-mongodb-99204dbf8857
+		- What are the use cases for a document-oriented database? Which of the following option(s) are correct?
+			* Web-based multiplayer games
+			* Product catalogues
+			* Real-time feeds
+
+	Key-value datastore
+		- Some of the popular key-value data stores used in the industry are Redis, Hazelcast, Riak, Voldemort, and Memcached.
+		- https://cloud.google.com/appengine/docs/standard/python/memcache/
+
+	
+	Relational database
+		- Postgresql
+		- Mysql
+
+	Graph database
+		- Graph databases are faster because the relationships in them are not calculated at query time, as it happens with the help of joins in the relational databases. Rather, the relationships here are persisted in the datastore in the form of edges, and we just have to fetch them; no need to run any sort of computation at the query time.
+		- A popular graph database used in the industry is Neo4J.
+		- https://neo4j.com/blog/david-meza-chief-knowledge-architect-nasa/
+		- https://neo4j.com/blog/walmart-neo4j-competitive-advantage/
+			
+
+	Time-series database
+		- Some of the popular time-series databases used in the industry are Influx DB, Timescale DB, Prometheus, etc
+		- https://www.influxdata.com/customer/ibm/
+		- https://www.influxdata.com/customer/customer_case_study_spiio/
+
+
+	Wide-column database
+		- Also known as column-oriented databases, wide-column databases store data in a record with a dynamic number of columns. A record can hold billions of columns.Its architecture uses (a) persistent, sparse matrix, multi-dimensional mapping (row-value, column-value, and timestamp) in a tabular format meant for massive scalability (over and above the petabyte scale).
+		
+		- In Cassandra, each row (addressed by a key) contains one or more "columns". Columns are themselves key-value pairs. The column names need not be predefined, i.e. the structure isn't fixed. Columns in a row are stored in sorted order according to their keys (names).The first part of the key is used to distribute the data across servers, the second part of the key lets you quickly find the data on the target server. If your partitioning key is (id) and your clustering key is (country, timestamp), the data will be stored like this:
+			
+			Normal column family:
+				row
+				    col  col  col ...
+				    val  val  val ...
+
+			Sample:  (All rows for a key is stored in same place)  
+				[Key 1]
+					1:JP,2020-11-01,"b..." | 1:US,2020-09-01,"c..." | 1:US,2020-10-01,"a..."
+				[Key2]
+					2:CA,2019-10-01,"e..." | 2:CA,2020-10-01,"d..." | 2:CA,2020-11-01,"f..."
+				[Key3]
+					3:GB,2020-09-01,"g..." | 3:GB,2020-09-02,"h..."
+
+				Customer ID    Attribute    Value
+				-----------    ---------    ---------------
+				     100001    name         John Smith
+				     100001    address 1    10 Victory Lane
+				     100001    address 3    Pittsburgh, PA  15120
+
+		- There is a further level of structure (not so commonly used) called super-columns, where a column contains nested (sub)columns.
+			Super column family:
+				row
+				      supercol                      supercol                     ...
+				          (sub)col  (sub)col  ...       (sub)col  (sub)col  ...
+				           val       val      ...        val       val      ...
+			Sample:
+				Customer ID: 100001
+				Attribute    Value
+				---------    --------------
+				fav color    blue
+				fav shirt    golf shirt	
+
+		- Some of the popular wide-column databases are Cassandra, HBase, Google BigTable, ScyllaDB, etc.
+		- https://hbase.apache.org/poweredbyhbase.html
+		- https://netflixtechblog.com/aegisthus-a-bulk-data-pipeline-out-of-cassandra-984882557fa
+		- https://blog.logrocket.com/nosql-wide-column-stores-demystified/ ****
+		- https://www.dataversity.net/wide-column-database/# ****
+		- https://stackoverflow.com/questions/62010368/what-exactly-is-a-wide-column-store *******
+
+	Document vs wide-column:
+		- https://stackoverflow.com/questions/7565012/how-does-column-oriented-nosql-differ-from-document-oriented
+
+		- The main difference is that document stores (e.g. MongoDB and CouchDB) allow arbitrarily complex documents, i.e. subdocuments within subdocuments, lists with documents, etc. whereas column stores (e.g. Cassandra and HBase) only allow a fixed format, e.g. strict one-level or two-level dictionaries.
+
+		- It's a trade-off between different features, with a column oriented design the storage engine can be much more efficient than a document oriented storage engine can be. MongoDB has to rewrite the whole document on disk if it grows bigger, but Cassandra doesn't have to (this is a simplification, of course, there are lots of details to this). This makes Cassandra much faster when it comes to writing. 
+
+	Databases dedicated to mobile apps and so on.	
+

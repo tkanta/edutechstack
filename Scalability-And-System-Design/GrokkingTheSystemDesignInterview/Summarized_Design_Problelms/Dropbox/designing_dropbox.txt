@@ -1,0 +1,14 @@
+
+
+------------ Capacity Estimation ---------------------
+
+100,000,000,000 - 100B
+10,000,000,000,000 - 10 PB
+
+
+ACID:
+- How to include ACID properties for NoSQL database
+
+Cacheing:
+	- https://en.wikipedia.org/wiki/Memcached
+

@@ -1,0 +1,68 @@
+
+================= Data driven system: (data stream processing) ==================
+
+- IOT devices in smart cities, Drones, Smart watches, Cell phone
+- Time-series database is one tech I discussed that persists and runs queries on real-time data being ingested from the IoT devices.
+
+
+=================== Data Ingestion ===============================
+
+There are several stages/layers to this whole data processing setup, such as the:
+
+Data collection/Preparation layer
+Data query layer
+Data processing layer
+Data Analytics layer
+Data visualization layer
+	- Kibana is one good example of a data visualization tool widely used in the industry. (https://www.elastic.co/kibana/)
+Data storage layer
+Data security layer
+
+================== Different Ways of Ingesting Data ====================
+
+- You’ll learn more about this when we go through the Lambda and the Kappa architectures of data processing
+- LInkedin (https://engineering.linkedin.com/data-ingestion/gobblin-big-data-ease)
+
+
+================= Data Ingestion Use Cases ================================
+
+- Moving Big Data into Hadoop:
+
+- Streaming data from databases to Elasticsearch server	
+	* All the data intended to show up in the search was replicated from the main storage to the Elasticsearch storage
+
+- Log processing (ELK stack)	
+	* All the logs are ingested to a central server to run analytics with the help of solutions like the ELK (Elastic Logstash Kibana) stack, etc.
+
+- Stream processing engines for real-time events: (Kafka, Apache Storm)
+	* Message queues like Kafka and stream computation frameworks like Apache Storm, Apache Nifi, Apache Spark, Samza, Kinesis, etc., are used to implement the real-time large-scale data processing features in online applications	
+	* https://netflixtechblog.com/keystone-real-time-stream-processing-platform-a3ee651812a
+
+- Netflix realtime proccessing:
+	https://netflixtechblog.com/keystone-real-time-stream-processing-platform-a3ee651812a
+	
+================== Data Pipe Lines ==========================================
+
+Summary: 
+	- Realtime distributed data processing using pipeline
+	- Static ETL data processing using batch
+
+- The ETL flow is the same as the data ingestion flow. The difference is just that the entire movement of data is done in batches as opposed to streaming it through the data pipelines in real-time
+
+- Lambda and Kappa architectures of distributed data processing in the upcoming lessons.
+
+- few popular data processing tools, such as Apache Flink, Storm, Spark, Kafka, etc. All these tools have one thing in common they facilitate processing data in a cluster in a distributed environment via data pipelines
+
+================= Distributed data processing ===========================
+
+summary:
+	 Hadoop is preferred for batch data processing, whereas Spark, Kafka, and Storm are the right pick for processing real-time streaming data	
+
+Apache kafka:
+	* Apache Kafka is an open-source distributed stream processing and messaging platform
+
+Apache Storm:
+	* Apache Storm is a distributed stream processing framework
+
+Apache Spark:
+	* Apache Spark is an open-source cluster computing framework. It provides high performance for both batch and real-time in-stream processing		

@@ -1,0 +1,31 @@
+
+
+=========================== Dynamo: Introduction ====================================
+
+- Distributed and Decentralized key-value store
+
+- Dynamo is a highly available key-value store developed by Amazon for their internal use. Many Amazon services, such as shopping cart, bestseller lists, sales rank, product catalog, etc., need only primary-key access to data. A multi-table relational database system would be an overkill for such services and would also limit scalability and availability. Dynamo provides a flexible design to let applications choose their desired level of availability and consistency.
+
+- Dynamo falls within the category of AP systems (i.e., available and partition tolerant)
+
+- The Dynamo design was highly influential as it inspired many NoSQL databases, like Cassandra, Riak, and Voldemort – not to mention Amazon’s own DynamoDB.
+
+- In CAP theorem terms, Dynamo falls within the category of AP systems (i.e., available and partition tolerant) and is designed for high availability and partition tolerance at the expense of strong consistency
+
+- Design goals
+	* Highly available
+	* Highly scalable
+	* Decentralized
+	* Eventual Consistent to achieve high availability
+
+Features:
+	- Data distribution (Consistent hashing)
+	- Data replication (eventual consistent)
+	- Handling temporary failures (sloppy quorum)
+	- Inter node communication (gossip protocol)
+	- High availability (using hinted handoff)
+	- Conflict resolution and handling permanent failures 
+		* vector clock to keep track value history and reconcile divergent histories
+		* Merkel tree to handle permanent failure
+
+		

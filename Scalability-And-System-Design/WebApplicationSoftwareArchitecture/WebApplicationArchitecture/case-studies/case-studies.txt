@@ -1,0 +1,62 @@
+
+
+======================= Google Map Service ========================
+
+Architecture:
+	Naturally, to set up a service like this, we will pick a client-server architecture as we need control over the service. Otherwise, we could have thought about the P2P architecture, but it won’t do us any good here
+
+Monolith vs microservice:
+	We need microservices to implement so many different functionalities. Let’s write a separate service for every feature. This is a cleaner approach and it will help the service scale and stay highly available. Even if a few services like real-time traffic, elevation API, etc., go down, the core search remains unaffected. For the third-party developers, Google offers different APIs such as the Direction API, Distance Matrix, Geocoding, Places, Roads, Elevation, Time zone, and Custom search API.
+
+Read / Wite:
+	 An application like this is read-heavy, not write-heavy.
+
+Data Type: Spatial
+	Spatial data is the data with objects representing geometric information like points, lines, polygons. The data also contains alphanumeric information, like Geohash, latitudes, longitudes, GIS (Geographical Information System) data, etc
+
+Database Preference:
+	Pick a non-relational NoSQL one because the map data doesn’t contain many relationships. It directly fetches the coordinates and processes them based on the user request. Also, a NoSQL database is inherently horizontally scalable. A NoSQL graph database would fit best as a database for this application.
+
+Backend:
+	Java is prefered, because it is performant and heavily used for writing scalable distributed systems and enterprise development		
+
+UI Interface:
+	- OpenLayers is a popular open-source UI library for making maps work with web browsers. You can leverage it if you do not want to write everything from the ground up
+	- 	Speaking of the UI, we can write this using JavaScript, Html5. Vanilla JavaScript serves well for simple requirements. However, if you want to leverage a framework, you can look into React, Angular, Vue, etc
+
+
+Real-time features Analysis:
+	https://scaleyourapp.com/how-hotstar-scaled-with-10-3-million-concurrent-users-an-architectural-insight/	
+
+
+===================== A Baseball Game Ticket Booking Web Portal ============================= 	
+
+ Database:
+ 	Implementing an online payment system makes transactions and strong consistency vital. The database needs to be ACID compliant. This makes a relational database like MySQL an obvious pick for us.
+
+ Handling Concurrency:
+ 	- Message Queue : Concurrent ticket request can be queued and using FIFO 
+ 	- DB caching and lock : DB Transaction Isolation locking mechanism can be used for ticket booking and caching can be used for mere information browsing
+ 	- In case you've selected the seats & have proceeded to the next page, the seats are blocked to prevent another user from opting for the same seats. 
+ 		
+ Backend Tech:
+ 	Speaking of the backend technology, we can pick from Java, Scala, Python, Go, etc. To send notifications to the users, we can pick a message queue like RabbitMQ or Kafka.		
+
+ UI:
+ 	- We can either design the responsive behavior from the ground up using CSS3 or leverage a popular open-source responsive framework like Bootstrap JS
+ 	- If you are fond of JavaScript frameworks, you can use React, Angular, Vue, etc. These frameworks are pretty popular in the industry, and businesses prefer to use them to standardize the behavior and the implementation of their applications.	
+
+ Database Isolation:
+ 	* https://en.wikipedia.org/wiki/Isolation_ (database_systems)
+ 	* https://en.wikipedia.org/wiki/Snapshot_isolation
+ 	
+ 	* Write skew  -> It is a phenomenon where two writes are allowed to the same column(s) in a table by two different writers (who have previously read the columns they are updating), resulting in the column having data that is a mix of the two transactions
+
+ 	* snapshot isolation -> It is a guarantee that all reads made in a transaction will see a consistent snapshot of the database (in practice it reads the last committed values that existed at the time it started), and the transaction itself will successfully commit only if no updates it has made conflict with any concurrent updates made since that snapshot.	
+
+ 	* Multiversion concurrency control (MCC or MVCC), is a concurrency control method commonly used by database management systems to provide concurrent access to the database and in programming languages to implement transactional memory.[1]
+
+ Spring Transaction ans Isolation:
+ 	* https://stackoverflow.com/questions/8490852/spring-transactional-isolation-propagation
+ 	* https://habr.com/en/post/513644/
+ 	* https://blog.mimacom.com/testing-optimistic-locking-handling-spring-boot-jpa/ (optimistic locking)	

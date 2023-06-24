@@ -1,0 +1,178 @@
+
+
+-------------- Web Application Software Architecture -------------
+
+Best Javascript Guide:
+	- https://javascript.info/ *****
+
+Http/2 Guide:
+	- https://web.dev/performance-http2/
+
+web architecture:
+------------------
+	N-Tier application : 
+		* Single responsibility
+		* Separation of concern
+
+	Layers and Tiers
+		* The difference between layers and tiers is that layers represent the conceptual organization of the code and its components, whereas, tiers represent the physical separation of components
+		* A tier is the logical separation of components in an application or a service. The components are the database, backend application server, user interface, messaging, and caching. When we need control over the code and the behavior of our application.	
+
+	Architecture:
+		* Client - Server
+		* Peer to Peer	
+
+
+	HTTP Push based Technology:
+		* websocket:
+			- https://www.html5rocks.com/en/tutorials/websockets/basics/
+			- https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API
+			- https://javascript.info/websocket **** (sample)
+			usecase:
+				- WebSocket is especially great for services that require continuous data exchange, e.g. online games, real-time trading systems and so on.
+			pros:
+				- client server can interchange messages with binary/text data
+			cons:
+				- The user has to write auto reconnect functionality it connection breaks with server
+				- client and server uses web socket protocol over TCP
+			
+
+		* Ajax Long polling:
+			- https://javascript.info/long-polling ****
+			usecase:
+				- Long polling works great in situations when messages are rare.If messages come very often, then the chart of requesting-receiving messages, painted above, becomes saw-like.Every message is a separate request, supplied with headers, authentication overhead, and so on. So, in this case, another method is preferred, such as Websocket or Server Sent Events.
+			pros:
+				- If the connection is lost, because of, say, a network error, the browser immediately sends a new request.
+			cons:
+				- The server architecture must be able to work with many pending connections. Servers written using Node.js usually don’t have such connections problems.
+
+		* HTML5 Event-Source API and Server-Sent Events (SSE)
+			- https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events
+			- https://developer.mozilla.org/en-US/docs/Web/API/EventSource
+			- https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events (sample client-server)
+			- https://javascript.info/server-sent-events ****
+			usecase:
+				- We need to receive a stream of data from server: maybe chat messages or market prices, or whatever
+			pros:
+				- Client automaticaly reconnect with server if connection breaks
+				- uses simpl http protocol
+				- Http/2 is prefered for connection limitation
+			cons:
+				- The server can only send messages to the client, not viceversa
+				- Connection is limitted to 6 per browser.
+				- A server can send a comment periodically to keep the connection alive.
+				
+
+		* Streaming over HTTP
+			- https://developer.mozilla.org/en-US/docs/Web/API/Streams_API/Concepts
+		
+		* Why does every browser request have a TTL Time To Live?			
+			- Because open connections between the client and the server are resource intensive and there is a limit to the number of open connections a server can manage.
+			- https://www.techtarget.com/searchnetworking/definition/time-to-live#:~:text=Time%2Dto%2Dlive%20(TTL)%20is%20a%20value%20for,or%20network%20before%20being%20discarded.
+			- TTL means different things for (DNS record caching, HTTP response cache, HTTP request)
+		
+		* Why Persistent connection needed ?
+			- client and server communication frequency is very high.
+			- When we need to reduce the number of client requests hitting the server every now and then, checking for new information.
+			- When we are certain that the response time of the server will be more than the TTL set by the browser.
+		
+		* Which technique suits best for implementing a browser-based multiplayer game?
+			- Websockets
+	
+	Client and server side rendering:			
+		* Client side is suitable for dynamic content and server side should be for static content
+
+
+Scalability:
+-------------
+	Eagleview: 
+		- The application’s performance is directly proportional to scalability.
+
+	- Latency:
+		* Network latency
+		* Application latency
+
+    - primary bottle necks for Scalability
+    	* Single Database
+    	* Application not using asynchronous module whenever required
+    	* Not using Caching
+    	* Inefficient configuration and setup of load balancer
+    	* Adding business logic to the database
+    	* Not picking right database
+
+    - DENTTAL (Documentation, Exception Handling, Null pointers, Time complexity, Test coverage, Analysis of code complexity, Logging)	 
+
+    Performance Analysis Tools (profiling):
+    	- https://en.wikipedia.org/wiki/List_of_performance_analysis_tools
+    	- Java : JConsole, VisualVM, inspectIT
+    	- https://www.inspectit.rocks/
+    	- https://en.wikipedia.org/wiki/JConsole *****
+    		- https://docs.oracle.com/javase/8/docs/technotes/guides/management/preface.html
+    		- https://docs.oracle.com/javase/8/docs/technotes/guides/management/toc.html
+    		- https://docs.oracle.com/javase/8/docs/technotes/guides/management/jconsole.html
+    	- https://en.wikipedia.org/wiki/VisualVM	
+
+    Performance Test Tools:
+    	- JMeter
+    	- Parameters to check
+    		* CPU usage
+    		* Memory usage
+    		* Network bandwidth consumption
+    		* Throughput
+    		* Latency
+    		* End-User experience when the system is under heavy load
+
+    Scalability 
+    	Well, the application’s performance is directly proportional to scalability. If an application is not performant, it will certainly not scale well.	
+    		- profiling
+			- caching
+			- CDN
+			- Data comppression
+			- Clubbing request/response 
+			- Test scalability
+
+	OPtimized Architecture (how-polyhaven-manages-5-million-page-views)
+    	* https://www.scaleyourapp.com/application-hosting-how-polyhaven-manages-5-million-page-views-and-80tb-traffic-a-month-for-400/ *****
+    	* https://www.cloudflare.com/ ( Storage )
+    	* https://vercel.com/ ( front end server )
+    		- Developers love Next.js, the open source React framework Vercel built together with Google and Facebook
+    	* https://www.vultr.com/products/cloud-compute/ (Cloud Compute)
+    	* https://cloud.google.com/firestore (document database)
+
+    handling global event usecase:
+    		- https://engineering.fb.com/2018/02/12/production-engineering/how-production-engineers-support-global-events-on-facebook/
+    		- https://www.scaleyourapp.com/how-hotstar-scaled-with-10-3-million-concurrent-users-an-architectural-insight/	
+
+    Grafana/Prometheus/cAdvisor:
+    	- tracking the system profile via web-based dashboards
+    	- https://www.scaleyourapp.com/what-is-grafana-why-use-it-everything-you-should-know-about-it/	
+
+
+High Availability:
+-------------------
+	 - Should have micro service architecture ( instant messaging, groups, photo upload etc.)   	
+	 - redundancy (active/passive HA) 
+	 		- redis master/slave instances
+	 		- DB master/slace instances
+	 		- few are active and others are standby
+	 - replication (active-active HA)
+	 		- Multiple nodes are active and load balanced request between them
+	 		- all are active
+	 - High Availability clustering
+	 		- kubernates container instances 
+	 		- A single state across all the nodes in a cluster is achieved with the help of a shared distributed memory and a distributed coordination service like the Zookeeper 		
+	 		
+Load Balancing:
+-----------------
+	- Load balancer distributes traffic accross any application component like Application servers, DB Servers, Message Queue.
+	- It also keeps the list of active nodes using health checks of nodes
+	- DNS load balancing : DNS Resolver -> Root NameServer -> Top Level Domain name server -> Autoritative Name server
+	- Hardware and software load balancer
+	- software load balancer ( weighted RR , Least connection, random, hashing)
+	- Generally, a cluster orchestration service like Kubernetes is leveraged to bring back the machines that went offline automatically without any human intervention. Load balancers are not expected to manage the cluster infrastructure.
+	- Why is DNS load balancing implemented on the authoritative nameserver? Because the authoritative nameserver returns the IP addresses of a domain’s application servers. If we implement load balancing here, we can easily return different IP addresses of application servers on every client request.
+	- What is true about DNS load balancing? 
+		* In DNS load balancing due to IP caching there is always a possibility of a request being routed to an out of service machine.
+		* DNS load balancing is an easy and less expensive way of setting up load balancing on a service.
+
+

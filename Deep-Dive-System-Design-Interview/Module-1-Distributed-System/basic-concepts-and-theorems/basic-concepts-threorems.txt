@@ -1,0 +1,69 @@
+
+
+-------------------- partitioning --------------------------
+
+* One of the primary mechanisms of achieving scalability is partitioning.
+* 2 types of partitioning
+	- Vertical
+		** Vertical partitioning involves splitting a table into multiple tables with fewer columns and using additional tables to store columns that relate rows across tables. We commonly refer to this as a join operation. We can then store these different tables in different nodes. Normalization is one way to perform vertical partitioning. However, general vertical partitioning goes far beyond that: it splits a column, even when they are normalized.
+	- Horizontal (sharding)
+		** Horizontal partitioning involves splitting a table into multiple, smaller tables, where each table contains a percentage of the initial table’s rows. We can then store these different sub-tables in different nodes.In a horizontally partitioned system, we can usually avoid accessing data from multiple nodes because all the data for each row is located in the same node. However, we may still need to access data from multiple nodes for requests that are searching for a range of rows that belong to multiple nodes.Another important implication of horizontal partitioning is the potential for loss of transactional semantics.
+
+* Another important implication of horizontal partitioning is the potential for loss of transactional semantics.When we store data in a single machine, we can easily perform multiple operations in an atomic way, where either all or none of them succeed. However, this is much harder to achieve in a distributed system.		
+
+* Vertical partitioning is mainly a data modeling practice, which can be performed by the engineers designing a system—sometimes independently of the storage systems used. However, horizontal partitioning is a common feature of distributed databases. So, to use these systems properly, engineers need to know how the system works under the hood. Therefore, we will mostly focus on horizontal partitioning.
+
+----------- Algorithms for Horizontal Partitioning ------------
+
+* Different types of partitioning
+	- range 
+	- hash
+		Advantage:
+			* The ability to calculate the partitioning mapping at runtime with no need to store and maintain the mapping. This is beneficial both in terms of data storage needs and performance, as we don’t need any additional requests to find the mapping
+			* A greater chance that the hash function will uniformly distribute the data across our system’s nodes, and prevent some nodes from overloading
+		Disadvantage:
+			* The inability to perform range queries at all—even for the attribute we use as a partitioning key—without storing additional data or querying all the nodes
+			* Adding or removing nodes from the system causes it to re-partition. This results in significant data movement across all nodes of the system
+
+	- consistent hash
+			------ Adv ----------
+			* Consistent hashing is a partitioning technique that is very similar to hash partitioning, but solves the increased data movement problem caused by hash partitioning.
+			* Reduced data movement when nodes are added or removed in the system
+			--- disadvantage -------
+			* The potential for the data’s non-uniform distribution because of the random assignment of nodes in the ring
+			* The potential for more imbalanced data distribution as nodes are added or removed. E.g., a node’s dataset is not distributed evenly across the system when it is removed but is instead transferred to a single node
+
+			Logic:
+				- Randomly assigned a number to each node in the range [0, 360]
+				- Calculate the mod key % 360
+				- Assign the key to the node that is greater than the mod value
+
+* Consistent hashing
+	amazone Dynamo:
+		- G. DeCandia et al., “Dynamo: Amazon’s Highly Available Key-value Store,” in Proceedings of twenty-first ACM SIGOPS symposium on Operating systems principles, 2007.
+		- https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf
+		- https://dl.acm.org/doi/10.1145/1323293.1294281 **
+	Apache Cassandra:
+		- A. Lakshman and P. Malik, “Cassandra — A Decentralized Structured Storage System,” Operating Systems Review, 2010.
+		- https://www.cs.cornell.edu/projects/ladis2009/papers/lakshman-ladis2009.pdf	
+
+
+-------------------------------- Replication ------------------------------------------------------
+
+There are 2 types of replication:
+	- Pessimistic replication tries to guarantee from the beginning that all the replicas are identical to each other—as if there was only one copy of the data all along.
+	- Optimistic replication, or lazy replication, allows the different replicas to diverge. This guarantees that they will converge again if the system does not receive any updates, or enters a quiesced state, for a period of time.
+
+Single-Master Replication Algorithm:
+	* Synchronous replication -> In synchronous replication, the node replies to the client to indicate the update is complete—only after receiving acknowledgments from the other replicas that they’ve also performed the update on their local storage. 
+	* Asynchronous replication -> the node replies to the client as soon as it performs the update in its local storage, without waiting for responses from the other replicas.		
+	* Advantages of single-master replication
+		- It is simple to understand and implement
+		- Concurrent operations serialized in the leader node, remove the need for more complicated, distributed concurrency protocols. In general, this property also makes it easier to support transactional operations
+		- It is scalable for read-heavy workloads, because the capacity for reading requests can be increased by adding more read replicas
+		
+	* Disadvantages of single-master replication
+		- It is not very scalable for write-heavy workloads, because a single node (the leader)’s capacity determines the capacity for writes
+		- It imposes an obvious trade-off between performance, durability, and consistency
+		- Scaling the read capacity by adding more follower nodes can create a bottleneck in the network bandwidth of the leader node, if there’s a large number of followers listening for updates
+		- The process of failing over to a follower node when the leader node crashes, is not instant. This may create some downtime and also introduce the risk of errors	

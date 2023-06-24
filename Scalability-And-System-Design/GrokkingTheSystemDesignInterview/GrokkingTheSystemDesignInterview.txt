@@ -1,0 +1,33 @@
+
+------------------------------------------- GrokkingTheSystemDesignInterview --------------------------------------------
+
+
+============== Designing a shorting URL: =========
+base64:
+	- https://www.base64decode.org/dec/c3ViamVjdA/
+
+Hashing:
+	MD5 vs SHA-256:	
+		- https://en.wikipedia.org/wiki/MD5
+	consustent hashing:
+		- https://www.educative.io/courses/grokking-the-system-design-interview/B81vnyp0GpY	
+	Range vs Hashed:
+		
+Linked HashMap:
+	- https://docs.oracle.com/javase/7/docs/api/java/util/LinkedHashMap.html
+
+Cassandra:
+	- https://cassandra.apache.org/	
+
+
+================ Designing Pastebin: ===================	
+	
+	Capacity Estimation:
+		Base64 has 64 different chars, to create 6 digit unique chars from 64, there will be 64^6 number of chars possible (68.7 Billion)
+		Memory estimates: 80:20 rule is 20% paste generate 80% traffic
+		- Traffic
+		- Storage
+		- Bandwidth
+		- Memory
+
+============= Designing Instagram =======================		

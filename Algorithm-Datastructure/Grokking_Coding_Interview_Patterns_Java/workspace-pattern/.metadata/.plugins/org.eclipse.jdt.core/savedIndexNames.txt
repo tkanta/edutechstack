@@ -1,0 +1,4 @@
+INDEX VERSION 1.131+D:\TechnologyStack\Educative\Algorithm-Datastructure\Grokking_Coding_Interview_Patterns_Java\workspace-pattern\.metadata\.plugins\org.eclipse.jdt.core
+1458592468.index
+3524689192.index
+1501239824.index

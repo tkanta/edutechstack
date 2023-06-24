@@ -1,0 +1,33 @@
+
+
+Best Usage of Caching by PolyHaven:
+-----------------------------------
+
+https://scaleyourapp.com/application-hosting-how-polyhaven-manages-5-million-page-views-and-80tb-traffic-a-month-for-400/
+
+- The caching layer of the app is powered by Cloudflare
+	* https://www.cloudflare.com/
+
+- The cache layer is further optimized by a Cloudflare product Argo, this improves the cache hit ratio to 93%. 
+	* https://blog.cloudflare.com/argo/
+
+- All the 3D asset data is stored on Backblaze cloud storage. Empowered by a partnership of Cloudflare and Backblaze
+	* https://www.backblaze.com/
+
+- The images on the website that are thumbnails of the assets, renders, previews, etc., are stored using another CDN service Bunny.net. Besides providing hosting, the CDN service also dynamically resizes and compresses the images for the website costing 27 USD per month
+	* https://bunny.net/		
+
+- The site is built using Next.js powered by Vercel servers
+	* https://nextjs.org/
+
+- The 3D assets are stored on the cloud object storage and the website database that is Google Firestore (a serverless document database) stores info on the 3D assets, download logs and so on.
+- A separate API powered by Vultr compute connects the frontend to the database and gives them control over caching the database reads. 	
+
+
+Types of Caching Strategy:
+-------------------------
+
+* Cache Aside
+* Read-through
+* Wright-through
+* Write-back

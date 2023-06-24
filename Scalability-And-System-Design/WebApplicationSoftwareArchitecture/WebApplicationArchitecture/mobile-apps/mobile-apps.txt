@@ -1,0 +1,43 @@
+
+
+- mobile-only, mobile-first, mobile-friendly
+
+
+- Responsive weapp:
+	Popular framework for responsive website both for mobile,desktop,tab etc. are Skeleton, HTML5 Boilerplate, Less Framework, Bootstrapjs, jQuery Mobile
+
+
+- Native or Hybrid mobile app:
+	Native : Android , ios
+	Hybrid : Apache cordova, flutter, Iconic, React native
+	- hybrid app development pros and cons
+		* single code base for multiple platform (Android, ios, window)
+		* Performance degradation compare to native app. performance issues specifically during the app initialization, initial render time, app launch screen, navigating between different screens, and so on. They also experienced dropped frames
+		*  long-term maintenance costs of the React-Native codebase were high
+	- native app development is the practical approach and way to go forward
+
+
+- choosing between a native and hybrid app
+	* native app: 
+		- when you need heavy graphic and hardware requirements. need to release asap when OS released with new feature.
+	* hybrid app: 
+		- You just need to test the waters with a pre-alpha release or an MVP (Minimum viable product). You can quickly launch the MVP via a hybrid app and have separate codebases later.
+
+- Progressive web app
+	* Progressive web apps or PWAs are apps having the look and feel of native apps that can run in both mobile and desktop browsers
+	* sample websites:
+		- https://in.bookmyshow.com/pwa/tvod/static/stream-compatible-devices
+		- https://web.dev/bookmyshow/
+    * PWA are much smaller in size than its Android or ios counterpart
+    * It will always updated when opened, and don't need to install update like its counterpart android and ios
+    * Takes less time to load
+    * The “add to home screen” feature enables the app PWA to tag to mobiles screen to provide a native-app like experience.
+	
+
+- App store
+	* Yes, the app store supports PWA. You can publish your progressive web application on the iOS app store and wait for approval.
+	* windows app store also supports PWA		
+
+- mobile backend as a service	
+	* Besides the business logic and the user interface, an online service contains several other key features that collectively make the service functional and worthy of getting the user’s attention. These features are user authentication, integration with social networks, push-notifications, real-time database, caching, data storage, messaging, chat integration, integration of third-party tools, analytics, crash reporting etc., etc.
+
