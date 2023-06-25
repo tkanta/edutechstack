@@ -368,5 +368,44 @@ Creating a Zero-Downtime Deployment:
 			kubectl rollout history -f go-demo-2-api.yml
 
 
-Rolling Back or Rolling Forward?
-		* kubectl rollout undo -f go-demo-2-api.yml
+Rolling Back or Rolling Forward?:
+		* Rolling back a release that introduced database changes is often not possible. Even when it is, rolling forward is usually a better option when practicing continuous deployment with high-frequency releases limited to a small scope of changes.
+
+		* 'set image' for dynamic deployement and 'rollout undo' for rollback
+
+		Commands:
+			* kubectl set image -f go-demo-2-api.yml api=vfarcic/go-demo-2:3.0 --record
+			* kubectl rollout undo -f go-demo-2-api.yml
+			* kubectl rollout history -f go-demo-2-api.yml
+			* kubectl get all
+
+Playing around with the Deployment:
+		* we can rollout to any previous revision
+
+		commands:
+			kubectl set image -f go-demo-2-api.yml api=vfarcic/go-demo-2:3.0 --record
+			kubectl set image -f go-demo-2-api.yml api=vfarcic/go-demo-2:4.0 --record
+			kubectl rollout history -f go-demo-2-api.yml
+			kubectl rollout undo -f go-demo-2-api.yml --to-revision=2
+
+
+Rolling Back Failed Deployments:
+		*  Please make sure that at least 60 seconds have passed since you executed the kubectl set image command. If you’re wondering why we are waiting, the answer lies in the progressDeadlineSeconds field set in the go-demo-2-api Deployment definition. That’s how much the Deployment has to wait before it deduces that it cannot progress due to a failure to run a Pod
+
+		kubectl set image -f go-demo-2-api.yml api=vfarcic/go-demo-2:does-not-exist --record
+		echo $?
+		kubectl rollout undo -f go-demo-2-api.yml
+		kubectl rollout status -f go-demo-2-api.ym
+
+Merging Everything into the Same YAML Definition:
+		* deployment and services are merged
+
+Updating Multiple Objects:
+		* kubectl get deployments --show-labels
+		* kubectl get deployments -l type=db,vendor=MongoLabs
+		* kubectl set image deployments -l type=db,vendor=MongoLabs db=mongo:3.4 --record
+				- It will match all eployment with thoes labels and update the image	
+		* kubectl describe -f go-demo-2.yml
+				- verify the image version					
+
+Scaling Deployments:		
