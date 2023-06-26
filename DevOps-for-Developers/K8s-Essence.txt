@@ -15,6 +15,12 @@ Replicaset Guide:
 	
 ------------------- Commands: --------------------
 
+
+deployment details:
+	kubectl get -f go-demo-2.yml ( get details of deployment, service etc)
+	kubectl get deployments --show-labels
+	kubectl get deployments -l type=db,vendor=MongoLabs
+
 Run / Delete POD:
 	kubectl run db --image mongo
 	kubectl delete pod db
@@ -65,25 +71,39 @@ service:
 	    --name=go-demo-2-svc \
 	    --target-port=28017 \
 	    --type=NodePort
+
 	describe service:
 		kubectl describe svc/go-demo-2-svc
 		kubectl get svc go-demo-2-api -o yaml
 
-Pod Name:
-	* POD_NAME=$(kubectl get pod \
-    --no-headers \
-    -o=custom-columns=NAME:.metadata.name \
-    -l type=db,service=go-demo-2 \
-    | tail -1)	
+	service port forward:
+		kubectl port-forward service/go-demo-2-api 3000:8080 --address 0.0.0.0
+		curl -i "0.0.0.0:3000/demo/hello"
 
-Update image:
-	kubectl set image -f go-demo-2-db.yml db=mongo:3.4 --record (update image name db with new version)
+	sevice info:
+		kubectl get svc go-demo-2-api -o yaml	
+
+Get Pod Name:
+	POD_NAME=$(kubectl get pod --no-headers -o=custom-columns=NAME:.metadata.name -l type=db,service=go-demo-2 | tail -1)	
+
+Get IP/port:
+	IP=$(minikube ip)
+	PORT=$(kubectl get svc go-demo-2-api -o jsonpath="{.spec.ports[0].nodePort}")
+	curl -i "http://$IP:$PORT/demo/hello"
 
 rolling update:
 	kubectl create -f go-demo-2-api.yml --record
 	kubectl set image -f go-demo-2-api.yml api=vfarcic/go-demo-2:2.0
-	kubectl rollout status -w -f go-demo-2-api.yml
+	kubectl set image -f go-demo-2-db.yml db=mongo:3.4 --record (update image name db with new version)
+	kubectl set image deployments -l type=db,vendor=MongoLabs db=mongo:3.4 --record ( update multiple objects)
+	
+	kubectl rollout status deployment go-demo-2-api
 	kubectl rollout history -f go-demo-2-api.yml
+	kubectl rollout history deployment go-demo-2-api
+
+scale replica:	
+	kubectl scale deployment go-demo-2-api --replicas 8 --record
+
 
 endpoint:
 	kubectl get ep go-demo-2 -o yaml (describe endpoint)

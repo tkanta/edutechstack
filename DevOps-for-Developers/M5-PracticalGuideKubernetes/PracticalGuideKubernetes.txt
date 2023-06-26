@@ -409,3 +409,17 @@ Updating Multiple Objects:
 				- verify the image version					
 
 Scaling Deployments:		
+		* Similarly, we’ll use kubectl scale to change the number of replicas. Consider this an introduction to automation that is coming later on.
+			- kubectl scale deployment go-demo-2-api --replicas 8 --record
+			- kubectl scale deployment go-demo-2-api --replicas 5 --record
+
+		* we can scale up / down the replicas
+		* NUmber of deployements / replicasets match the number of replicas
+
+
+
+--------------------------------------------- Ingress -------------------------------------------------------
+
+Getting Started with Ingress:
+		* It seems that we already accomplished the external access to the applications through Kubernetes Services, they do not make the applications truly accessible. We still need forwarding rules based on paths and domains, SSL termination and a number of other features 
+		* In a more traditional setup, we’d probably use an external proxy and a load balancer. Ingress provides an API that allows us to accomplish these things, in addition to a few other features we expect from a dynamic cluster.
