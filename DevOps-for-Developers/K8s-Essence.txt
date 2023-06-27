@@ -115,7 +115,9 @@ port forwarding to service:
 
 ingress controller:
 	- kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/cloud/deploy.yaml (k3d)
-
+	- nohup kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 3000:80 --address 0.0.0.0  > /dev/null 2>&1 &
+	- kubectl get svc -n ingress-nginx
+	- kubectl get pods -n ingress-nginx
 
 Difference:
 	apply vs create:

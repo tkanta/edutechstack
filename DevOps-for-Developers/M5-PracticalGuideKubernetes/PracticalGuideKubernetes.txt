@@ -435,4 +435,26 @@ Enabling Ingress Controllers:
 				# Please wait for a few seconds before running the next command 
 				curl -i "0.0.0.0:3000/healthz"
 
-				
+Creating Ingress Resources Based on Paths:
+
+		* The list of general annotations and the Controllers that support them can be found in the Ingress Annotations page (https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/nginx-configuration/annotations.md). For those specific to the NGINX Ingress Controller (https://github.com/kubernetes/ingress-nginx/blob/main/README.md) , please visit the NGINX Annotations page, and for those specific to GCE Ingress, visit the ingress-gce page.				
+
+
+Sequential Breakdown of the Process:
+		* ingress flow Steps:
+				- The Kubernetes client (kubectl) sent a request to the API server requesting the creation of the Ingress resource defined in the go-demo-2.yml file.
+				- The ingress controller is watching the API server for new events. It detected that there is a new Ingress resource.
+				- The ingress controller configured the load balancer. In this case, it is nginx which modified nginx.conf with the values of all go-demo-2-api endpoints.
+				- The load balancer is running on each node (nginx, haproxy)
+
+		* sample full path of server /collection/v1/els . ingress will define (/collection). Any request having /collection will be forwarded to the server with full URI.
+
+		*  Rule rewrite :  We could, for example, create a rule that rewrites path base /devops-toolkit to /. someone sends a request to /devops-toolkit/something, Ingress would rewrite it to /something before sending it to the destination Service. We’d need to write rewrite rules instead. While such an action is often useful, we’ll ignore it for now. For now, / as the base path should do		
+
+		* for ingress controller pod and service will be created under perticular ingress namespace.
+		* Ingress resources can be fetched using kubectl get ingress
+		* Commands:
+				- nohup kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 3000:80 --address 0.0.0.0  > /dev/null 2>&1 &
+				- kubectl get svc -n ingress-nginx
+				- kubectl get pods -n ingress-nginx
+				- kubectl get ingress
