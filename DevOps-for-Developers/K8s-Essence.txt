@@ -109,8 +109,13 @@ endpoint:
 	kubectl get ep go-demo-2 -o yaml (describe endpoint)
 
 port forwarding to service:
-	kubectl port-forward service/go-demo-2-svc 3000:28017 --address 0.0.0.0	
-	nohup kubectl port-forward service/go-demo-2-api --address 0.0.0.0  3000:8080 > /dev/null 2>&1 &	    
+	- kubectl port-forward service/go-demo-2-svc 3000:28017 --address 0.0.0.0	
+	- nohup kubectl port-forward service/go-demo-2-api --address 0.0.0.0  3000:8080 > /dev/null 2>&1 &	    
+	- nohup kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 3000:80 --address 0.0.0.0 > /dev/null 2>&1 &
+
+ingress controller:
+	- kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/cloud/deploy.yaml (k3d)
+
 
 Difference:
 	apply vs create:

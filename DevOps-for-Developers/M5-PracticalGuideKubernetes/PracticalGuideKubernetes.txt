@@ -423,3 +423,16 @@ Scaling Deployments:
 Getting Started with Ingress:
 		* It seems that we already accomplished the external access to the applications through Kubernetes Services, they do not make the applications truly accessible. We still need forwarding rules based on paths and domains, SSL termination and a number of other features 
 		* In a more traditional setup, we’d probably use an external proxy and a load balancer. Ingress provides an API that allows us to accomplish these things, in addition to a few other features we expect from a dynamic cluster.
+
+
+Enabling Ingress Controllers:
+	  * Kubernetes itself does not have a ready-to-go solution for this. Unlike other types of Controllers that are typically part of the kube-controller-manager binary, Ingress Controller needs to be installed separately. Instead of a Controller, kube-controller-manager offers Ingress resource that other third-party solutions can utilize to provide requests forwarding and SSL features. In other words, Kubernetes only provides an API, and we need to set up a Controller that will use it.
+
+	  *  The ingress image is based on NGINX Ingress Controller. It is one of the only two currently supported and maintained by the Kubernetes community. The other one is GLBC that comes with Google Compute Engine (GCE) Kubernetes hosted solution.
+
+	  * By default, the Ingress Controller is configured with only two endpoints. If we’d like to check Controller’s health, we can send a request to /healthz.			nohup kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 3000:80 --address 0.0.0.0 > /dev/null 2>&1 &
+
+				# Please wait for a few seconds before running the next command 
+				curl -i "0.0.0.0:3000/healthz"
+
+				
