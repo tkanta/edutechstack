@@ -48,7 +48,8 @@ POD run / delete:
 	kubectl exec db --  pkill mongod
 	kubectl get pods
 	kubectl delete -f db.yml 
-	kubectl get pods	
+	kubectl get pods
+	kubectl run docker --image=docker:17.11  --restart=Never docker image ls	
 
 POD describe:
 	kubectl describe -f db.yml
@@ -98,6 +99,8 @@ rolling update:
 	kubectl set image deployments -l type=db,vendor=MongoLabs db=mongo:3.4 --record ( update multiple objects)
 	
 	kubectl rollout status deployment go-demo-2-api
+	kubectl rollout status deploy prometheus
+	
 	kubectl rollout history -f go-demo-2-api.yml
 	kubectl rollout history deployment go-demo-2-api
 
@@ -113,9 +116,26 @@ port forwarding to service:
 	- nohup kubectl port-forward service/go-demo-2-api --address 0.0.0.0  3000:8080 > /dev/null 2>&1 &	    
 	- nohup kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 3000:80 --address 0.0.0.0 > /dev/null 2>&1 &
 
-ingress controller:
-	- kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/cloud/deploy.yaml (k3d)
 
+ingress:
+	* kubectl get ing --all-namespaces
+	* The Ingress "default" label must consist of lower case alphanumeric characters or '-', start with an alphabetic character, and end with an alphanumeric character (e.g. 'my-name',  or 'abc-123', regex used for validation is '[a-z]([-a-z0-9]*[a-z0-9])?'
+
+ingress controller:
+	kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/cloud/deploy.yaml (k3d)
+
+
+formatting:
+	kubectl exec -it docker -- docker image ls --format "{{.Repository}}"
+
+Docker:
+	- docker system prune -f (The docker system prune command removes all unused resources. At least, all those created and unused by Docker)
+	- https://docs.docker.com/build/building/multi-stage/ 
+
+
+Running deployement from stdin:
+	cat volume/prometheus.yml | sed -e "s/192.168.99.100/$(minikube ip)/g" | kubectl create -f -  --record --save-config
+	* 📝 Please note that, this time, the create command has dash (-) instead of the path to the file. That’s an indication that stdin should be used instead.
 
 Difference:
 	apply vs create:

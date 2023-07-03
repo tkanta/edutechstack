@@ -435,4 +435,133 @@ Enabling Ingress Controllers:
 				# Please wait for a few seconds before running the next command 
 				curl -i "0.0.0.0:3000/healthz"
 
-				
+Creating Ingress Resources Based on Paths:
+		* annotations: The specification API defines only the fields that are mandatory for all Ingress Controllers. All the additional info an Ingress Controller needs is specified through annotations.
+			- We specified the annotation nginx.ingress.kubernetes.io/ssl-redirect: "false" which tells the Controller that we do NOT want to redirect all HTTP requests to HTTPS
+
+		* We specified a set of rules in the spec section. They are used to configure Ingress resources. For now, our rule is based on http with a single path and a backend. All the requests with the path starting with /demo will be forwarded to the service go-demo-2-api on the port 8080.	
+		* sample:
+				nohup kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 3000:80 --address 0.0.0.0 > /dev/null 2>&1 &
+				curl -i "http://0.0.0.0:3000/demo/hello"
+
+
+Sequential Breakdown of the Process:
+		* The Kubernetes client (kubectl) sent a request to the API server requesting the creation of the Ingress resource defined in the go-demo-2.yml file.
+		* The ingress controller is watching the API server for new events. It detected that there is a new Ingress resource.
+		* The ingress controller configured the load balancer. In this case, it is nginx which modified nginx.conf with the values of all go-demo-2-api endpoints.
+
+		* Sample Code:
+			nohup kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 3000:80 --address 0.0.0.0  > /dev/null 2>&1 &
+			#Now click on the link beside the run button 
+			#Next run the following command
+			curl "http://0.0.0.0:3000/demo/hello"						
+
+Creating Ingress Resources Based on Domains:
+		* We can also configure ingress resource using domain (host:)	
+		* Sample:
+				kubectl apply -f devops-toolkit-dom.yml --record
+				kubectl get svc -n ingress-nginx
+				nohup kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 3000:80 --address 0.0.0.0 > /dev/null 2>&1 &
+				curl -i "http://0.0.0.0:3000"
+				curl -I -H "Host: devopstoolkitseries.com" "http://0.0.0.0:3000"
+				curl -H "Host: acme.com" "http://0.0.0.0:3000/demo/hello"		
+
+		* Snaps :
+			root@3379b2971102d1f0:/usercode# kubectl get svc -n ingress-nginx
+			NAME                                 TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)                      AGE
+			ingress-nginx-controller-admission   ClusterIP      10.43.232.92    <none>        443/TCP                      8m3s
+			ingress-nginx-controller             LoadBalancer   10.43.104.145   172.19.0.3    80:30907/TCP,443:32502/TCP   8m3s
+			
+			root@3379b2971102d1f0:/usercode# kubectl get pods -n ingress-nginx
+			NAME                                        READY   STATUS      RESTARTS   AGE
+			svclb-ingress-nginx-controller-d4gdx        2/2     Running     0          8m47s
+			ingress-nginx-admission-create-24f42        0/1     Completed   0          8m47s
+			ingress-nginx-controller-55dcf56b68-vtll4   1/1     Running     0          8m47s			
+
+Creating an Ingress Resource with Default Backend:
+		* When an Ingress spec is without rules, it is considered a default backend. As such, it will forward all requests that do not match paths and/or domains set as rules in the other Ingress resources.
+
+		* when a two default ingress is created, one with functional and other with non-functional service endpoint than for each request only the default ingress with functional service will be selected.
+
+		* sample:
+					kubectl create -f default-backend.yml
+					nohup kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 3000:80 --address 0.0.0.0 > /dev/null 2>&1 &
+					curl -I -H "Host: acme.com" "http://0.0.0.0:3000"
+					k3d cluster delete mycluster --all
+
+
+Comparison with Docker Swarm:
+		* Kubernetes provides a well-defined Ingress API that third-party solutions can utilize to deliver a seamless experience. Behind this Ingress resource could be nginx, voyager, haproxy, or trafficserver Ingress Controller. All of them use the same Ingress API to deduce which Services should be used by forwarding algorithms
+
+		* Docker Swarm does not have anything resembling an Ingress API
+
+
+
+--------------------------------------------- Volumes -------------------------------------------------------		
+
+Getting Started with Volumes:
+	* There are over twenty-five Volume types supported by Kubernetes.
+	* many Volume types are specific to a hosting vendor. For example, awsElasticBlockStore works only with AWS, azureDisk and azureFile work only with Azure, and so on and so forth.
+
+
+Accessing Host’s Resources through hostPath Volumes:
+	* hostPath allows us to mount a file or a directory from a host to Pods and, through them, to containers
+	* Docker consists of two main pieces. There is a client, and there is a server. When we executed docker image ls, we invoked the client which tried to communicate with the server through its API. The problem is that Docker server is not running in that container. What we should do is tell the client (inside a container) to use Docker server that is already running on the host.By default, the client sends instructions to the server through the socket located in “/var/run/docker.sock”. We can accomplish our goal if we mount that file from the host into a container.
+			
+			* kubectl run docker --image=docker:17.11  --restart=Never docker image ls
+
+	* manifest sample:
+
+			spec:
+		    containers:
+		    - name: docker
+		      image: docker:17.11
+		      command: ["sleep"]
+		      args: ["100000"]
+		      volumeMounts:
+		      - mountPath: /var/run/docker.sock
+		        name: docker-socket
+		    volumes:
+		    - name: docker-socket
+		      hostPath:
+		        path: /var/run/docker.sock
+		      type: Socket	
+
+		   Getting Error: 
+		   
+		   	Warning  FailedMount  23s (x10 over 4m33s)  kubelet            MountVolume.SetUp failed for volume "docker-socket" : hostPath type check failed: /var/run/docker.sock is not a socket file
+  			Warning  FailedMount  16s (x2 over 2m30s)   kubelet            Unable to attach or mount volumes: unmounted volumes=[docker-socket], unattached volumes=[docker-socket kube-api-access-jjxpj]: timed out waiting for the condition  
+
+  * Types of hostpath:
+  		- The Directory type will mount a directory from the host. It must exist on the given path. If it doesn’t, we might switch to DirectoryOrCreate type which serves the same purpose. The difference is that DirectoryOrCreate will create the directory if it does not exist on the host.
+
+			- The File and FileOrCreate are similar to their Directory equivalents. The only difference is that this time we’d mount a file, instead of a directory.
+
+			- The other supported types are Socket, CharDevice, and BlockDevice. They should be self-explanatory. If you don’t know what character or block devices are, you probably don’t need those types.    
+
+Running the Pod after mounting hostPath:
+		* docker and many other images use alpine as the base
+		* If you’re not familiar with alpine, it is a very slim and efficient base image, and we strongly recommend that you use it when building your own.
+		* Images like debian, centos, ubuntu, redhat, and similar base images are often a terrible choice made because of a misunderstanding of how containers work.
+	  * Sample commands:
+
+	  	kubectl create -f hostpath-mounting.yaml
+			kubectl exec -it docker -- docker image ls --format "{{.Repository}}"
+			kubectl exec docker -it -- sh
+			apk add -U git
+			git clone https://github.com/Faizan-Zia/go-demo-2
+			cd go-demo-2
+			docker image build -t vfarcic/go-demo-2:beta .
+			docker image ls --format "{{.Repository}}"
+			docker system prune -f
+			docker image ls --format "{{.Repository}}"
+			exit
+			kubectl delete -f hostpath-mounting.yaml
+
+		* usecases:
+				- hostpath mounting can be used to build docker images across different nodes using pods, where artifact required to build image can be pulled into init pods and images will be created in nodes and once completed pods will be discarded.
+
+Using hostPath Volume Type to Inject Configuration Files:
+		* Prometheus needs a full external-url if we want to change the base path.
+		* Changing Prometheus configuration: 
+				We could, for example, enter the container, update the configuration file, and send the reload request to Prometheus. That would be a terrible solution since it would last only until the next time we update the application, or until the container fails, and Kubernetes decides to reschedule it.Let’s explore alternative solutions. We could, for example, use hostPath Volume for this as well. If we can guarantee that the correct configuration file is inside the cluster, the Pod could attach it to the prometheus container. Let’s try it out. The output of the prometheus-hostpath with relevant segments is shown below.
