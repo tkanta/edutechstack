@@ -135,7 +135,11 @@ Docker:
 
 Running deployement from stdin:
 	cat volume/prometheus.yml | sed -e "s/192.168.99.100/$(minikube ip)/g" | kubectl create -f -  --record --save-config
-	* 📝 Please note that, this time, the create command has dash (-) instead of the path to the file. That’s an indication that stdin should be used instead.
+	* Please note that, this time, the create command has dash (-) instead of the path to the file. That’s an indication that stdin should be used instead.
+	- kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/cloud/deploy.yaml (k3d)
+	- nohup kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 3000:80 --address 0.0.0.0  > /dev/null 2>&1 &
+	- kubectl get svc -n ingress-nginx
+	- kubectl get pods -n ingress-nginx
 
 Difference:
 	apply vs create:
