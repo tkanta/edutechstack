@@ -1,0 +1,23 @@
+
+---------------------------- introduction ---------------------------------
+
+* Deep learning is considered a subfield of machine learning
+* In practice, deep learning is the scaling up of computational structures called neural networks.
+* It is important to keep in mind that deep learning is all about learning powerful representations
+* There is a huge shift from extracting features to learning features, and that is what deep learning is all about.
+* Deep learning has already transformed a variety of businesses such as web search, augmented reality, social networks, automobiles, retail, cybersecurity, and manufacturing. 
+* You will learn to formulate problems in terms of machine and deep learning
+* Secondly, you will learn the most basic components that tackle some of the following tasks:
+
+		Image classification
+		Time series prediction
+		Image denoising and compression
+		Image generation
+		Machine translation
+		Graph and node classification
+
+
+------------------------------- Neural Networks -----------------------------------
+
+Linear Classifiers:
+	* 

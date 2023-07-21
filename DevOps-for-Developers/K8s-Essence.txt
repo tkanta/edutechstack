@@ -12,9 +12,20 @@ k8s podSpec guide:
 Replicaset Guide:
 	https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.24/#replicaset-v1-apps
 
-	
+
+emptydir vs persistence volume:
+	https://www.alibabacloud.com/blog/kubernetes-volume-basics-emptydir-and-persistentvolume_594834
+	https://kubernetes.io/docs/concepts/storage/volumes/?spm=a2c65.11461447.0.0.37da3505crUBaD#types-of-volumes
+
 ------------------- Commands: --------------------
 
+
+configmap:
+	kubectl create cm my-config --from-file=prometheus-conf.yml	
+	kubectl exec -it alpine -- ls -l /etc/config
+	kubectl create cm my-config --from-file=cm/prometheus-conf.yml --from-file=cm/prometheus.yml (from multiple files)	
+	kubectl create cm my-config --from-file=cm (from directory cm )
+	kubectl delete cm my-config
 
 deployment details:
 	kubectl get -f go-demo-2.yml ( get details of deployment, service etc)
@@ -38,7 +49,7 @@ POD details:
 	kubectl get -f go-demo-2.yml -o jsonpath="{.spec.containers[*].name}"
 	kubectl get -f go-demo-2.yml -o json
 
-POD run / delete:
+POD run / delete / exec / describe:
 	kubectl describe -f db.yml
 	kubectl exec db -- ps aux (short lived command execution)
 	kubectl exec -it db -- sh (long lived command execution)
@@ -50,6 +61,7 @@ POD run / delete:
 	kubectl delete -f db.yml 
 	kubectl get pods
 	kubectl run docker --image=docker:17.11  --restart=Never docker image ls	
+	kubectl exec $POD_NAME -it -- kill 1 ( pod kill simulation )
 
 POD describe:
 	kubectl describe -f db.yml
@@ -84,10 +96,11 @@ service:
 	sevice info:
 		kubectl get svc go-demo-2-api -o yaml	
 
-Get Pod Name:
-	POD_NAME=$(kubectl get pod --no-headers -o=custom-columns=NAME:.metadata.name -l type=db,service=go-demo-2 | tail -1)	
+POD Name:
+	POD_NAME=$(kubectl get pods --no-headers -o=custom-columns=NAME:.metadata.name -l type=db,service=go-demo-2 | tail -1)	
+	POD_NAME=$(kubectl get pods -l service=jenkins,type=master -o jsonpath="{.items[*].metadata.name}")
 
-Get IP/port:
+POD IP/port:
 	IP=$(minikube ip)
 	PORT=$(kubectl get svc go-demo-2-api -o jsonpath="{.spec.ports[0].nodePort}")
 	curl -i "http://$IP:$PORT/demo/hello"
@@ -112,10 +125,13 @@ endpoint:
 	kubectl get ep go-demo-2 -o yaml (describe endpoint)
 
 port forwarding to service:
-	- kubectl port-forward service/go-demo-2-svc 3000:28017 --address 0.0.0.0	
+	- https://amalgjose.com/2021/06/08/how-to-configure-kubernetes-port-forward-bind-to-0-0-0-0-instead-of-default-127-0-0-1/
+	- kubectl port-forward service/go-demo-2-svc 3000:28017 --address 0.0.0.0 
+		* port-forward allows to access the service from external host through host-ip:3000
+		* IP address 0.0. 0.0 is used on servers to designate a service may bind to all network interfaces.	
 	- nohup kubectl port-forward service/go-demo-2-api --address 0.0.0.0  3000:8080 > /dev/null 2>&1 &	    
 	- nohup kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 3000:80 --address 0.0.0.0 > /dev/null 2>&1 &
-
+	- kubectl port-forward <pod-name> 28015:27017
 
 ingress:
 	* kubectl get ing --all-namespaces

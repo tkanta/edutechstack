@@ -446,15 +446,24 @@ Creating Ingress Resources Based on Paths:
 
 
 Sequential Breakdown of the Process:
-		* The Kubernetes client (kubectl) sent a request to the API server requesting the creation of the Ingress resource defined in the go-demo-2.yml file.
-		* The ingress controller is watching the API server for new events. It detected that there is a new Ingress resource.
-		* The ingress controller configured the load balancer. In this case, it is nginx which modified nginx.conf with the values of all go-demo-2-api endpoints.
+		* ingress flow Steps:
+				- The Kubernetes client (kubectl) sent a request to the API server requesting the creation of the Ingress resource defined in the go-demo-2.yml file.
+				- The ingress controller is watching the API server for new events. It detected that there is a new Ingress resource.
+				- The ingress controller configured the load balancer. In this case, it is nginx which modified nginx.conf with the values of all go-demo-2-api endpoints.
+				- The load balancer is running on each node (nginx, haproxy)
 
-		* Sample Code:
-			nohup kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 3000:80 --address 0.0.0.0  > /dev/null 2>&1 &
-			#Now click on the link beside the run button 
-			#Next run the following command
-			curl "http://0.0.0.0:3000/demo/hello"						
+		* sample full path of server /collection/v1/els . ingress will define (/collection). Any request having /collection will be forwarded to the server with full URI.
+
+		*  Rule rewrite :  We could, for example, create a rule that rewrites path base /devops-toolkit to /. someone sends a request to /devops-toolkit/something, Ingress would rewrite it to /something before sending it to the destination Service. We’d need to write rewrite rules instead. While such an action is often useful, we’ll ignore it for now. For now, / as the base path should do		
+
+		* for ingress controller pod and service will be created under perticular ingress namespace.
+		* Ingress resources can be fetched using kubectl get ingress
+		* Commands:
+				- nohup kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 3000:80 --address 0.0.0.0  > /dev/null 2>&1 &
+				- kubectl get svc -n ingress-nginx
+				- kubectl get pods -n ingress-nginx
+				- kubectl get ingress
+
 
 Creating Ingress Resources Based on Domains:
 		* We can also configure ingress resource using domain (host:)	
@@ -559,31 +568,52 @@ Running the Pod after mounting hostPath:
 			kubectl delete -f hostpath-mounting.yaml
 
 		* usecases:
-				- hostpath mounting can be used to build docker images across different nodes using pods, where artifact required to build image can be pulled into init pods and images will be created in nodes and once completed pods will be discarded.
+				- hostpath mounting can be used to build docker images across different nodes using pods, where artifact required to build image can be pulled into init pods and images will be created in nodes and once completed pods will be discarded. The benefit is it will distribute image build across nodes using distributed pods.
+				- Sooner or later, we’ll have to build our images. A simple solution would be to execute the docker image build command directly from a server. However, that might cause problems. Building images on a single host means that there is an uneven resource utilization and that there is a single point of failure. Wouldn’t it be better if we could build images anywhere inside a Kubernetes cluster?
+				Instead of executing the docker image build command, we could create a Pod based on the docker image. Kubernetes will make sure that the Pod is scheduled somewhere inside the cluster, thus distributing resource usage much better.
 
 Using hostPath Volume Type to Inject Configuration Files:
 		* Prometheus needs a full external-url if we want to change the base path.
 		* Changing Prometheus configuration: 
 				We could, for example, enter the container, update the configuration file, and send the reload request to Prometheus. That would be a terrible solution since it would last only until the next time we update the application, or until the container fails, and Kubernetes decides to reschedule it.Let’s explore alternative solutions. We could, for example, use hostPath Volume for this as well. If we can guarantee that the correct configuration file is inside the cluster, the Pod could attach it to the prometheus container. Let’s try it out. The output of the prometheus-hostpath with relevant segments is shown below.
 
-		* The list of general annotations and the Controllers that support them can be found in the Ingress Annotations page (https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/nginx-configuration/annotations.md). For those specific to the NGINX Ingress Controller (https://github.com/kubernetes/ingress-nginx/blob/main/README.md) , please visit the NGINX Annotations page, and for those specific to GCE Ingress, visit the ingress-gce page.				
+		* The list of general annotations and the Controllers that support them can be found in the Ingress Annotations page (https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/nginx-configuration/annotations.md). For those specific to the NGINX Ingress Controller (https://github.com/kubernetes/ingress-nginx/blob/main/README.md) , please visit the NGINX Annotations page, and for those specific to GCE Ingress, visit the ingress-gce page.		
+
+    usecase:
+    	 - In case of prometheus, we can load config from host in to the container and send reload signal to prometheus pod insteadof logging into pod and update the same and reload.				
 
 
-Sequential Breakdown of the Process:
-		* ingress flow Steps:
-				- The Kubernetes client (kubectl) sent a request to the API server requesting the creation of the Ingress resource defined in the go-demo-2.yml file.
-				- The ingress controller is watching the API server for new events. It detected that there is a new Ingress resource.
-				- The ingress controller configured the load balancer. In this case, it is nginx which modified nginx.conf with the values of all go-demo-2-api endpoints.
-				- The load balancer is running on each node (nginx, haproxy)
+Working with the New Prometheus Configuration:
+		* Do use hostPath to mount host resources like /var/run/docker.sock and /dev/cgroups. Do not use it to inject configuration files or store the state of an application.
 
-		* sample full path of server /collection/v1/els . ingress will define (/collection). Any request having /collection will be forwarded to the server with full URI.
+		* prometheus url:
+				https://ed-6069882977779712_dc.educative.run/prometheus/config
+				https://ed-6069882977779712_dc.educative.run/prometheus/targets
 
-		*  Rule rewrite :  We could, for example, create a rule that rewrites path base /devops-toolkit to /. someone sends a request to /devops-toolkit/something, Ingress would rewrite it to /something before sending it to the destination Service. We’d need to write rewrite rules instead. While such an action is often useful, we’ll ignore it for now. For now, / as the base path should do		
 
-		* for ingress controller pod and service will be created under perticular ingress namespace.
-		* Ingress resources can be fetched using kubectl get ingress
-		* Commands:
-				- nohup kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 3000:80 --address 0.0.0.0  > /dev/null 2>&1 &
-				- kubectl get svc -n ingress-nginx
-				- kubectl get pods -n ingress-nginx
-				- kubectl get ingress
+Non-Persisting State:
+		* PODNM=$(kubectl get pods -l service=jenkins,type=master -o jsonpath="{.items[*].metadata.name}")
+
+Persisting State through the emptyDir Volume Type:
+		* An emptyDir Volume is created when a Pod is assigned to a node. It will exist for as long as the Pod continues running on that server.What that means is that emptyDir can survive container failures. When a container crashes, a Pod is not removed from the node. Instead, Kubernetes will recreate the failed container inside the same Pod and, thus, preserve the emptyDir Volume. All in all, this Volume type is only partially fault-tolerant.
+
+
+
+------------------------------------------- ConfigMaps --------------------------------------------------------------
+
+Getting Started with ConfigMaps:
+	* ConfigMap takes a configuration from a source and mounts it into running containers as a volume.
+	* For setting ConfigMap you will use the following command after creating the cluster.
+			- kubectl config current-context 
+	* We are not limited to a single --from-file argument. We can specify as many as we need.		
+	* commands:
+			kubectl create cm my-config --from-file=prometheus-conf.yml	
+			kubectl exec -it alpine -- ls -l /etc/config	
+
+Injecting Configurations from Multiple Files:
+	* kubectl create cm my-config --from-file=cm/prometheus-conf.yml --from-file=cm/prometheus.yml	(from multiple files)	
+	* kubectl create cm my-config --from-file=cm (from directory cm )
+
+
+Injecting Configurations from Key/Value Literals:
+	* 	
