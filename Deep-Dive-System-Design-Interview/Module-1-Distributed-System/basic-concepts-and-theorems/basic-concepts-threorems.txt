@@ -55,8 +55,10 @@ There are 2 types of replication:
 	- Optimistic replication, or lazy replication, allows the different replicas to diverge. This guarantees that they will converge again if the system does not receive any updates, or enters a quiesced state, for a period of time.
 
 Single-Master Replication Algorithm:
+	* Single-master replication is a technique where we designate a single node amongst the replicas as the leader, or primary, that receives all the updates.
 	* Synchronous replication -> In synchronous replication, the node replies to the client to indicate the update is complete—only after receiving acknowledgments from the other replicas that they’ve also performed the update on their local storage. 
-	* Asynchronous replication -> the node replies to the client as soon as it performs the update in its local storage, without waiting for responses from the other replicas.		
+	* Asynchronous replication -> the node replies to the client as soon as it performs the update in its local storage, without waiting for responses from the other replicas.
+	* Most widely used databases, such as PostgreSQL or MySQL, use a single-master replication technique that supports both asynchronous and synchronous replication.		
 	* Advantages of single-master replication
 		- It is simple to understand and implement
 		- Concurrent operations serialized in the leader node, remove the need for more complicated, distributed concurrency protocols. In general, this property also makes it easier to support transactional operations
@@ -67,3 +69,21 @@ Single-Master Replication Algorithm:
 		- It imposes an obvious trade-off between performance, durability, and consistency
 		- Scaling the read capacity by adding more follower nodes can create a bottleneck in the network bandwidth of the leader node, if there’s a large number of followers listening for updates
 		- The process of failing over to a follower node when the leader node crashes, is not instant. This may create some downtime and also introduce the risk of errors	
+
+Multi-Master Replication Algorithm:
+	* Multi-master replication is an alternative replication technique that favors higher availability and performance over data consistency.
+	* Approaches to conflict resolution
+		- Exposing conflict resolution to the clients#
+		- Last-write-wins conflict resolution
+		- Causality tracking algorithms#
+
+Quorums in Distributed Systems:
+	* The main pattern we’ve seen so far is this: writes are performed to all the replica nodes, while reads are performed to one of them. When we ensure that writes are performed to all of them synchronously before replying to the client
+	
+	* Availability is quite low for write operations, because the failure of a single node makes the system unable to process writes until the node recovers.
+	
+	* To solve this problem, we can use the reverse strategy. That is, we write data only to the node that is responsible for processing a write operation, but process read operations by reading from all the nodes and returning the latest value.
+	
+	* A useful mechanism to achieve a balance in this trade-off is to use quorums.Let’s consider an example. In a system of three replicas, we can say that writes need to complete in two nodes (as a quorum of two), while reads need to retrieve data from two nodes. This way, we can be sure that the reads will read the latest value. This is because at least one of the nodes in the read quorum will also be included in the latest write quorum.				
+
+	* D. K. Gifford, “Weighted voting for replicated data,” in Proceedings of the seventh ACM symposium on Operating systems principles, 1979.
