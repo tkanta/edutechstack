@@ -87,3 +87,54 @@ Quorums in Distributed Systems:
 	* A useful mechanism to achieve a balance in this trade-off is to use quorums.Let’s consider an example. In a system of three replicas, we can say that writes need to complete in two nodes (as a quorum of two), while reads need to retrieve data from two nodes. This way, we can be sure that the reads will read the latest value. This is because at least one of the nodes in the read quorum will also be included in the latest write quorum.				
 
 	* D. K. Gifford, “Weighted voting for replicated data,” in Proceedings of the seventh ACM symposium on Operating systems principles, 1979.
+	* The concept of a quorum is used extensively in other areas, like distributed transactions or consensus protocols.
+
+Safety Guarantees in Distributed Systems:
+	* The main safety guarantees that systems provide are around the three properties shown in the illustration.
+	* The concepts of atomicity and isolation originate from database research and ACID transactions. When we mention consistency in this course, we will mostly refer to the notion of consistency made popular by the CAP theorem.
+
+
+ACID Transaction:
+	
+	* Atomicity (A) : Atomicity guarantees that a transaction that comprises multiple operations is treated as a single unit. This means that either all operations of the transaction are executed or none of them are.	
+	
+	* Consistency (C) : Consistency guarantees that a transaction only transitions the database from one valid state to another valid state, while maintaining any database invariants.	An invariant is a value or condition that is expected to be consistent during the execution of a process.For example, consider an application that has a table A with records that refer to records in table B through a foreign key relationship. The database prevents a transaction from deleting a record from table A, unless any records in table B referenced from this record are already deleted.
+	
+	* Isolation (I) : Isolation guarantees that even though transactions might run concurrently and have data dependencies, the result is as if one of them was executed at a time and there was no interference between them
+	
+	* Durability (D) : Durability guarantees that once a transaction is committed, it remains committed even in the case of failure.
+
+CAP Theorem:
+	* https://en.wikipedia.org/wiki/PACELC_theorem
+	* These sub-categories are combined to form the following four categories: 
+			AP/EL
+			CP/EL
+			AP/EC
+			CP/EC	
+    * Example: The default versions of Amazon's early (internal) Dynamo, Cassandra, Riak, and Cosmos DB are PA/EL systems: if a partition occurs, they give up consistency for availability, and under normal operation they give up consistency for lower latency.
+
+Consistency Models:
+	* https://en.wikipedia.org/wiki/Consistency_model
+	* There are many different consistency models used across the modern system design field. We will focus on the most fundamental ones. These are the following:
+
+		Linearizability
+		Sequential Consistency
+		Causal Consistency
+		Eventual Consistency    
+
+CAP Theorem's Consistency Model:
+	* Two commonly supported consistency models
+		Considering the guarantees provided by several popular distributed systems nowadays (i.e., Apache Cassandra, DynamoDB, etc.), two models are commonly supported.
+
+		-Strong consistency, specifically linearizability
+		-Weak consistency, specifically eventual consistency
+
+Isolation Levels and Anomalies:
+	* Subsequent research examines more anomalies extensively and attempts a stricter definition of these levels. The basic parts will be covered in this lesson, but please refer to this paper for a deeper analysis.
+		* H. Berenson, P. Bernstein, J. Gray, J. Melton, E. O’Neil, and P. O’Neil, “A Critique of ANSI SQL Isolation Levels,” SIGMOD Rec., 1995.		
+		
+
+Prevention of Anomalies in Isolation Levels:
+	
+Consistency and Isolation:
+				

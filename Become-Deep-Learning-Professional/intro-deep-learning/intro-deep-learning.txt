@@ -17,7 +17,26 @@
 		Graph and node classification
 
 
-------------------------------- Neural Networks -----------------------------------
+========================================== Neural Networks ===============================================
+
+Deep vs neural:
+	* Deep learning is a subfield of machine learning, and neural networks make up the backbone of deep learning algorithms. It's the number of node layers, or depth, of neural networks that distinguishes a single neural network from a deep learning algorithm, which must have more than three
+
+Vector:
+	* Definition of a vector. A vector is an object that has both a magnitude and a direction. Geometrically, we can picture a vector as a directed line segment, whose length is the magnitude of the vector and with an arrow indicating the direction. The direction of the vector is from its tail to its head.
+
+matrix:
+	* matrix, a set of numbers arranged in rows and columns so as to form a rectangular array.
+
+Tensor:
+	https://en.wikipedia.org/wiki/Tensor.
+	a mathematical object analogous to but more general than a vector, represented by an array of components that are functions of the coordinates of a space.
 
 Linear Classifiers:
-	* 
+-------------------
+	* https://www.sharetechnote.com/html/Python_PyTorch_nn_Linear_01.html#:~:text=PyTorch%20%2D%20nn.Linear,name%20'Linear'%20came%20from.
+	* nn.Linear(n,m) is a module that creates single layer feed forward network with n inputs and m output. Mathematically, this module is designed to calculate the linear equation Ax = b where x is input, b is output, A is weight. This is where the name 'Linear' came from.
+
+Optimization and Gradient Descent:
+---------------------------------
+	

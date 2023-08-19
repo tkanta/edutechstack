@@ -22,7 +22,6 @@ emptydir vs persistence volume:
 
 configmap:
 	kubectl create cm my-config --from-file=prometheus-conf.yml	
-	kubectl exec -it alpine -- ls -l /etc/config
 	kubectl create cm my-config --from-file=cm/prometheus-conf.yml --from-file=cm/prometheus.yml (from multiple files)	
 	kubectl create cm my-config --from-file=cm (from directory cm )
 	kubectl delete cm my-config
@@ -50,6 +49,7 @@ POD details:
 	kubectl get -f go-demo-2.yml -o json
 
 POD run / delete / exec / describe:
+	kubectl exec -it alpine -- ls -l /etc/config  (directly executing command in a POD name alpine)
 	kubectl describe -f db.yml
 	kubectl exec db -- ps aux (short lived command execution)
 	kubectl exec -it db -- sh (long lived command execution)

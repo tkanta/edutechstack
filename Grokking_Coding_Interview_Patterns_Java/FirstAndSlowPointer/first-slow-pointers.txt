@@ -1,0 +1,14 @@
+
+
+Quartiles:
+-----------
+Quartiles are three values that split sorted data into four parts, each with an equal number of observations. Quartiles are a type of quantile. 
+
+
+Happy Number:
+---------------
+- create slow and fast pointer
+- calculate sum of squares of digits of a number
+- Iterate till fast number is (!= 1) and (!= slow)
+- if fast number converges to 1, it is a happy number otherwise its a non-happy number
+

@@ -9,7 +9,7 @@ public class ValidPalindromeWithOneRemoval {
 		
 		int skip = 0;
 		
-		while(left < right) {
+		while(left <= right) {
 			if(s.charAt(left) == s.charAt(right)) {
 				left++;
 				right--;
@@ -32,7 +32,7 @@ public class ValidPalindromeWithOneRemoval {
 	}
 	
 	public static void main(String[] args) {
-		String[] strs = new String[] { "abceba", "raceacat", "deead","madame", "dead", "abca", "tebbem", "eeccccbebaeeabebccceea",
+		String[] strs = new String[] { "abba", "abceba", "raceacat", "deead","madame", "dead", "abca", "tebbem", "eeccccbebaeeabebccceea",
 				"ognfjhgbjhzkqhzadmgqbwqsktzqwjexqvzjsopolnmvnymbbzoofzbbmynvmnloposjzvqxejwqztksqwbqgmdazhqkzhjbghjfno" };
 		for(String s : strs) {
 			System.out.println(s + " is palindrom ? "+ isPalindrome(s));
