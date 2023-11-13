@@ -20,11 +20,60 @@ emptydir vs persistence volume:
 ------------------- Commands: --------------------
 
 
+
+Security:
+	check k8s secure port:
+		kubectl config view -o jsonpath='{.clusters[?(@.name=="k3d-mycluster")].cluster.server}'
+		response: https://0.0.0.0:37141
+ 	check if RBAC is enabled:
+ 		kubectl api-versions
+
+ 	SERVER=$(kubectl config view -o jsonpath='{.clusters[?(@.name=="k3d-mycluster")].cluster.server}')	
+ 	
+ 	kubectl config set-cluster jdoe --certificate-authority /usercode/certs/keys/server-ca.crt --server $SERVER
+	kubectl config set-credentials jdoe --client-certificate keys/jdoe.crt --client-key keys/jdoe.key
+	kubectl config set-context jdoe --cluster jdoe --user jdoe
+	kubectl config use-context jdoe
+	kubectl config view
+	kubectl get pods
+	kubectl get all	
+ 	
+namespace:
+	kubectl create ns testing
+	kubectl config set-context testing --namespace testing --cluster k3d-mycluster --user admin@k3d-mycluster
+	kubectl config set-context k3d-mycluster --cluster k3d-mycluster --user admin@k3d-mycluster	
+	kubectl config view
+	kubectl config current-context 
+	kubectl config use-context testing
+	kubectl delete ns testing (deleting a namespace will delete all resource in that namespace)
+	kubectl -n testing get all
+
+	reaching across namespace:
+		<service-name>.<namespace-name>.svc.cluster.local
+			go-demo-2-api.testing
+			go-demo-2-api.testing.svc.cluster.local
+		kubectl exec -it test -- curl "http://go-demo-2-api.testing.svc.cluster:8080/demo/hello"
+	
+	* https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.24/#namespace-v1-core
+
+display format:
+	-o yaml
+	-o json
+
+
+Secrets:
+	kubectl create secret generic/docker-registry/tls my-creds --from-literal=username=jdoe --from-literal=password=incognito
+	kubectl get secret my-creds -o json
+	kubectl get secret my-creds -o jsonpath="{.data.username}" | base64 --decode
+
 configmap:
 	kubectl create cm my-config --from-file=prometheus-conf.yml	
 	kubectl create cm my-config --from-file=cm/prometheus-conf.yml --from-file=cm/prometheus.yml (from multiple files)	
 	kubectl create cm my-config --from-file=cm (from directory cm )
 	kubectl delete cm my-config
+	kubectl get cm my-config -o yaml
+	kubectl create cm my-config --from-literal=something=else --from-literal=weather=sunny
+	kubectl create cm my-config --from-env-file=my-env-file.yml
 
 deployment details:
 	kubectl get -f go-demo-2.yml ( get details of deployment, service etc)
@@ -38,6 +87,7 @@ Run / Delete POD:
 	kubectl delete $POD_NAME
 
 POD details:
+	* get pods -o yaml (It provides details about pod spec, mount, volumes, metadata like podname) etc.
 	kubectl create -f db.yml
 	kubectl get pods
 	kubectl get pods -o wide
@@ -49,6 +99,7 @@ POD details:
 	kubectl get -f go-demo-2.yml -o json
 
 POD run / delete / exec / describe:
+	kubectl exec -it test -- apk add -U curl (add curl)
 	kubectl exec -it alpine -- ls -l /etc/config  (directly executing command in a POD name alpine)
 	kubectl describe -f db.yml
 	kubectl exec db -- ps aux (short lived command execution)
@@ -64,13 +115,13 @@ POD run / delete / exec / describe:
 	kubectl exec $POD_NAME -it -- kill 1 ( pod kill simulation )
 
 POD describe:
+	* It will provide container status, allocation, image pull status, Mounts, Volumes etc.
 	kubectl describe -f db.yml
 	kubectl describe pod <podName>
 	kubectl exec db -- ps aux (run onetime command in containers of pod)
 	echo 'db.stats()' | mongo localhost:27017/test (execute mongodb stats after connecting to mongo)
 
 POD label:
-	POD_NAME=$(kubectl get pods -o name | tail -1)
 	kubectl label $POD_NAME service-	      (delete label)
 	kubectl label $POD_NAME service=go-demo-2 (add label)
 	kubectl get pods --show-labels
@@ -97,6 +148,7 @@ service:
 		kubectl get svc go-demo-2-api -o yaml	
 
 POD Name:
+	POD_NAME=$(kubectl get pods -o name | tail -1)
 	POD_NAME=$(kubectl get pods --no-headers -o=custom-columns=NAME:.metadata.name -l type=db,service=go-demo-2 | tail -1)	
 	POD_NAME=$(kubectl get pods -l service=jenkins,type=master -o jsonpath="{.items[*].metadata.name}")
 
@@ -111,7 +163,7 @@ rolling update:
 	kubectl set image -f go-demo-2-db.yml db=mongo:3.4 --record (update image name db with new version)
 	kubectl set image deployments -l type=db,vendor=MongoLabs db=mongo:3.4 --record ( update multiple objects)
 	
-	kubectl rollout status deployment go-demo-2-api
+	kubectl rollout status deployment go-demo-2-api (provides deployment status at realtime)
 	kubectl rollout status deploy prometheus
 	
 	kubectl rollout history -f go-demo-2-api.yml
@@ -129,16 +181,23 @@ port forwarding to service:
 	- kubectl port-forward service/go-demo-2-svc 3000:28017 --address 0.0.0.0 
 		* port-forward allows to access the service from external host through host-ip:3000
 		* IP address 0.0. 0.0 is used on servers to designate a service may bind to all network interfaces.	
+		* curl -H "Host: go-demo-2.com" http://0.0.0.0:3000/demo/hello
 	- nohup kubectl port-forward service/go-demo-2-api --address 0.0.0.0  3000:8080 > /dev/null 2>&1 &	    
 	- nohup kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 3000:80 --address 0.0.0.0 > /dev/null 2>&1 &
 	- kubectl port-forward <pod-name> 28015:27017
-
+	
 ingress:
 	* kubectl get ing --all-namespaces
 	* The Ingress "default" label must consist of lower case alphanumeric characters or '-', start with an alphabetic character, and end with an alphanumeric character (e.g. 'my-name',  or 'abc-123', regex used for validation is '[a-z]([-a-z0-9]*[a-z0-9])?'
 
 ingress controller:
 	kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/cloud/deploy.yaml (k3d)
+	nohup kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 3000:80 --address 0.0.0.0  > /dev/null 2>&1 &
+		* port forward to any ingress resource running in different namespaces, from common ingress controller running at port 80
+		* service/ingress-nginx-controller  LoadBalancer   10.43.154.246   172.19.0.3    80:32497/TCP,443:31214/TCP   11m
+		* Sample: (Two ingress resources are running in different namespace are invoked)
+			curl -H "Host: go-demo-2.com" "http://0.0.0.0:3000/demo/hello"
+			curl -H "Host: 2.0.go-demo-2.com" "http://0.0.0.0:3000/demo/hello"
 
 
 formatting:

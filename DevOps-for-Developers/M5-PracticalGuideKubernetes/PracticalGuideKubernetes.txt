@@ -616,4 +616,196 @@ Injecting Configurations from Multiple Files:
 
 
 Injecting Configurations from Key/Value Literals:
-	* 	
+	* kubectl create cm my-config --from-literal=something=else --from-literal=weather=sunny
+	* The keys will be considered as file name
+
+Injecting Configurations from Environment Files:
+	* kubectl create cm my-config --from-env-file=my-env-file.yml
+
+Converting ConfigMap Output into Environment Variables:
+	* - name: something
+      valueFrom:
+        configMapKeyRef:
+          name: my-config
+          key: something
+  *  envFrom:
+    - configMapRef:
+        name: my-config
+
+Defining ConfigMaps as YAML:
+	* kubectl get cm my-config -o yaml
+	* cat prometheus.yml | sed -e "s/192.168.99.100/$(minikube ip)/g" | kubectl create -f -
+
+A Plea NOT to Use ConfigMaps!:
+	 	                		
+
+---------------------------------- Secrets ----------------------------------------------
+
+Getting Started with Secrets:
+	* A Secret is a relatively small amount of sensitive data. Some of the typical candidates for Secrets would be passwords, tokens, and SSH keys.
+	* We already used Secrets without even knowing. Every Pod we created so far had a Secret mounted automatically by the system.	 	                		
+
+Exploring Built-In Secrets:
+	* k8s auto-mount a Secret (/var/run/secrets/kubernetes.io/serviceaccount) for every pod. We got three files, They are required if we’d like to access the API server from within the containers. “ca.crt” is the certificate, the namespace contains the namespace the Pod is running in, and the last one is the token we’d need to establish communication with the API.
+
+	* Commands
+		* kubectl get pods -l service=jenkins,type=master -o jsonpath="{.items[*].metadata.name}
+		* kubectl get pods --show-labels
+		* kubectl get pods -l service=jenkins,type=master -o yaml
+
+* Creating Generic Secrets:
+		* Just as with ConfigMaps, generic Secrets can use --from-env-file, --from-file, and --from-literal as sources. They can be mounted as files, or transformed into environment variables. Since creating Secrets is so similar to creating ConfigMaps, we won’t go into all the permutations we can do.		
+
+* Mounting Generic Secrets:
+		* Basically the secret key name will be a file name mounted specified as path, that contains the value of the key
+			volumeMounts:
+        - name: jenkins-home
+          mountPath: /var/jenkins_home
+        - name: jenkins-creds
+          mountPath: /etc/secrets
+			volumes:
+      - name: jenkins-home
+        emptyDir: {}
+      - name: jenkins-creds
+        secret:
+          secretName: my-creds
+          defaultMode: 0444
+          items:
+          - key: username
+            path: jenkins-user
+          - key: password
+            path: jenkins-pass
+		 *  Line 19-20: We added jenkins-creds that mounts the /etc/secrets directory.
+
+				Line 24-26: The jenkins-creds Volume references the Secret named my-creds.
+
+				Line 27: Since we want the process inside the container to only read the Secret, we set the defaultMode to 0444. That will give read permissions to everyone. Typically, we’d set it to 0400, thus giving the read permissions only to the root user. However, since the Jenkins image uses the jenkins user, we gave read permissions to everyone instead of only to the root user.
+
+				Line 29-32: Finally, since the image expected files named jenkins-user and jenkins-pass, we made explicit paths. Otherwise, Kubernetes would create files username and password.			
+
+Secrets Compared to ConfigMaps:
+		* The only significant difference between ConfigMaps and Secrets is that the latter creates files in a tmpfs (temporary file storage).
+		* Secrets are almost the same as ConfigMaps. The main difference is that the secret files are created in tmpfs. Kubernetes secrets do not make your system secure. They are only a step towards such a system.
+
+Not so Secretive Secrets:
+	* We need to take additional precautions to protect ourselves. That might include, but is not limited to, the following actions:
+
+		- Secure the communication between etcd instances with SSL/TLS.
+		- Limit the access to etcd and the disk or partitions that were used by it.
+		- Do not define Secrets in YAML files stored in a repository. Create Secrets through ad-hoc kubectl create secret commands. If possible, delete commands history afterward.
+		- Make sure that the applications using Secrets do not accidentally output them to logs or transmit them to other applications.
+		- Create policies that allow only trusted users to retrieve secrets. However, you should be aware that even with proper policies in place, any user with permissions to run a Pod could mount a Secret and read it.						
+
+Comparison with Docker Swarm:
+	* Kubernetes stores Secrets in etcd. By default, they are exposed, and we need to take extra precautions to protect them.
+  * Docker Swarm secrets are, on the other hand, more secure by default. They are synchronized between managers using SSL/TLS, and they are encrypted at rest. We prefer “secured by default” approach behind Docker Swarm secrets.
+
+
+==================================== Namespace =============================================
+
+Deploying the First Release:
+	* IMG=vfarcic/go-demo-2
+	* TAG=1.0
+	* cat go-demo-2.yml | sed -e "s@image: $IMG@image: $IMG:$TAG@g" | kubectl create -f
+	* kubectl rollout status deploy go-demo-2-api
+	* nohup kubectl port-forward service/go-demo-2-api 3000:8080 --address 0.0.0.0 > /dev/null 2>&1 &
+	* curl -H "Host: go-demo-2.com"  "http://0.0.0.0:3000/demo/hello"
+
+Exploring Virtual Clusters:
+	* Almost all of the system services are running as Kubernetes objects
+	* Namespaces are so much more than scopes for object names.
+	    They allow us to split a cluster among different groups of users.
+	    Each of those Namespaces can have different permissions and resources quotas.
+	    There are quite a few other things we can do if we combine Namespaces with other Kubernetes services and concepts.	
+
+Exploring the Existing Namespaces:
+	* The primary reason for kube-public's existence is to provide space where we can create objects that should be visible throughout the whole cluster.
+	* A good example is ConfigMaps. When we create one in, let’s say, the default Namespace, it is accessible only by the other objects in the same Namespace. Those residing somewhere else would be oblivious of its existence. If we’d like such a ConfigMap to be visible to all objects no matter where they are, we’d put it into the kube-public Namespace instead. We won’t use this Namespace much (if at all).
+
+Creating a New Namespace:
+	* By default there will be a default context and its namespace is not provided, so it is default namespace
+	* We can create a new context with the namespace and use that context
+	* kubectl create ns testing
+		kubectl config set-context testing --namespace testing --cluster k3d-mycluster --user admin@k3d-mycluster	
+		kubectl config view
+		kubectl config use-context testing
+
+Deploying to a New Namespace:
+
+Communicating between namespace:
+	* We can reach to a service in different namespace using service name in the below formats:
+		- <service-name>.<namespace-name>.svc.cluster.local
+		- <service-name>.<namespace-name>
+
+Comparison with Docker Swarm:
+	* Even though Docker Swarm stacks do provide a functionality similar to Kubernetes Namespaces, their usage is limited. If, for example, we’d like to split the cluster into production and testing, we’d need to create two potentially large Swarm stack files. That would be impractical.
+	
+	* Moreover, Kubernetes Namespaces can be associated with resource quotas, policies, and quite a few other things. They do act as genuinely separate clusters. Swarm stacks, on the other hand, are meant to group services into logical entities.
+	
+	* Some might argue that they are useful only for bigger clusters or organizations with many teams. We think that’s an understatement. Namespaces can be applied to many other use-cases.
+	
+	* For example, creating a new Namespace for every continuous integration, delivery, or deployment pipeline is a beneficial practice. We get a unique scope for names, we can mitigate potential problems through resource quotas, and we can increase security. At the end of the process, we can remove the Namespace and all the objects we created inside it.		
+
+What is Next:
+	* Deploying test releases as part of a continuous deployment process is not the only usage of Namespaces. There can be many other situations when they are useful. We could, for example, give a separate Namespace to each team in our organization. Or we could split the cluster into Namespaces based on the type of applications (e.g., monitoring, continuous-deployment, back-end, and so on).
+
+	* All in all, Namespaces are a handy way to separate the cluster into different sections. Some of the Namespaces we’ll create will be long-lasting while others, like testing Namespace from our examples, will be short-lived.
+
+	
+	=================================  Securing K8s ==========================================
+
+	* We will need to create an authentication and authorization mechanism
+
+Accessing Kubernetes API:
+		
+Authorizing Requests and Creating a Cluster:
+		* kubectl create -f go-demo-2.yml --record --save-config	
+
+Creating Users to Access the Cluster:
+		
+		SERVER=$(kubectl config view -o jsonpath='{.clusters[?(@.name=="k3d-mycluster")].cluster.server}')	
+		
+		kubectl config set-cluster jdoe --certificate-authority /usercode/certs/keys/server-ca.crt --server $SERVER
+		kubectl config set-credentials jdoe --client-certificate keys/jdoe.crt --client-key keys/jdoe.key
+		kubectl config set-context jdoe --cluster jdoe --user jdoe
+		kubectl config use-context jdoe
+		kubectl config view
+		kubectl get pods
+		kubectl get all
+
+		-----------------------------------
+		root@8c997bbc4371a18e:/usercode/certs# kubectl config view
+					apiVersion: v1
+					clusters:
+					- cluster:
+					    certificate-authority: /usercode/certs/keys/server-ca.crt
+					    server: https://0.0.0.0:38597
+					  name: jdoe
+					- cluster:
+					    certificate-authority-data: DATA+OMITTED
+					    server: https://0.0.0.0:38597
+					  name: k3d-mycluster
+					contexts:
+					- context:
+					    cluster: jdoe
+					    user: jdoe
+					  name: jdoe
+					- context:
+					    cluster: k3d-mycluster
+					    user: admin@k3d-mycluster
+					  name: k3d-mycluster
+					current-context: jdoe
+					kind: Config
+					preferences: {}
+					users:
+					- name: admin@k3d-mycluster
+					  user:
+					    client-certificate-data: REDACTED
+					    client-key-data: REDACTED
+					- name: jdoe
+					  user:
+					    client-certificate: /usercode/certs/keys/jdoe.crt
+					    client-key: /usercode/certs/keys/jdoe.key
+			------------------------------
+			root@8c997bbc4371a18e:/usercode/certs# kubectl get pods
+				Error from server (Forbidden): pods is forbidden: User "jdoe" cannot list resource "pods" in API group "" in the namespace "default"		    

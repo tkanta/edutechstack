@@ -1,0 +1,29 @@
+
+
+* But what does that actually mean? Well, Angular is a web application framework that helps developers build web applications that can run on all platforms. This makes Angular an ideal choice for your next web application.
+
+* Combining declarative templates, dependency injection, end-to-end tooling, and integrated best practices to solve development challenges. Angular empowers developers to build applications that live on the web, mobile, or desktop.
+
+* By learning Angular, you can build many different types of applications using one framework. For example, you can build a complete web application, such as the Google Grab and Go program, where enterprise companies can manage their usage of Chromebooks.
+	- https://chromeenterprise.google/
+
+* If you ever wanted to build an email client, you can build it in Angular. There is already a project called ProtonMail, which is a full-featured email client developed by scientists and engineers from CERN, written in Angular.
+
+* Note: TypeScript only checks types at compile time while the types of the response from the backend is known only at run time.
+
+* Not only does TypeScript help us write better code, but it also allows tools such as VSCode to provide IntelliSense of our code, which gives us:
+
+	Better navigation
+	Refactoring
+	Autocompletion
+	This makes the experience of writing TypeScript far more enjoyable than JavaScript.	
+
+* There is also a huge ecosystem around Angular, teams such as Nrwl with their Nx Extensions, which allow teams to create libraries to support the large enterprise-level applications that Nrwl specializes in. The NX tool helps the CLI create libraries within Angular projects so that large-scale teams can share code across teams.
+
+* The Angular community, as well as allowing us to learn from one another, is also active in building libraries and tools that work with Angular. Libraries such as NgRx, NGXS, and MobX all provide solutions on how to manage state within an Angular application. There are also UI libraries such as Angular Material, NGX-Bootstrap, and Nebular, which provide UI components you can add to your Angular applications.
+
+There are libraries for accessing data from cloud-based systems, such as Firebase. So, if your application needs to connect to an existing Firebase application, there are libraries you can add that simplify working with Firebase in your application. You can also find libraries that facilitate working with GraphQL if that’s how your team creates their APIs.
+
+If you want to add tools to your Angular workflow, the Angular community has provided tools like Augury, which is a plugin for Chrome that debugs Angular applications.
+
+Another great tool from the Angular community is the NX workspaces from Nrwl. They have created an extension to the Angular CLI that helps to create large enterprise Angular applications, where teams of developers work on the same project. The NX tool helps the CLI create libraries within Angular projects so that large-scale teams can share code across teams.	

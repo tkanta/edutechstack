@@ -1,0 +1,49 @@
+
+* Directive should be declared in declaration part of NgModule
+		@NgModule({
+		  declarations: [
+		    AppComponent,
+		    BoldDirective
+		  ],
+		  imports: [
+		    BrowserModule
+		  ],
+		  providers: [],
+		  bootstrap: [AppComponent]
+		})
+		export class AppModule { }
+
+* In Angular, directives are similar to components. The main differences are that directives don’t have their own template and are applied to existing DOM elements. Directives are applied to elements by CSS selectors, which are specified in the @Directive declaration.
+		@Directive({
+		  selector: '[appBold]'
+		})
+		export class BoldDirective {
+		    constructor(el: ElementRef) {
+		       el.nativeElement.style.fontWeight = 'bold';
+		    }
+		}
+
+* <p appBold>This text will be bold</p>
+
+* Directive selector to apply all with class=header
+	@Directive({
+	  selector: '.header'
+	})
+	export class BoldDirective {
+
+	  constructor(el: ElementRef) {
+	    el.nativeElement.style.fontWeight = 'bold';
+	  }
+	}		
+
+* NgClass (Attribute directive )
+	buttonClass = 'app-button button-active'; 							 (String)
+	<button [ngClass]="['app-button', 'button-active']"> 				 (Array)
+	<button [ngClass]="{ 'app-button': true, 'button-active': true }">	 (Object)
+
+* optional and non null
+	? denotes an optional property. For example, if you have @Input() childMessage?: string;, it means that the childMessage property is optional, and you can pass undefined or omit it.
+
+	! is the non-null assertion operator. If you have @Input() childMessage!: string;, it tells TypeScript to assume that childMessage will be assigned a value and will not be null or undefined.
+
+* 	

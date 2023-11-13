@@ -1,0 +1,24 @@
+
+
+==================== commands: =====================
+
+run angular application:
+	ng serve
+	npm run
+	ng server -o
+
+Angular commands allows you to either view or set configuration settings for your app
+	ng config
+
+compile the complete application into a /dist folder
+	ng build
+
+commands is used as part of adding multi-language support to your application
+	ng xi18n
+
+commands adds Angular Material to the Angular project?
+	ng add @angular/material
+
+With Angular Elements, you can convert that Angular application to a web component that will run within the Java page as a standalone piece of functionality.
+
+			
