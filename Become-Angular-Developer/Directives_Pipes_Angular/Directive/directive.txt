@@ -1,4 +1,59 @@
 
+Error: error:0308010C:digital envelope routines::unsupported
+=============================================================
+
+https://stackoverflow.com/questions/69692842/error-message-error0308010cdigital-envelope-routinesunsupported?page=1&tab=scoredesc#tab-top
+
+Enable legacy OpenSSL provider.
+
+On Unix-like (Linux, macOS, Git bash, etc.):
+
+	export NODE_OPTIONS=--openssl-legacy-provider
+
+On Windows command prompt:
+
+	set NODE_OPTIONS=--openssl-legacy-provider
+
+On PowerShell:
+
+	$env:NODE_OPTIONS = "--openssl-legacy-provider"
+
+
+
+
+
+=============================  Understanding Directive : =========================================
+
+* From the data source to the template looks like this:
+	{{data}}
+	[target]="data"
+
+	here target 
+		- can be a '@Input' attribute in a child component
+			[name]="name"		
+		- can be a attributive directive ngIf/ngClass etc.
+			[ngClass]
+
+* From the template to the data source looks like this:
+	(target)="function"
+
+	here target 
+		- can be a function such as click
+			(click)
+		- can be a event emitter in a clild component such as 
+			(nameChange) --> @Output() nameChange
+			(ngModelChange)
+
+
+=============================================== Directive ====================================================
+
+Directive used : 
+		NgClass, (Attribute directives)
+		NgStyle, (Attribute directives)
+		NgModel, (Attribute directives)  
+		NgIf (structural directive)
+
+
 * Directive should be declared in declaration part of NgModule
 		@NgModule({
 		  declarations: [
@@ -46,4 +101,119 @@
 
 	! is the non-null assertion operator. If you have @Input() childMessage!: string;, it tells TypeScript to assume that childMessage will be assigned a value and will not be null or undefined.
 
-* 	
+
+Built-in Ng-Model directive
+----------------------------	
+From the data source to the template looks like this:
+	{{data}}
+	[target]="data"
+
+From the template to the data source looks like this:
+	(target)="function"
+
+The NgModel syntax#
+	<input [(ngModel)]="name">		
+
+The single two-way can be used to bind the name, like this:
+	<p>Name:</p>
+	<input type="text" [(ngModel)]="name">
+
+Two one-ways are used for the email, like this:
+	<p>E-mail:</p>
+	<input type="email" [ngModel]="email" (ngModelChange)="onEmailChange($event)">	
+
+Sample:
+	@Component({
+	  selector: 'app-form',
+	  template: `
+	            <input type="text" [(ngModel)]="name">
+	            <p> Hey, my name is {{ name }} </p>
+	    `,
+	})
+	export class FormComponent {  
+	    name: string = 'John';
+	}
+
+
+HTML section 
+--------------
+	https://www.w3schools.com/tags/tag_section.asp
+
+Built-in NgIf directive
+----------------------------		
+	<div *ngIf="true"> Hello there, I'm visible! </div>
+	<div *ngIf="false"> and I'm hidden </div>
+	The NgIf directive not only hides the element from view, but actually removes it entirely from the DOM
+
+	Sample code:
+		<p *ngIf="user; then userView; else noUserView"></p>
+
+		<ng-template #userView> Hello {{ user.name }}! </ng-template>
+		<ng-template #noUserView> Nice to meet you! </ng-template>
+		---------------
+		<div *ngIf="userA;elseloading">
+		  <li *ngIf="userA.premium">
+		    name:
+		    <span*ngIf="userA.name;elseunknown">{{userA.name}}</span>
+		    , premium: {{userA.premium ? 'Yes' : 'No'}}
+		  </li>
+		</div>
+
+		<ng-template #loading>Loading...</ng-template>
+
+The Built-in `NgFor` Directive
+-------------------------------
+	* Sample:
+		<ul>
+		    <li *ngFor="let fruit of fruits">{{ fruit }}</li>
+		</ul>	
+
+	* InnerHTML security
+		https://coderpad.io/blog/development/javascript-innerhtml/#:~:text=What%20is%20innerHTML%20in%20JavaScript,or%20change%20elements'%20innerHTML%20content.
+
+	* index
+		*ngFor="let item of elements; let i = index"
+
+	* odd and even element
+		<ul>
+		    <li
+		      *ngFor="let fruit of fruits; let evenItem = even; let oddItem = odd;"
+		            [ngClass]="{"even": evenItem, "odd": oddItem}">
+		        {{ fruit }}
+		    </li>
+		</ul>	
+
+	* First and Last element 
+		<ul>
+		    <li
+		      *ngFor="let fruit of fruits; let first = first; let last = last;"
+		            [ngClass]="{"first-element": first, "last-element": last}">
+		        {{ fruit }}
+		    </li>
+		</ul>		
+
+	* Tracking items
+		* How does Angular know how to identify items? By default, NgFor tracks items using object identity
+		* If we now render the list and sort it, Angular re-creates everything because each object changed. So, how do we tell Angular not to compare object references but instead to use something genuinely unique and easier to distinguish? In our case, the id of each fruit is perfect for this.
+
+		<ul>
+		    <li *ngFor="let fruit of fruits; trackBy: trackFruit">
+		        {{ fruit.emoji }}
+		    </li>
+		</ul>
+		export class AppComponent {
+		  fruits = [
+		    { id: 'f1', emoji: '🍎', name: 'apple' },
+		    { id: 'f2', emoji: '🍐', name: 'pear' },
+		    { id: 'f3', emoji: '🍌', name: 'banana' },
+		    { id: 'f4', emoji: '🍉', name: 'water melon' },
+		    { id: 'f5', emoji: '🍓', name: 'strawberry' },
+		    { id: 'f6', emoji: '🥥', name: 'coconut' },
+		  ];
+
+		  trackFruit(index, fruit) {
+		    return fruit.id;
+		  }
+		}
+
+	

@@ -1,0 +1,34 @@
+<ul>
+  <div *ngIf="userA; else loading">
+    <li *ngIf="userA.premium">
+      name:
+      <span *ngIf="userA.name; else unknown">{{userA.name}}</span>
+      , premium: {{userA.premium ? 'Yes' : 'No'}}
+    </li>
+  </div>
+  <div *ngIf="userB">
+    <li *ngIf="userB.premium">
+      name:
+      <span *ngIf="userB.name; else unknown">{{userB.name}}</span>
+      , premium: {{userB.premium ? 'Yes' : 'No'}}
+    </li>
+  </div>
+  <div *ngIf="userC">
+    <li *ngIf="userC.premium">
+      name:
+      <span *ngIf="userC.name; else unknown">{{userC.name}}</span>
+      , premium: {{userC.premium ? 'Yes' : 'No'}}
+    </li>
+  </div>
+  <div *ngIf="userD">
+    <li *ngIf="userD.premium">
+      name:
+      <span *ngIf="userD.name; else unknown">{{userD.name}}</span>
+      , premium: {{userD.premium ? 'Yes' : 'No'}}
+    </li>
+  </div>
+</ul>
+
+<ng-template #loading>Loading...</ng-template>
+
+<ng-template #unknown>Unknown</ng-template>

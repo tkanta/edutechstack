@@ -34,9 +34,112 @@ Tensor:
 
 Linear Classifiers:
 -------------------
+	* This is the core idea behind all deep learning models. In the end, we will have a trained classifier that can be generalized in previous unseen examples.
+
 	* https://www.sharetechnote.com/html/Python_PyTorch_nn_Linear_01.html#:~:text=PyTorch%20%2D%20nn.Linear,name%20'Linear'%20came%20from.
 	* nn.Linear(n,m) is a module that creates single layer feed forward network with n inputs and m output. Mathematically, this module is designed to calculate the linear equation Ax = b where x is input, b is output, A is weight. This is where the name 'Linear' came from.
 
+	Steps:
+		- Initialize a classifier
+		- Feed a training example to get output y
+		- compute the loss between prediction y and t
+		- Adjust the weight according to the loss
+		- Repeat for all training example
+		
 Optimization and Gradient Descent:
 ---------------------------------
 	
+To recap, the training algorithm, known as gradient descent, can be formulated like this for the N-dimensional case:
+•	Initialize the classifier f(xi,W) with random weights W.
+•	Feed a training example xi (vector) with corresponding target vector ti in the classifier, and compute the output yi=f(xi,W).
+•	Compute the loss between the prediction yi and target vector ti. The mean squared error loss is commonly used 2C=∑(yi−ti)2.
+•	Compute the gradients for the loss with respect to the weights/parameters.
+•	Adjust the weights W based on the rule wit=wit−1−l∗∂wi∂C. Note that ∂wi∂C is the gradient of the parameter and λ the learning rate.
+•	Repeat for all training examples.
+
+
+Neural Networks:
+----------------
+
+* Neural Networks (NN)
+
+* What is perceptron in machine learning?
+	In machine learning, the perceptron (or McCulloch-Pitts neuron) is an algorithm for supervised learning of binary classifiers. A binary classifier is a function which can decide whether or not an input, represented by a vector of numbers, belongs to some specific class.
+
+Backpropagation Algorithm:
+---------------------------
+Two final things to note here:
+
+* The derivative with respect to the activation is a summation due to the fact that the activation of a neuron now depends on the activations of all the neurons on the previous layer.
+* The same derivative also depends on the derivatives of the next layer’s activation (backpropagation of the error).
+
+
+Build a Neural Network With Pytorch:
+-------------------------------------
+
+pytorch libbrary:
+	https://pytorch.org/docs/stable/generated/torch.nn.Linear.html
+	https://pytorch.org/docs/stable/nn.html#loss-functions
+	https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module
+		- Base class for all neural network modules.
+
+Sample neural network
+
+	import torch
+	def neuron(input):
+	  wts=torch.tensor([0.5,0.5,0.5])
+	  b=torch.tensor([0.5])
+	  return torch.add(torch.matmul(input,wts),b)
+
+	if __name__ == "__main__":
+	  input=torch.tensor([1.0,2.0,3.0])
+	  output=neuron(input)
+	  print('output --> ',output)
+
+Another sample using Module passed to class:
+	class Model(nn.Module): 
+    def __init__(self): 
+        super(Model, self).__init__() 
+        self.linear1 = nn.Linear(2, 3) 
+        self.linear2 = nn.Linear(3, 2) 
+  
+    def forward(self, x): 
+        h = torch.sigmoid(self.linear1(x)) 
+        o = torch.sigmoid(self.linear2(h)) 
+        return o 
+
+	if __name__ == "__main__":
+	  model= Model() 
+	  X = torch.randn((1, 2)) 
+	  Y = model(X)    
+	  print(Y) 
+
+
+
+Optimization and Gradient Descent:
+
+	Feed a training example x.
+	Compute the output y.
+	Compute the loss.
+	Compute the gradients.
+		- We first compute the gradients for the loss with respect to the weights and then adjust the weights based on the update rule
+	Adjust the weights.
+	Repeat for all training examples.
+
+What does optimizer.zero_grad() do?
+	Clears gradient buffers from the previous steps
+
+
+Where does the actual forward propagation happen?
+	optimizer.zero_grad()
+	outputs = model(inputs)	*****
+	loss = criterion(outputs, labels)
+	loss.backward()
+	optimizer.step(	
+
+
+============================================ training Neural Networks ================================================
+
+Optimization:
+-------------
+* In the case of machine learning, optimization refers to minimizing the loss function by systematically updating the network weights. Mathematically, this is expressed as:

@@ -1,0 +1,37 @@
+
+
+
+====================== ===========setup pytorch locally ==============================================
+
+https://www.digitalocean.com/community/tutorials/how-to-install-and-use-pytorch
+
+
+========================== setup google colab and other python library  ==============================
+
+Google Search keys:
+	setting up pytorch in colab notebook
+
+https://medium.com/analytics-vidhya/google-colab-tutorial-how-to-setup-a-deep-learning-environment-on-colab-bc5ab7569f02 ***
+https://pytorch.org/tutorials/beginner/colab.html
+
+Steps to setup py lib:
+-----------------------
+	- open collab using this flow ( Google Drive --> New --> More --> Google Colaboratory )
+
+	- It has CODE and TEXT to allow you add a new cell to write your code or text, and when you hit SHIFT+ENTER, it will execute the cell
+
+	- open https://pytorch.org/?utm_source=Google&utm_medium=PaidSearch&utm_campaign=**LP+-+TM+-+General+-+HV+-+CAN&utm_adgroup=Install+PyTorch+Using+Pip&utm_keyword=install+pytorch+using+pip&utm_offering=AI&utm_Product=PyTorch&gclid=CjwKCAjw88v3BRBFEiwApwLevbJQfq_-AGl1f6xEoO0Z4N31uLJSV69Zocsi41E2tEVu4o-lty5xJxoCDGMQAvD_BwE
+
+	- choose the specifications of the pytorch version you want to download, make sure you choose Linux, Pip, and Python, and then the CUDA version you want to install, and you would see a pip command line shown at the bottom
+
+	- simply run (!pip install torch trochvision) in the CoLab CODE cell
+
+Steps to import custom python module:
+--------------------------------------
+1. Run the below command by opening collab
+	from google.colab import drive
+	drive.mount('/content/drive/') 
+
+2. It ask permission and drive will be Mounted at /content/drive/	
+
+

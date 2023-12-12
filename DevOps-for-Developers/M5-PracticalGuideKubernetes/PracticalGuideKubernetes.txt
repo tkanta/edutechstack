@@ -762,7 +762,25 @@ Authorizing Requests and Creating a Cluster:
 		* kubectl create -f go-demo-2.yml --record --save-config	
 
 Creating Users to Access the Cluster:
-		
+		mkdir keys openssl genrsa -out keys/jdoe.key 2048
+		openssl req -new -key keys/jdoe.key -out keys/jdoe.csr -subj "/CN=jdoe/O=devs"
+		ls -1 /usercode/certs/client-ca.*
+			/usercode/certs/client-ca.crt
+			/usercode/certs/client-ca.key
+		openssl x509 -req -in keys/jdoe.csr -CA /usercode/certs/client-ca.crt -CAkey /usercode/certs/client-ca.key -CAcreateserial -out keys/jdoe.crt -days 365	
+		cp /usercode/certs/server-ca.crt /usercode/certs/keys
+		ls -1 keys
+			jdoe.crt
+			jdoe.csr
+			jdoe.key
+			server-ca.crt
+		SERVER=$(kubectl config view -o jsonpath='{.clusters[?(@.name=="k3d-mycluster")].cluster.server}')
+				echo $SERVER	
+				https://0.0.0.0:37141	
+
+
+Accessing the Cluster as a User:
+
 		SERVER=$(kubectl config view -o jsonpath='{.clusters[?(@.name=="k3d-mycluster")].cluster.server}')	
 		
 		kubectl config set-cluster jdoe --certificate-authority /usercode/certs/keys/server-ca.crt --server $SERVER
@@ -809,3 +827,186 @@ Creating Users to Access the Cluster:
 			------------------------------
 			root@8c997bbc4371a18e:/usercode/certs# kubectl get pods
 				Error from server (Forbidden): pods is forbidden: User "jdoe" cannot list resource "pods" in API group "" in the namespace "default"		    
+
+
+Exploring RBAC Authorization:
+	* A Rule is a set of operations (verbs), resources, and API groups. Verbs describe activities that can be performed on resources which belong to different API Groups.
+	* A Role is a collection of Rules. It defines one or more Rules that can be bound to a user or a group of users.
+	* Subjects define entities that are executing operations. A Subject can be a User, a Group, or a Service Account.
+	* As the name suggests, RoleBindings bind Subjects to Roles.
+
+Peeking into Pre-Defined Cluster Roles:
+
+	kubectl auth can-i get pods --as jdoe (check if you can perform an operation)
+	kubectl get roles
+	kubectl get clusterroles
+	kubectl get clusterroles | grep -v system
+	kubectl describe clusterrole view
+
+Creating Role Bindings:
+		* This is a good moment to clarify that a Role Binding does not need to be used only with a Role, but that it can also be combined with a Cluster Role (as in our example). As the rule of thumb, we define Cluster Roles when we think that they might be used cluster-wide (with Cluster Role Bindings) or in multiple Namespaces (with Role Bindings).
+
+		The scope of the permissions is defined with the type of binding, not with the type of role. Since we used Role Binding, the scope is limited to a single Namespace which, in our case, is the default.
+
+		RoleBinding:
+		 	kubectl create rolebinding jdoe --clusterrole view --user jdoe --namespace default  --save-config
+		 	kubectl get rolebindings
+			kubectl describe rolebinding jdoe
+			kubectl --namespace kube-system describe rolebinding jdoe
+			kubectl auth can-i get pods --as jdoe  (yes, in the same namespace)
+			kubectl auth can-i get pods --as jdoe --all-namespaces (no, in all namespace or clusterwide)
+			kubectl delete rolebinding jdoe	
+
+
+Creating Cluster Role Bindings:
+		
+	Sample crb-view.yml -->
+					apiVersion: rbac.authorization.k8s.io/v1
+					kind: ClusterRoleBinding
+					metadata:
+					  name: view
+					subjects:
+					- kind: User
+					  name: jdoe
+					  apiGroup: rbac.authorization.k8s.io
+					roleRef:
+					  kind: ClusterRole
+					  name: view
+					  apiGroup: rbac.authorization.k8s.io
+
+		kubectl create -f crb-view.yml --record --save-config
+		kubectl describe clusterrolebinding view
+		kubectl auth can-i get pods --as jdoe --all-namespaces (yes, in all namespace or clusterwide)
+
+		* Functionally, the difference is that, this time, we’re creating ClusterRoleBinding instead of RoleBinding. Also, we specified the apiGroup explicitly thus making it clear that the ClusterRole is RBAC.
+  
+
+Combining Role Bindings with Namespaces:
+		* We can create a new(eg. dev) Namespace and allow a selected group of users to do almost anything in it. That should give developers enough freedom within the dev Namespace while avoiding the risks of negatively impacting the resources running in others. We can give both Role / ClusterRole in permission in that namespace scope.
+		
+			* rb-dev.yml --> 
+				
+				apiVersion: v1
+				kind: Namespace
+				metadata:
+				  name: dev
+				---
+				apiVersion: rbac.authorization.k8s.io/v1
+				kind: RoleBinding
+				metadata:
+				  name: dev
+				  namespace: dev
+				subjects:
+				- kind: User
+				  name: jdoe
+				  apiGroup: rbac.authorization.k8s.io
+				roleRef:
+				  kind: ClusterRole
+				  name: admin
+				  apiGroup: rbac.authorization.k8s.io 
+
+			* rb-jdoe.yml --> 
+
+				apiVersion: v1
+				kind: Namespace
+				metadata:
+				  name: dev
+				---
+				apiVersion: rbac.authorization.k8s.io/v1
+				kind: RoleBinding
+				metadata:
+				  name: dev
+				  namespace: dev
+				subjects:
+				- kind: User
+				  name: jdoe
+				  apiGroup: rbac.authorization.k8s.io
+				roleRef:
+				  kind: ClusterRole
+				  name: admin
+				  apiGroup: rbac.authorization.k8s.io	  
+
+			  -------- End yaml --------------
+			  Line 1-4: The first section defines the dev Namespace.
+
+				Line 8-20: The second section specifies the binding with the same name. Since we’re using RoleBinding (not ClusterRoleBinding), the effects will be limited to the dev Namespace. At the moment, there is only one subject (the User jdoe). We can expect the list to grow with time.
+
+				Line 17-20: roleRef uses ClusterRole (not Role) kind. Even though the Cluster Role is available across the whole cluster, the fact that we are combining it with RoleBinding will limit it to the specified Namespace.
+
+				The Cluster Role admin has an extensive set of resources and verbs, and the Users (at the moment only jdoe) will be able to do almost anything within the dev Namespace.
+
+				kubectl create -f rb-dev.yml --record --save-config
+				kubectl --namespace dev auth can-i create deployments --as jdoe (yes)
+				kubectl --namespace dev auth can-i  delete deployments --as jdoe (yes)
+				kubectl --namespace dev auth can-i "*" "*" --as jdoe (no)
+				kubectl create -f rb-jdoe.yml --record --save-config
+				kubectl --namespace jdoe auth can-i "*" "*" --as jdoe (yes)
+
+
+
+Granting Access as a Release Manager:
+		kubectl describe clusterrole admin
+		kubectl create -f crb-release-manager.yml --record --save-config
+		kubectl describe clusterrole release-manager
+		kubectl --namespace default auth can-i "*" pods --as jdoe
+		kubectl --namespace default auth can-i create deployments --as jdoe
+		kubectl --namespace default auth can-i delete deployments --as jdoe
+		kubectl config use-context jdoe
+		kubectl --namespace default create deployment db --image mongo:3.3
+		kubectl --namespace default delete deployment db
+		kubectl config set-context jdoe --cluster jdoe --user jdoe --namespace jdoe
+		kubectl config use-context jdoe
+		kubectl create deployment db --image mongo:3.3
+		kubectl delete deployment db
+		kubectl create rolebinding mgandhi --clusterrole=view --user=mgandhi --namespace=jdoe
+
+
+Replacing Users With Groups:
+		openssl req -in /usercode/certs/keys/jdoe.csr -noout -subject		
+				subject=/CN=jdoe/O=devs
+
+		
+		openssl req -in /usercode/certs/keys/jdoe.csr  -noout -subject
+		kubectl config use-context k3d-mycluster
+		kubectl apply -f groups.yml   --record
+		kubectl --namespace dev auth  can-i create deployments --as jdoe
+		kubectl config use-context jdoe
+		kubectl --namespace dev  create deployment new-db --image mongo:3.3
+			
+
+		Sample yaml file:
+				apiVersion: v1
+				kind: Namespace
+				metadata:
+				  name: dev
+
+				---
+				apiVersion: rbac.authorization.k8s.io/v1
+				kind: RoleBinding
+				metadata:
+				  name: dev
+				  namespace: dev
+				subjects:
+				- kind: Group
+				  name: devs
+				  apiGroup: rbac.authorization.k8s.io
+				roleRef:
+				  kind: ClusterRole
+				  name: admin
+				  apiGroup: rbac.authorization.k8s.io
+
+				---
+				apiVersion: rbac.authorization.k8s.io/v1
+				kind: ClusterRoleBinding
+				metadata:
+				  name: view
+				subjects:
+				- kind: Group
+				  name: devs
+				  apiGroup: rbac.authorization.k8s.io
+				roleRef:
+				  kind: ClusterRole
+				  name: view
+				  apiGroup: rbac.authorization.k8s.io	
+
+			* From now on, any user with a certificate that has /O=devs in the subject will have the same permissions as John (admin role) within the dev Namespace as well as view permissions everywhere else. We just saved ourselves from constantly modifying YAML files and applying changes	  

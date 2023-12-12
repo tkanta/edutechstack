@@ -21,6 +21,30 @@ emptydir vs persistence volume:
 
 
 
+Creating User and Groups, Service Account(SA):
+	
+Switching context (user/namespace/cluster):
+	* We can switch user/namespace/cluster by switching context, that configures (user, cluster, namespace)
+		kubectl config view
+		kubectl config current-context
+		kubectl config use-context jdoe
+		kubectl config set-context jdoe --cluster jdoe --user jdoe --namespace jdoe
+
+		user and context creation:
+		  kubectl config set-cluster jdoe --certificate-authority  /usercode/certs/keys/server-ca.crt --server $SERVER (create new cluster)
+		  kubectl config set-credentials jdoe --client-certificate keys/jdoe.crt --client-key keys/jdoe.key (create user)
+		  kubectl config set-context jdoe --cluster jdoe --user jdoe (create context)
+
+
+Rolebinding and clusterrolebinding:
+	* The rolebinding can bind a user (Group, SA)  to a Role or a Clusterroles in a given namespace.Since we used Role Binding, the scope is limited to a single Namespace which, in our case, is the default
+	* This is a good moment to clarify that a Role Binding does not need to be used only with a Role, but that it can also be combined with a Cluster Role (as in our example). 
+	* As the rule of thumb, we define Cluster Roles when we think that they might be used cluster-wide (with Cluster Role Bindings) or in multiple Namespaces.
+	Grant cluster-wide access to the user with the help of ClusterRoleBindings. A user given a ClusterRole using ClusterRoleBinding will execute on those resource across namespaces 
+
+	kubectl get rolebindings -n default
+	kubectl get clusterrolebindings
+
 Security:
 	check k8s secure port:
 		kubectl config view -o jsonpath='{.clusters[?(@.name=="k3d-mycluster")].cluster.server}'
@@ -37,8 +61,34 @@ Security:
 	kubectl config view
 	kubectl get pods
 	kubectl get all	
- 	
+
+	Roles:
+		kubectl auth can-i get pods --as jdoe (check if you can perform an operation)
+		kubectl get roles
+		kubectl get clusterroles
+		kubectl get clusterroles | grep -v system
+		kubectl describe clusterrole view
+	 	kubectl auth can-i "*" "*"
+	
+	RoleBinding:
+	 	kubectl create rolebinding jdoe --clusterrole view --user jdoe --namespace default  --save-config
+	 	kubectl get rolebindings
+		kubectl describe rolebinding jdoe
+		kubectl --namespace kube-system describe rolebinding jdoe
+		kubectl auth can-i get pods --as jdoe
+		kubectl auth can-i get pods --as jdoe --all-namespaces
+		kubectl delete rolebinding jdoe
+
+	varification of roles:
+		kubectl --namespace default auth can-i "*" pods --as jdoe
+		kubectl --namespace default auth can-i create deployments --as jdoe
+		kubectl --namespace default auth can-i delete deployments --as jdoe
+
+
+
 namespace:
+	- https://kubernetes.io/docs/reference/kubectl/cheatsheet/#kubectl-context-and-configuration
+
 	kubectl create ns testing
 	kubectl config set-context testing --namespace testing --cluster k3d-mycluster --user admin@k3d-mycluster
 	kubectl config set-context k3d-mycluster --cluster k3d-mycluster --user admin@k3d-mycluster	
@@ -79,6 +129,8 @@ deployment details:
 	kubectl get -f go-demo-2.yml ( get details of deployment, service etc)
 	kubectl get deployments --show-labels
 	kubectl get deployments -l type=db,vendor=MongoLabs
+	kubectl --namespace default create deployment db --image mongo:3.3
+	kubectl --namespace default delete deployment db
 
 Run / Delete POD:
 	kubectl run db --image mongo

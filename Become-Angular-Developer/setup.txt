@@ -1,0 +1,27 @@
+
+https://angular.io/guide/setup-local
+
+1. Install nodejs latest version
+2. npm install -g @angular/cli
+3. npm install
+4. On PowerShell execute -->  $env:NODE_OPTIONS = "--openssl-legacy-provider"
+
+		Error: error:0308010C:digital envelope routines::unsupported
+		=============================================================
+
+		https://stackoverflow.com/questions/69692842/error-message-error0308010cdigital-envelope-routinesunsupported?page=1&tab=scoredesc#tab-top
+
+		Enable legacy OpenSSL provider.
+
+		On Unix-like (Linux, macOS, Git bash, etc.):
+
+			export NODE_OPTIONS=--openssl-legacy-provider
+
+		On Windows command prompt:
+
+			set NODE_OPTIONS=--openssl-legacy-provider
+
+		On PowerShell:
+
+			$env:NODE_OPTIONS = "--openssl-legacy-provider"
+5. ng serve

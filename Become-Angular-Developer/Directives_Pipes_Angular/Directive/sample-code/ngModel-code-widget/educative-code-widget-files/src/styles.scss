@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+
+body {
+  background: #0092ed;
+  color: white;
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+}
+
+.app-button {
+  padding: 12px 24px;
+  border-radius: 16px;
+  min-width: 100px;
+  margin: 4px;
+  border: none;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.warn-button {
+  background-color: #e00040;
+  color: white;
+}
+
+.primary-button {
+  background-color: #fafafa;
+  color: #000;
+}
+
+.secondary-button {
+  background-color: #30597c;
+  color: white;
+}

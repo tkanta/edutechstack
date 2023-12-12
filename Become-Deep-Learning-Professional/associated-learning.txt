@@ -1,0 +1,9 @@
+
+
+================ Associated Learning ====================
+
+PythonForDatascience:
+	D:\TechnologyStack\Udemy\udemystack\PythonForDatascience
+
+open_AI:
+	D:\TechnologyStack\AI_ML_SKILL\AI	
