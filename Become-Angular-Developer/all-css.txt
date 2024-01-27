@@ -1,0 +1,25 @@
+
+padding Title author
+---------------------------
+.author{
+    padding: 10px;
+    color: #6c757d;
+  }
+
+
+border thickness
+-----------------
+ .post{ 
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25rem;
+    display: block;
+  }
+
+
+wrapping images
+----------------------
+:host{ 
+    display: flex;  
+    flex-wrap: wrap;  
+    justify-content: center;
+  }

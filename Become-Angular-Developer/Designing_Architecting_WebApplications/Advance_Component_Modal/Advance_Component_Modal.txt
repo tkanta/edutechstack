@@ -1,0 +1,40 @@
+
+
+Angular lifecycle hooks:
+	https://angular.io/guide/lifecycle-hooks
+
+Modals : 
+	https://getbootstrap.com/docs/5.0/components/modal/	
+
+
+Moving Modal to root:
+	
+	* In the example above, we’re updating the import statement for the @angular/core package to include the ElementRef class. We used this class when we were creating directives. It gave us access to the element to which the directive is attached. Similarly, we can use it in components to have access to the element that the component generates when it’s initialized.
+
+	We’re immediately creating a property by adding it to the constructor() function. The constructor() function is called before the ngOnInit() function. Therefore, we’ll have access to the element.
+
+	* Inside the ngOnInit() function, we’re calling the appendChild() function on the <body> element in the document. This will add an element to the element on which it’s called. If the element exists in the document, it will move the element. We’re passing in the this.el.nativeElement property, which is where the element on the document is stored.
+	
+	* Sample:
+
+	  import { Component, OnInit, ElementRef } from '@angular/core';	  
+	  export class ModalComponent implements OnInit {
+
+		  constructor(private el: ElementRef) { }
+
+		  ngOnInit(): void {
+		    document.body.appendChild(this.el.nativeElement);
+		  }
+
+		  ngOnDestroy() {
+		    this.el.nativeElement.remove();
+		  }
+
+	  }
+
+Event Bubbling:
+	* Event bubbling is when an event runs down an element’s parent elements. JavaScript will run the handler functions on the element where the event originated. Afterward, it will allow ancestor elements to handle the event.
+
+	* We can prevent event bubbling using the stopPropagation() function on the $event object. In the modal.component.html template file, we’ll stop the propagation on the <div> element with the modal-dialog class
+
+		<div class="modal-dialog" (click)="$event.stopPropagation()">	

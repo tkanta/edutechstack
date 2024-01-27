@@ -1,0 +1,49 @@
+
+============================== Creating a New Project ======================================
+
+* ng new components
+* Components are reusable elements with their own template, logic, and styles. Angular will scan the template for components. If it detects a component, it will create a new instance of the class and insert the component’s template.
+
+	- It will load the components we’ve created in the project.
+	- Next, it will scan the contents of the src/index.html file for uses of any of the components that are registered with our application. It will match the name of the tags to the selector option in each component.
+	- The <app-root> tag will match with the App component. Angular will interpret this as us wanting to load the App component.
+	- A new instance of the App component is created because the tag name matches the App component’s selector option. The component’s template will be inserted into the <app-root> tags.
+
+* By default, NgModules are eagerly loaded. This means that as soon as the application loads, so do all the NgModules, whether they are immediately necessary or not. For large applications with lots of routes, consider lazy loading —a design pattern that loads NgModules as needed.
+	- https://angular.io/guide/lazy-loading-ngmodules
+
+* ng generate component post
+	- This will generate the four files necessary for a component. In the src/app directory, there will be a new directory, called post, with four files called post.component.ts, post.component.html, post.component.css, and post.component.spec.ts.
+	- Invoke it inside root folder and angular will autometically creates it inside src/app folder
+
+
+============================= Passing Data From Parent to Child Component ===================
+
+* We can pass data from parent to child component using @Input() decorator
+
+
+======================= The ngFor Directive ============================================
+
+<app-post *ngFor="let post of posts; let i = index"
+  [img]="post.img"
+  [author]="post.author"
+  [title]="post.title"
+></app-post>
+
+
+==========================================Static Assets ===============================
+
+src/assets directory is where we can upload assets, like images, that will be included with the project.
+We can provide relative path to assets directory in our template file
+
+
+=================================== Scoped CSS =======================================
+
+* The main benefit of defining styles in the component CSS files is that the styles are scoped. What does this mean? It means that the styles will only affect the template in the component.
+
+* Every template inside a component is placed inside a component tag. In some cases, we may want to select the component tag. For example, we may want to select the <app-post> component tag. If we’re going to apply styles to the <app-post> tag from the post.component.css file, we’ll need to use a special pseudo selector called :host.
+
+		:host {
+		  font-size: 20px;
+		}
+

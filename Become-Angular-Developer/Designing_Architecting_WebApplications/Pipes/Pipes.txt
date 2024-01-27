@@ -1,0 +1,90 @@
+
+* A pipe is a function for formatting a value. It’s a feature in templates that we can use to modify the output of an expression. It’s possible to use pipes outside of a template, but it’s rare to do so.
+
+
+
+
+----------- Pipe Parameters ------------------
+
+* https://angular.io/api?type=pipe
+
+* pipes:
+	titlecase
+	date
+
+	sample:
+		<p>{{ todaysDate | date: 'short' }}</p>
+		<p>{{ todaysDate | date: 'MMMM d' }}</p>
+
+* Custom format option for date
+	https://angular.io/api/common/DatePipe#custom-format-options	
+
+----------- Currency Pipe and Decimal Pipe ---------------
+
+currency:
+	<p>{{ cost | currency }}</p>
+	<p>{{ cost | currency: 'JPY' }}</p>
+	¥2,000
+
+* Perfect! One thing to keep in mind is that the currency pipe will not perform a conversion on your value. It will merely format it. It’s essential to perform a currency conversion before outputting it. 2000 Yen is not equal to 2000 USD.
+
+
+Decimal:
+	<p>{{ temperature | number: '1.0-0' }}</p>
+	temperature = 25.3;
+	result : 25
+
+---------------- JSON Pipe -----------------------------
+
+* The json pipe is convenient for debugging an object. It doesn’t serve much purpose outside of this.
+
+https://angular.io/api/common/JsonPipe.
+
+<pre>{{ pizza | json }}</pre>
+{
+  "toppings": [
+    "pepperoni",
+    "mushroom"
+  ],
+  "size": "Large"
+}
+
+--------------- Custom Pipes -----------------
+
+* ng generate pipe double
+* We can move the two generated file to a separete folder and import it into app.module.ts file
+* The ng generate pipe <name> command will create two files in the src/app directory: double.pipe.spec.ts and double.pipe.ts. The double.pipe.spec.ts file is for testing the pipe. The double.pipe.ts file is where we’ll write the logic for the pipe.
+
+------------
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'double'
+})
+export class DoublePipe implements PipeTransform {
+
+  transform(value: number, loop: number = 1 , flip: boolean = false): number {
+    for (let i = 0; i < loop; i++) {
+      value = value * 2;
+    }
+
+    if (flip) {
+      value = value * -1;
+    }
+    
+    return value;
+  }
+
+}
+
+cost = 4000
+<p>{{ cost | double: 2 : true }}</p>
+-8000
+
+------------------------ Taking Things a Step Further -----------------------------------
+
+* Using pipes outside of interpolation
+	<p *ngIf="(cost | double) > 3000">Show me!</p>
+
+* Multiple pipes#
+	<p>{{ temperature | double | number: '1.2-2' }}</p>

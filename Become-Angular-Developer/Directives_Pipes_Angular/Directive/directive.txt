@@ -22,7 +22,7 @@ On PowerShell:
 
 
 
-=============================  Understanding Directive : =========================================
+=============================  Important notes on Directive : =========================================
 
 * From the data source to the template looks like this:
 	{{data}}
@@ -45,6 +45,22 @@ On PowerShell:
 			(ngModelChange)
 
 
+* '@Input' attribute
+	   when passing attribute to child component from parent.
+	   
+	   <app-weather forecast="sun"></app-weather>
+	   	  in above case forecast is passed with a simple string directly, the value 'sun' is not propery in parent class
+	   
+	   <app-weather [forecast]="sun"></app-weather>
+	   		in above case forecast is passed with a propery 'sun' in parent class
+
+* we can’t apply two structural directives to the same element!
+
+		<ul>
+		    <li *ngFor="let user of users" *ngIf="user">
+		        {{ user.name }}
+		    </li>
+		</ul>
 =============================================== Directive ====================================================
 
 Directive used : 
@@ -100,6 +116,10 @@ Directive used :
 	? denotes an optional property. For example, if you have @Input() childMessage?: string;, it means that the childMessage property is optional, and you can pass undefined or omit it.
 
 	! is the non-null assertion operator. If you have @Input() childMessage!: string;, it tells TypeScript to assume that childMessage will be assigned a value and will not be null or undefined.
+
+* component vs Directive
+	A component is a reusable set of DOM elements that creates a UI supplied with custom behavior.
+	A directive is a reusable behavior that can be applied to existing DOM elements.
 
 
 Built-in Ng-Model directive
@@ -216,4 +236,79 @@ The Built-in `NgFor` Directive
 		  }
 		}
 
-	
+	* <section *ngFor="let user of users; let even = even; let odd = odd; trackBy: trackBy"
+         (click)="selectedUser = user"
+         [ngClass]="{even: even, odd: odd, active: selectedUser === user}">
+
+		- In this case active class will be applied dynamically based on the condition 'selectedUser === user'	
+
+Built-in `NgSwitch` Directive:
+------------------------------
+
+parent:
+	<app-weather forecast="sun"></app-weather>
+	<app-weather forecast="cloud"></app-weather>
+	<app-weather forecast="rain"></app-weather>
+	<app-weather forecast="snow"></app-weather>
+
+child:	
+	export class WeatherComponent {
+	  @Input() forecast!: 'sun' | 'rain' | 'cloud' | 'snow';
+	}
+
+	* <section [ngSwitch]="forecast">
+	  <p *ngSwitchCase="'sun'" [innerHTML]="sun"></p>
+	  <p *ngSwitchCase="'rain'" [innerHTML]="rain"></p>
+	  <p *ngSwitchCase="'cloud'" [innerHTML]="cloud"></p>
+	  <p *ngSwitchCase="'snow'" [innerHTML]="snow"></p>
+	  <p *ngSwitchDefault [innerHTML]="rainbow"></p>
+	</section>
+
+-The plain attribute directive NgSwitch is in control of other directives.
+-The structural directive NgSwithCase adds or removes elements from the DOM if its bound value equals the expression value.
+-The structural directive NgSwitchDefault adds an element to the DOM when none of the present cases are met.
+-It’s worth mentioning that NgSwitch works pretty similarly to NgIf. That’s useful to remember because NgSwitch doesn’t only hide the elements from the user’s view, but it altogether removes them from the DOM just like NgIf. So, we don’t have to worry about the performance. They are both excellent.
+
+parent:
+		export interface User {
+		  id: number;
+		  name: string;
+		  premium: boolean | undefined;
+		}
+
+		export class AppComponent {
+
+		  users: User[] = [
+		    { id: 1, name: 'John Doe', premium: false },
+		    { id: 2, name: 'Jane Doe', premium: true },
+		    { id: 3, name: 'Alice Doe', premium: true },
+		    { id: 4, name: 'Bob Doe', premium: undefined },
+		  ];
+		}
+
+		<div *ngFor="let user of users" [ngSwitch]="user.premium">
+		  <app-premium-user *ngSwitchCase="true" [user]="user"></app-premium-user>
+		  <app-standard-user *ngSwitchCase="false" [user]="user"></app-standard-user>
+		  <app-unknown-user *ngSwitchDefault [user]="user"></app-unknown-user>
+		</div>
+
+
+child:
+		export class PremiumUserComponent {
+		  @Input() user: User;
+		}
+
+		<p>{{user.name}}</p>
+
+
+A Useful Trick with `ng-container`:
+----------------------------------
+
+* The <ng-container> directive is very useful when we need a container to apply a directive, and there’s no point in adding new elements in the DOM. It’s efficient because it only lives in our Angular template and is removed during the runtime.
+	 <ul>
+	    <li *ngFor="let user of users">
+	        <ng-container *ngIf="user">
+	            {{ user.name }}
+	        <ng-container>
+	    </li>
+	</ul>

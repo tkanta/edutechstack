@@ -1,0 +1,228 @@
+
+=========================== Overall understanding ==================================
+
+@Input value binding:
+	<img src="/assets/avatar.png" appAvatar [size]="value">
+		* the size input property used in child directive will be bound to the value variable in parent class
+		* Since the size property of the directive is an Input property, we can use the data binding to not only bind it with a plain string like 120px, but also to bind it with any other field. In our case, we want to bind it with the value component’s field.
+
+	<img src="/assets/avatar.png" appAvatar size="120px">
+		* the size input property used in child directive will be bound to the hardcoded value in the image tag
+
+	<button appButton="secondary" [size]="180"> Click me</button>
+		* here the size with [] can handle both string/number if the destination directive has @Input variable size as number
+
+
+lifecycle call backs:
+	ngOnChanges: which is called each time the Input property changes (implements OnChanges)
+	ngOnInit:  it only works once (implements OnInit)
+
+substution:
+	<button appButton="secondary" [size]="150"> Click me</button>
+	@Input() size: number = 120;
+	this.elementRef.nativeElement.style.width = `${this.size}px`;
+
+
+Introduction to Attribute Directives:
+-----------------------------------------
+	* Attribute directives can be easily created using the the Angular CLI command ng g d <name>. Usually, it’s helpful to inject the instance of ElementRef that gives the reference to the host element of the directive. While implementing, we must remember that with our directive, different selectors help trigger specific elements.
+	* We’ll create a similar directive to the one in the previous lesson, so that it matches the following criteria:
+		•	The directive should set the size of the element to 72px x 72px.
+		•	The directive should add a yellow, 1px-width border to the image.
+		•	The directive should round the image so that it’s in the same shape as the circle.
+		•	The directive should only work on <img> element and not any other.
+	
+	parent:	
+		<img src="/assets/avatar.png" appAvatar>
+
+	Child directive:
+		@Directive({
+		  selector: 'img[appAvatar]'
+		})
+		export class AvatarDirective implements OnInit {
+
+		  constructor(private elementRef: ElementRef) {
+		  }
+
+		  ngOnInit() {
+		    const size = '72px';
+		    this.elementRef.nativeElement.style.width = size;
+		    this.elementRef.nativeElement.style.height = size;
+		    this.elementRef.nativeElement.style.border = `1px solid gold`;
+		    this.elementRef.nativeElement.style.borderRadius = size;
+		  }
+		}
+
+	
+Pass Values to the Custom Attribute Directive:
+----------------------------------------------
+	* Directives can use @Input properties to get data the same way that the child components do.
+	* We can specify the Input property name to be the same as the directive selector name, which results in applying a single attribute to the template.
+	* It’s essential to use proper lifecycle hooks in our directives.
+
+
+	Child:
+	-------
+		import { Directive, ElementRef, Input, OnChanges, OnInit } from '@angular/core';
+
+		@Directive({
+		  selector: '[appAvatar]'
+		})
+		export class AvatarDirective implements OnChanges {
+
+		    @Input() appAvatar: number = 64;
+
+		  constructor(private elementRef: ElementRef) { }
+
+		    ngOnChanges() {
+		        this.elementRef.nativeElement.style.width = this.appAvatar + 'px';
+		        this.elementRef.nativeElement.style.height = this.appAvatar + 'px';
+		    }
+		}
+
+	Parent:
+	--------
+		<img src="/assets/avatar.png" [appAvatar]="value">	
+
+		import { Component } from '@angular/core';
+
+		@Component({
+		  selector: 'app-root',
+		  templateUrl: './app.component.html',
+		  styleUrls: ['./app.component.scss']
+		})
+		export class AppComponent {
+
+		  value: number = 64;
+
+		  increase() {
+		    this.value = this.value + 4;
+		  }
+
+		  decrease() {
+		    this.value = this.value - 4;
+		  }
+		}
+
+Handle Events with a Custom Attribute Directive:
+-------------------------------------------------
+
+Host listener can receive event and its object. In this case, we register for the click event and want to receive the whole event object.
+
+	@HostListener('click', ['$event'])
+    onClick(event: Event) {
+        // ... do something on click
+    }
+
+
+Receiving click event in Directive from parent component and sending back output event to parent component
+
+		Child Directive:
+			import { Directive, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, Output } from '@angular/core';
+			@Directive({
+			  selector: '[appZoom]'
+			})
+			export class ZoomDirective {
+
+			  @Output() zoom: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+			  private zoomIn: boolean = false;
+
+			  constructor(private elementRef: ElementRef) {
+			  }
+
+			  @HostListener('click')
+			  onClick() {
+			    if (this.zoomIn) {
+			      // If element is zoomed in, reset the zoom and send false as an event.
+
+			      this.elementRef.nativeElement.style.transform = 'scale(1)';
+			      this.zoom.emit(false);
+			    } else {
+			      // If element is zoomed out, set the zoom and send true as an event.
+
+			      this.elementRef.nativeElement.style.transform = 'scale(1.1)';
+			      this.zoom.emit(true);
+			    }
+			    // Update the value to match the current state.
+			    this.zoomIn = !this.zoomIn;
+			  }
+			}
+
+		parent component:
+			<img src="/assets/avatar.png" appZoom (zoom)="onZoom($event)">
+			---------------------------------------
+			import { Component } from '@angular/core';
+
+			@Component({
+			  selector: 'app-root',
+			  templateUrl: './app.component.html',
+			  styleUrls: ['./app.component.scss']
+			})
+			export class AppComponent {
+
+			  onZoom(zoom: boolean) {
+			    zoom ? console.log('zoom in') : console.log('zoom out');
+			  }
+			}	
+
+
+Directive mouseenter/mouseleave 
+
+		Child Directive:
+			
+			import { Directive, HostListener, ElementRef, Input, OnChanges, OnInit, Output, EventEmitter } from '@angular/core';
+
+			@Directive({
+			  selector: '[appAvatar]'
+			})
+			export class AvatarDirective implements OnChanges {
+
+			  @Input() size: number = 64;
+			  @Output() zoom: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+			  constructor(private elementRef: ElementRef) {
+			  }
+
+			  ngOnChanges() {
+			    this.elementRef.nativeElement.style.width = this.size + 'px';
+			    this.elementRef.nativeElement.style.height = this.size + 'px';
+			  }
+
+			  @HostListener('mouseenter')
+			  onMouseHover(){
+			     this.elementRef.nativeElement.style.transform = 'scale(1.5)'
+			     this.zoom.emit(true)
+			  }
+			  // Set the image scale when mouse is over
+			  // Emit the event about that
+
+			   @HostListener('mouseleave')
+			    onMouseLeave(){
+			      this.elementRef.nativeElement.style.transform = 'scale(1)'
+			      this.zoom.emit(false)
+			    }
+			  // Reset the image scale when the mouse leaves element
+			  // Emit the event about that
+
+			}
+
+	  Parent Component:
+	  		<img src="/assets/avatar.png" appAvatar [size]="156" (zoom)="onZoom($event)">
+			----------------------
+			import { Component } from '@angular/core';
+
+			@Component({
+			  selector: 'app-root',
+			  templateUrl: './app.component.html',
+			  styleUrls: ['./app.component.scss']
+			})
+			export class AppComponent {
+
+			  // TODO receive the event and log message in the console
+			  onZoom(zoom: boolean){
+			     zoom ? console.log('Zoom In') : console.log('zoom out')
+			  }
+			}
+		
+		

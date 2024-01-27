@@ -1,0 +1,110 @@
+
+
+=========================== Setup Project ============================
+
+1. Install Angular CLI
+	https://www.knowledgehut.com/blog/web-development/install-angular-cli
+		npm install –g @angular/cli
+
+	npm update if required:
+		npm install -g npm@10.3.0
+
+	uninstall angular/cli
+		npm uninstall –g @angular/cli
+		npm cache clean
+		npm cache clean --force
+		npm cache verify	
+
+2. Install new project
+	ng new reverse-phrase
+
+3. start/stop server
+	npm start
+	ng serve			
+
+
+======================== Reviewing the Files ==============================
+
+Webpack : 
+	 is a popular module bundler, a tool for bundling application source code in convenient chunks and for loading that code from a server into a browser. It's an excellent alternative to the SystemJS approach used elsewhere in the documentation		
+
+.browserslistrc: 
+	Angular is built with various tools, such as Webpack. Most tools can be configured to output different results for specific browsers. It can be tedious to configure each tool for different browsers. This is where the .browserslistrc file comes into play.
+
+	Instead of configuring each tool, you can outsource the list of browsers to support in one file. The current configuration will support the latest browser but not IE. You can click on the link at the top of the file for various queries that can be added for more browser support. You can also run the following command to get the list of browsers the configuration will support:	 
+
+	- npx browserslist
+
+.editorconfig:
+ 	The .editorconfig file can be detected by most code editors. If present, the settings in the file will override the current settings of the editor. This saves you from having to manually make the changes. It’s a great way to keep formatting consistent across multiple editors.	
+
+angular.json:
+	The angular.json file is how we can configure the workspace and project. The CLI will use it to determine how it should build the project for development and production. We’ll be revisiting this file throughout the course.
+
+tsconfig.json#:
+	There are three configuration files for TypeScript: tsconfig.app.json, tsconfig.json, and tsconfig.spec.json. The tsconfig.app.json file is used when the application is compiled. The tsconfig.spec.json file is used when the testing code is compiled. Both files extend the tsconfig.json file.
+
+
+Tunnel visioning#
+	However, Angular is different. The files required for a basic project are comprehensive. This is because Angular is meant for large applications that can scale. Unlike other frameworks, it’s not meant for building small widgets on a page. It’s a convention over configuration framework.
+
+
+
+========================= Event Binding =============================
+
+* The only thing you need to know about the @Component decorator is that it helps Angular identify the class as a component class.
+* One thing you’ll notice is that we’re not using the this keyword or referring to the class name, AppComponent, in the template. Angular is capable of directly referencing the methods and properties in a component class. This allows us to call the function by its name onClickReverse(). We don’t have to use:
+* Every template will be connected to a component class. A component class is an object of methods and properties that are exposed to the template. It can be used to control and interact with the template. We can find the component class in the app.component.ts file
+
+
+========================= property binding =============================
+
+* property-value-does-not-exist-on-type-eventtarget-in-typescript
+
+	event.target here is an HTMLElement which is the parent of all HTML elements, but isn't guaranteed to have the property value. TypeScript detects this and throws the error. Cast event.target to the appropriate HTML element to ensure it is HTMLInputElement which does have a value property:
+		(event.target as HTMLInputElement).value	
+
+		sample error snippet:
+			<input (input)="onInputText($event.target.value)" />
+
+
+========================== Interpolation =================================
+
+* Angular will search through your template for expressions. It will interpolation on the result of an expression, which is the process of replacing placeholders with string values.		
+
+* We can output properties using double curly braces ({{ }}). The code inside the curly braces must be an expression. The result of the expression will be interpolated, and Angular will replace the curly braces with the evaluated value. This is interpolation.
+
+
+========================== Global CSS ======================================
+
+* There are various CSS frameworks available. Any of them will work with Angular. 
+
+* we’ll be using Bootstrap. We’ll need to install it using the following command:
+	npm install bootstrap
+
+* The first way is to use the src/styles.css file. This file is a stylesheet that will be applied globally to the application. We’ll use it to add Bootstrap to our project. At the top of the file, we’ll import the CSS.
+	@import 'bootstrap/dist/css/bootstrap.min.css';
+
+* The second way is to update the angular.json file. We briefly looked at the angular.json file in an earlier lesson. This file can be used to configure how our Angular project is compiled. It’s the settings that the CLI will use when serving and building the project.	
+
+	- Inside the project’s settings, there’s a property called architect. The architect property can be used to configure how the CLI will build the project corresponding to the command that’s building the project.
+
+		- The serve command uses the build command behind the scenes. This means both the serve and build objects are used. The serve object takes priority and will overwrite the properties in the build object
+		- Inside it, there’s an array called styles. This is an array of CSS files that should be bundled with the project. The CSS will be applied globally to the application. styles is not defined in the serve object, so we can add it to the build object since it will be merged with the serve object
+			"styles": [
+			  "src/styles.css",
+			  "bootstrap/dist/css/bootstrap.min.css"
+			]
+
+
+======================== Structural Directives ===============================
+
+Directive:
+	Structural: *ngIf
+	Attribute:	 ngClass		
+
+
+======================== Deploying the App =============================
+
+* Vercel comes with a tool for deploying projects with a single command. We’ll need to install the tool if we want to deploy the project.	
+* You can sign up here: https://vercel.com/.

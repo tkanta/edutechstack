@@ -1,0 +1,6 @@
+
+
+-------------- component ----------------
+
+* A parent component can directly use the child component if the child component is declared under 'declarations' section of app.module.ts
+* A parent component can pass value to child component using  @Input() variable
