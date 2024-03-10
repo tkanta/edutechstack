@@ -1,0 +1,50 @@
+
+================================= Intro =========================================
+
+* Benefits of Threads
+	Higher throughput, though in some pathetic scenarios it is possible to have the overhead of context switching among threads steal away any throughput gains and result in worse performance than a single-threaded scenario. However such cases are unlikely and an exception, rather than the norm.
+
+	Responsive applications that give the illusion of multi-tasking.
+
+	Efficient utilization of resources. Note that thread creation is light-weight in comparison to spawning a brand new process. Web servers that use threads instead of creating new processes when fielding web requests, consume far fewer resources.
+
+	All other benefits of multi-threading are extensions of or indirect benefits of the above.
+
+* Problems with Threads
+	However, as it is said, there's no free lunch in life. The premium for using threads manifests in the following forms:
+
+	Usually very hard to find bugs, some that may only rear head in production environments
+	Higher cost of code maintenance since the code inherently becomes harder to reason about
+	Increased utilization of system resources. Creation of each thread consumes additional memory, CPU cycles for book-keeping and waste of time in context switches.
+	Programs may experience slowdown as coordination amongst threads comes at a price. Acquiring and releasing locks adds to program execution time. Threads fighting over acquiring locks cause lock contention.	
+
+=============================== Program vs Process vs Thread ==========================
+
+Program
+	A program is a set of instructions and associated data that resides on the disk and is loaded by the operating system to perform some task. An executable file or a python script file are examples of programs. In order to run a program, the operating system's kernel is first asked to create a new process, which is an environment in which a program executes.
+
+Process
+	A process is a program in execution. A process is an execution environment that consists of instructions, user-data, and system-data segments, as well as lots of other resources such as CPU, memory, address-space, disk and network I/O acquired at runtime. A program can have several copies of it running at the same time but a process necessarily belongs to only one program.
+
+Thread
+	Thread is the smallest unit of execution in a process. A thread simply executes instructions serially. A process can have multiple threads running as part of it. Usually, there would be some state associated with the process that is shared among all the threads and in turn each thread would have some state private to itself. The globally shared state amongst the threads of a process is visible and accessible to all the threads, and special attention needs to be paid when any thread tries to read or write to this global shared state. There are several constructs offered by various programming languages to guard and discipline the access to this global state, which we will go into further detail in upcoming lessons.	
+
+============================ Concurrency vs Parallelism ====================================
+
+* From the above discussion it should be apparent that a concurrent system need not be parallel, whereas a parallel system is indeed concurrent. Additionally, a system can be both concurrent and parallel e.g. a multitasking operating system running on a multicore machine.
+
+* Concurrency is about dealing with lots of things at once. Parallelism is about doing lots of things at once
+ 
+
+=================== Cooperative Multitasking vs Preemptive Multitasking =================================
+
+* Early versions of both Windows and Mac OS used cooperative multitasking. Later on preemptive multitasking was introduced in Windows NT 3.1 and in Mac OS X. However, preemptive multitasking has always been a core feature of Unix based systems.	
+
+
+===================== Synchronous vs Asynchronous =====================================================
+
+* Asynchronous (or async) execution refers to execution that doesn't block when invoking subroutines. Or if you prefer the more fancy Wikipedia definition: Asynchronous programming is a means of parallel programming in which a unit of work runs separately from the main application thread and notifies the calling thread of its completion, failure or progress. An asynchronous program doesn’t wait for a task to complete and can move on to the next task.
+
+
+======================= I/O Bound vs CPU Bound ======================================================
+

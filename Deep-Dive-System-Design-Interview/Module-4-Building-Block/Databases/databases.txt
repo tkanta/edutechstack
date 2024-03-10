@@ -15,6 +15,19 @@ Cons:
 -  Google’s Cloud Spanner is one such database that’s geo-replicated with automatic horizontal sharding ability and high-speed global snapshots of data.
 
 
+------------- TYpes of databases --------------------------
+
+Relational:
+	Pros:
+		* One of the greatest powers of the relational database is its abstractions of ACID transactions and related programming semantics
+		* DDL even allows us to modify schema while other queries are happening and the database server is running.
+		* One of the biggest advantages of the relational database is that it eliminates data redundancy
+		* Concurrency in a relational database is handled through transactional access to the data
+		* The process of aggregating data from multiple sources is a common practice in enterprise applications. A common way to perform this aggregation is to integrate a shared database where multiple applications store their data. This way, all the applications can easily access each other’s data while the concurrency control measures handle the access of multiple applications.
+		* The export and import operations make backup and restoration easier. Most cloud-based relational databases perform continuous mirroring to avoid loss of data and make the restoration process easier and quicker
+	COns:
+		* 	
+
 -------------- Data Replication ----------------------
 
 

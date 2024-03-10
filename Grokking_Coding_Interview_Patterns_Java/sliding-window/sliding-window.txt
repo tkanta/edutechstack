@@ -1,0 +1,60 @@
+
+
+============ Real-world problems================
+
+Many problems in the real world use the sliding window pattern. Let’s look at some examples.
+
+* Telecommunications: Find the maximum number of users connected to a cellular network’s base station in every k-millisecond sliding window.
+
+* E-commerce: Given a dataset of product IDs in the order they were viewed by the user and a list of products that are likely to be similar, find how many times these products occur together in the dataset.
+
+* Video streaming: Given a stream of numbers representing the number of buffering events in a given user session, calculate the median number of buffering events in each one-minute interval.
+
+* Social media content mining: Given the lists of topics that two users have posted about, find the shortest sequence of posts by one user that includes all the topics that the other user has posted about.
+
+* Repeated DNA sequence
+
+
+	Given a string, s, that represents a DNA subsequence, and a number k
+	, return all the contiguous subsequences (substrings) of length k
+	 that occur more than once in the string
+
+	ChatGPT
+	--------------
+	To achieve this, you can use a sliding window approach along with a dictionary to keep track of the occurrences of each subsequence. Here's a Python function to do this:
+
+	python
+	Copy code
+	def repeated_subsequences(s, k):
+	    if len(s) < k:
+	        return []
+
+	    subsequences = {}
+	    repeated = set()
+
+	    for i in range(len(s) - k + 1):
+	        sub = s[i:i+k]
+	        if sub in subsequences:
+	            repeated.add(sub)
+	        else:
+	            subsequences[sub] = i
+
+	    return list(repeated)
+
+	# Example usage:
+	s = "AAGGTCCGAAGG"
+	k = 3
+	result = repeated_subsequences(s, k)
+	print(result)  # Output: ['AAG', 'AGG']
+	This function iterates through the string s using a sliding window of size k. It checks if the current subsequence exists in a dictionary. If it does, it means the subsequence has been encountered before, so it adds it to the repeated set. If not, it adds the subsequence to the dictionary. Finally, it returns a list of all the repeated subsequences found.
+
+
+polynomial rolling hash technique
+---------------------------------
+
+https://www.educative.io/answers/what-is-the-rabin-karp-algorithm
+
+Polynomials are algebraic expressions consisting of variables and coefficients, involving only the operations of addition, subtraction, multiplication, and non-negative integer exponents of variables. They are often expressed in the form:
+
+
+

@@ -1,0 +1,201 @@
+
+
+====================== Introduction to RxJS =====================
+
+RxJs library:
+	https://rxjs.dev/
+
+* The purpose of RxJS is to make dealing with asynchronous tasks easier. You can think of it as an alternative to promises and async/await syntax in JavaScript. With that being said, you don’t have to use RxJS. It’s completely optional. If you prefer promises or async/await, then, by all means, use it
+
+
+====================== Observables =================================
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/6.5.5/rxjs.umd.min.js"></script>
+const { fromEvent } = rxjs;
+const input = document.querySelector('input');
+const observable = fromEvent(input, 'input');
+
+* The fromEvent() function has two arguments. The first is the target on which we want to listen to an event. In this case, we want to listen for an event on the <input> element. The second argument is the name of the event to which we’ll be listening.
+
+* t’s common practice to destructure the object to grab the functions we want. This allows for tree shaking thus reducing the size of our bundle. It won’t apply in this case because we’re using a CDN, but it’s what we’ll do when going back to working in an actual project.
+
+
+===================== Observers =======================================
+
+
+observable.subscribe({
+    next(value) {
+        console.log(value);
+    }
+}) 
+
+* In this example, we’re calling the subscribe() function on the observable. This is how we create an observer. We’re passing an object where we have one function called next(). The object we pass in is what’s called the observer.
+
+* There are three possible functions we can define in the object: next(), error(), and complete() functions.
+
+====================== Pipes and Operators ==============================
+const { fromEvent } = rxjs;
+const { map } = rxjs.operators;
+const observable = fromEvent(input, 'input')
+    .pipe(
+        map(event => event.target.value),
+        map(value => parseInt(value))
+    );
+
+observable.subscribe({
+    next(value) {
+        console.log(value);
+    }
+}) 
+
+*  operators are functions that can transform a value in an observable. They’ll return a new observable. Pipes are a way to group multiple operators. The pipe() function will take care of passing the observable from one operator to the next.
+
+
+====================== Avoiding Single Operators ================================
+
+* By using multiple operators, we can swap them out easily without disturbing the rest of the chain. There are over 100 different operators.
+
+* https://rxjs.dev/api?type=function (operators)
+
+======================== Handling Errors ======================================
+
+observable.subscribe({
+    next(value) {
+        console.log(value);
+    },
+    error(err) {
+        console.log(err.message);
+    }
+}) 
+
+
+======================== Creating Raw Observables ===============================
+
+const { Observable } = rxjs;
+
+const observable = new Observable(observer => {
+    observer.next('Hello!');
+
+    observer.complete();
+
+    observer.error(new Error('An error has occurred.'));
+});
+
+observable.subscribe({
+    next(value) {
+        console.log('Observable sent a value', value);
+    },
+    complete() {
+        console.log('Complete');
+    },
+    error(err) {
+        console.log(err.message);
+    }
+})
+
+==================== Alternative Observer Syntax ===================================
+
+observable.subscribe(
+    (value) => console.log('Observable sent a value', value), // next
+    (err) => console.log(err.message), // error 
+    () => console.log('Complete'), // complete
+);
+
+=================== Unicast Observables ===========================================
+
+const { Observable } = rxjs;
+const { tap } = rxjs.operators;
+
+const observable = new Observable(observer => {
+    observer.next('Hello');
+
+    observer.complete();
+}).pipe(
+    tap(value => console.log('Tap function is running:', value))
+);
+
+observable.subscribe(
+    (value) => console.log('1st Observer:' , value),
+    (err) => console.log(err.message),
+    () => console.log('1st Complete')
+)
+
+observable.subscribe(
+    (value) => console.log('2nd Observer:' , value),
+)
+
+* So far, we’ve been working with one observer. We can have multiple observers if we’d like. For every observer we have, we’ll get a unique set of data. Let’s look at an example. It’s essential to understand this because we shouldn’t assume that we’ll get the same data every time. Just because one observer gets one set of data doesn’t guarantee another observer will get the same data.
+
+Tap function is running:
+Hello
+1st Observer:
+Hello
+1st Complete
+Tap function is running:
+Hello
+2nd Observer:
+Hello
+
+============================ Understanding RxJS in Our Application =================================
+
+* Since the http.get() method returns an observable; we’re more than free to chain the pipe() method to add some operators. We’re using the pluck() operator to grab the drinks property from the response. Since it’s an operator, it will return a new observable where it will emit the data.
+
+public search(query: string) {
+    return this.http.get('https://www.thecocktaildb.com/api/json/v1/1/search.php', {
+      params: {
+        s: query,
+      }
+    }).pipe(
+      pluck('drinks')
+    );
+  }
+-----------
+search(query: string) {
+    this.query = query;
+
+    this.cocktail.search(query).subscribe((response: any) => {
+      this.drinks = response;
+    });
+  }
+
+
+====================== Using Generics With Observables ===============================================
+
+interface CocktailResponse {
+  drinks: {
+    strDrink: string;
+    strInstructions: string;
+  }[]
+}
+
+public search(query: string) {
+    return this.http.get<CocktailResponse>('https://www.thecocktaildb.com/api/json/v1/1/search.php', {
+      params: {
+        s: query,
+      }
+    }).pipe(
+      pluck('drinks')
+    );
+  }
+
+* We’re setting the observable’s response to the CocktailResponse type. Afterward, we can update the app.component.ts file by removing the any type from the response parameter.
+
+* The best part about this is that it will help us debug our application. TypeScript will know if we’re misusing the response. It will be able to tell us before we run our code in the browser.
+
+
+======================= observer sample subscription ========================
+
+search(query: string){
+    this.query = query;
+    this.cocktail.search(query).subscribe( { next: (response: any) => {
+      console.log('--------> ',response);
+      this.drinks = response;
+    },
+    error: (err) => {
+      console.log(err)
+    },
+    complete: () => {
+      console.log('completed!')
+    }});
+    
+  }

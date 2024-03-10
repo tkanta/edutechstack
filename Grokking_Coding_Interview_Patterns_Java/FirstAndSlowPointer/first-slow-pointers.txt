@@ -12,3 +12,36 @@ Happy Number:
 - Iterate till fast number is (!= 1) and (!= slow)
 - if fast number converges to 1, it is a happy number otherwise its a non-happy number
 
+====================== Fast and Slow Pointers: Introduction =========================
+
+probelms
+	- Find the middle node of a Linked List
+	- Determine if a Integer is a happy number
+
+Does my problem match this pattern?
+	Either as an intermediate step, or as the final solution, the problem requires identifying:
+	- the first x% of the elements in a linked list, or,
+	- the element at the k-way point in a linked list, for example, the middle element, or the element at the start of the second quartile, etc.
+	- the kth last element in a linked list
+
+======================== Happy Number ================================================
+
+Time complexity Logarithm:
+	- https://towardsdatascience.com/logarithms-exponents-in-complexity-analysis-b8071979e847	
+	- https://www.linkedin.com/pulse/algorithm-complexity-understanding-time-space-devender-singh#:~:text=Logarithmic%20Space%20Complexity%20(O(log,is%20a%20binary%20search%20tree.
+
+What is logarithm:
+	- https://byjus.com/maths/logarithms/
+	In Mathematics, logarithms are the other way of writing the exponents. A logarithm of a number with a base is equal to another number. A logarithm is just the opposite function of exponentiation. For example, if 10^2 = 100 then log10 100 = 2.
+
+	Hence, we can conclude that, 
+	Logb x = n  or   bn = x	
+	This can be read as “Logarithm of x to the base b is equal to n”.
+
+Time complexity:
+	We have to take the largest number in each n digit number( e.g 2 digit number 99), the time complexity of this function is O(logn), because the number of digits in the number n is log n base 10 
+
+
+========================== Linked List Cycle ==================================
+
+	

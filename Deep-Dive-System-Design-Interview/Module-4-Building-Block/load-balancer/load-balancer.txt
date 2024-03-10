@@ -1,0 +1,29 @@
+
+=========================== Global and Local Load Balancing ===========================
+
+Proxy Vs Reverse Proxy vs Load Balancer:
+	https://www.nginx.com/resources/glossary/reverse-proxy-vs-load-balancer/
+	https://medium.com/tech-it-out/proxy-vs-reverse-proxy-vs-load-balancer-3937915631c8 ***
+
+Keepalive vs haproxy:
+	https://stackoverflow.com/questions/29292393/advantage-of-using-haproxy-and-keepalived-vs-just-keepalived
+	
+	* Keepalived is working in layer 4 so doesn't have layer 7 knowledge at all. By using HAProxy and Keepalived together you can get benefit of having some options that HAProxy provides in layer 7 like Stickiness, Sampling and converting information, ACLs and conditions, Content switching, Stick-tables, Formated strings, HTTP rewriting and redirection, Server protection, etc.
+
+	If you only need to have a load balancer without any manipulating or any high level decision (layer 7) you can use only Keepalived and it will be faster because it works in layer 4.	
+
+	* Administrators can use both Keepalived and HAProxy together for a more robust and scalable high availability environment. Using the speed and scalability of HAProxy to perform load balancing for HTTP and other TCP-based services in conjunction with Keepalived failover services, administrators can increase availability by distributing load across real servers as well as ensuring continuity in the event of router unavailability by performing failover to backup routers.
+		- https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/load_balancer_administration/s2-lvs-keepalived-haproxy-vsa
+
+
+===================== Advanced Details of Load Balancers =======================
+
+* The OSI model is a conceptual framework that classifies different functionalities of a communication system into seven distinct layers. Each layer has its specific set of responsibilities, scope, and interaction with other layers to ensure reliable and efficient communication. For a concise explanation of the OSI model, see https://www.educative.io/answers/what-is-the-osi-model. To dive deep into OSI, see https://www.educative.io/blog/osi-model-layers.
+
+* software LBs can provide predictive analysis that can help prepare for future traffic patterns.
+
+* Layer 7 LBs provide services at tier 3. Since these LBs are in direct contact with the back-end servers, they perform health monitoring of servers at HTTP level. This tier enables scalability by evenly distributing requests among the set of healthy back-end servers and provides high availability by monitoring the health of servers directly. This tier also reduces the burden on end-servers by handling low-level details like TCP-congestion control protocols, the discovery of Path MTU (maximum transmission unit), the difference in application protocol between client and back-end servers, and so on. The idea is to leave the computation and data serving to the application servers and effectively utilize load balancing commodity machines for trivial tasks. In some cases, layer 7 LBs are at the same level as the service hosts.
+	- TCP-congestion control protocols:  TCP makes use of a congestion window to estimate the number of in-flight packets in a connection to avoid network congestion. Two well-known TCP congestion protocols are Tahoe and Reno.
+	- MTU : Path MTU is the largest packet size that a source can send on the network beyond which packet fragmentation will happen. This number is equal to the smallest MTU on the network path.
+
+* LBs have come a long way to become a service offered in the cloud, starting since their inception in the form of hardware. They’re a key component of any enterprise-level service. Horizontal scalability of hosting servers will always require a good load balancing layer capable of providing load balancing, session maintenance, TLS offloading, service discovery, and more.

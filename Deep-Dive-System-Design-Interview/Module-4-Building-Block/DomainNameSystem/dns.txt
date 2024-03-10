@@ -1,0 +1,81 @@
+
+
+Type
+Description
+Name
+Value
+
+Example (Type, Name, Value)
+
+
+========================== Introduction to Domain Name System (DNS) ====================
+
+Common Types of Resource Records
+---------------------------------------
+A
+Provides the hostname to IP address mapping
+Hostname
+IP address
+(A, relay1.main.educative.io,104.18.2.119)
+
+NS
+Provides the hostname that is the authoritative DNS for a domain name  
+Domain name
+Hostname
+(NS, educative.io, dns.educative.io)
+
+CNAME
+Provides the mapping from alias to canonical  hostname
+Hostname
+Canonical name
+(CNAME, educative.io, server1.primary.educative.io)
+
+MX
+Provides the mapping of mail server from alias to canonical hostname
+Hostname
+Canonical name
+(MX, mail.educative.io, mailserver1.backup.educative.io)
+
+Caching:
+----------
+	 DNS uses caching at different layers to reduce request latency for the user. Caching plays an important role in reducing the burden on DNS infrastructure because it has to cater to the queries of the entire Internet.
+
+Hierarchy:
+----------- 
+	DNS name servers are in a hierarchical form. The hierarchical structure allows DNS to be highly scalable because of its increasing size and query load. In the next lesson, we’ll look at how a tree-like structure is used to manage the entire DNS database.
+
+
+============================ How the Domain Name System Works ================================
+
+* There are two ways to perform a DNS query:
+
+Iterative: The local server requests the root, TLD, and the authoritative servers for the IP address.
+Recursive: The end user requests the local server. The local server further requests the root DNS name servers. The root name servers forward the requests to other name servers.
+
+* DNS uses various protocols to update and transfer information among replicated servers in a hierarchy. DNS compromises on strong consistency to achieve high performance because data is read frequently from DNS databases as compared to writing. However, DNS provides eventual consistency and updates records on replicated servers lazily. Typically, it can take from a few seconds up to three days to update records on the DNS servers across the Internet. The time it takes to propagate information among different DNS clusters depends on the DNS infrastructure, the size of the update, and which part of the DNS tree is being updated.
+
+* Typically, DNS uses UDP. However, DNS can use TCP when its message size exceeds the original packet size of 512 Bytes. This is because large-size packets are more prone to be damaged in congested networks. DNS always uses TCP for zone transfers.
+
+	Some clients prefer DNS over TCP to employ transport layer security for privacy reasons.
+
+* Typically, it can take from a few seconds up to three days to update records on the DNS servers across the Internet
+
+* End users’ operating systems have configuration files (/etc/resolv.conf in Linux) with the DNS resolvers’ IP addresses, which in turn obtain all information for them. (Often, DHCP provides the default DNS resolver IP address along with other configurations.) The end-systems request DNS resolves for any DNS queries. DNS resolvers have special software installed to resolve queries through the DNS infrastructure. The root server’s IP addresses are within the special software. Typically, the Berkeley Internet Name Domain (BIND) software is used on DNS resolvers. The InterNIC (https://www.internic.net/domain/named.root) maintains the updated list of 13 root servers.
+
+So, we break the chicken-and-egg problem by seeding each resolver with prior knowledge of root DNS servers (whose IPs rarely change).
+
+* There are 13 logical root name servers (named letter A through M) with many instances (1000) spread throughout the globe. These servers are managed by 12 different organizations.
+
+* Typically, DNS uses UDP. However, DNS can use TCP when its message size exceeds the original packet size of 512 Bytes. This is because large-size packets are more prone to be damaged in congested networks. DNS always uses TCP for zone transfers.
+
+Some clients prefer DNS over TCP to employ transport layer security for privacy reasons.		
+
+
+commands:
+------------
+	nslookup www.google.com
+		cached version of Google’s authoritative nameservers response
+
+	dig www.google.com
+		Query time: 4 msec
+		ANSWER SECTION represents the number of seconds the cache is maintained in the DNS resolver

@@ -1,0 +1,18 @@
+
+
+==================== Modified Binary Search: Introduction =====================
+
+* Does my problem match this pattern?
+	•	Yes, if either of these conditions is fulfilled:
+	o	The problem requires us to find a target value (or its first or last occurrence) in a sorted array or a sorted list that supports direct addressing.
+	o	We may use this pattern when segments of an input array are sorted, even if the whole list does not, at first sight, seem to be sorted. For example, we can modify the binary search technique to find a target in a sorted array that has been rotated around an arbitrary pivot.
+	•	No, if either of these conditions is fulfilled:
+	o	The input data structure does not support direct addressing.
+	o	The data to search is not sorted according to criteria relevant to the search. For example, if we’re looking for a particular date in a list of dates, but the list is sorted in alphabetical order (and not chronologically), we cannot use binary search.
+	o	The solution does not require us to find a particular value or range of values.
+
+* You may notice that at least one half of the array is always sorted—if the array is rotated by less than half the length of the array, at least the second half of the array will still be sorted. Contrarily, if the array is rotated by more than half the length of the array, then at least the first half of the array will be sorted. We can use this property to our advantage and modify the binarySearch function as follows:
+
+If the target value lies within the sorted half of the array, our problem is a basic binary search.
+
+Otherwise, discard the sorted half and keep examining the unsorted half.

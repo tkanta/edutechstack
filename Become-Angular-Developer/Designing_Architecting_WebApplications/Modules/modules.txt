@@ -1,0 +1,49 @@
+
+
+=================== Creating new Project ===========================
+
+* ng new website --routing
+	- During the setup process, the CLI will ask you about the default settings for the project. Typically, it will ask if you’d like to add routing. By adding the --routing option, it will skip this question and automatically install routing for you. As for the rest of the settings, you can go with the default.Alternatively, you can just run the command without the --routing option. You can select to have routing installed during the setup. They both result in the same thing.
+
+
+================ Exploring Modules ==========================	
+
+* declarations#
+	Anytime we create a directive, component, or pipe, we need to register it with our project. It isn’t automatically injected into our application. We can register these classes by adding them to the declarations option.
+
+* imports:
+	Modules can import other modules. This is how we can share things, like components, between modules. In the app.module.ts file, a module, called BrowserModule, is being imported into the module. This is a module defined by Angular to help us interact with the browser.
+
+* exports:
+	Even though this option is not in the app.module.ts file, it goes hand-in-hand with the imports option. The exports option allows us to specify what pieces of a module can be exported. Not everything becomes exposed the second we import a module. We need to specifically tell Angular what can be exposed.
+
+* providers:
+	The providers option is deprecated. We won’t have to worry about it since it won’t be available in future versions of Angular.
+
+* bootstrap:
+	The bootstrap option is an exclusive option to the root module of an application. In this case, the app module. It’s a list of components that will be inserted into the browser when the application starts.				
+
+================= Creating a Module ==============================
+
+* ng generate module <name>
+
+* ng generate module home --routing
+	- generate home and its corresponding routing module under home folder	
+		* home.module.ts
+		* home-routing.module.ts
+
+* The most important part of this code is the @NgModule() decorator. This will help Angular understand that the AppModule class is a module.
+
+* A module can do the below things
+	- declaration : of all components/pipes/directive that it has created inside the module
+	- imports  : routing module as well as other third party and custom modules
+	- exports : components/pipes/directive that will be available to modules that has imported this module
+
+================== Importing and Exporting Modules ==========================
+
+* ng generate component home/home-main
+	 - create a home-main component under home module
+
+* Module can import other modules and only the exported elements(component, pipes, directive) from the imported module will be available to the module that has imported the module
+
+* Route modules will be traversed through out the interconnected modules and applied with matching routes

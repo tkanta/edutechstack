@@ -1,0 +1,170 @@
+
+========================= Getting Started with State Persistence ==================================
+
+
+======================== Analyzing Failure of the Stateful Application ===========================
+
+Emulate pod failure by killing container process:
+	kubectl --namespace jenkins exec -it $POD_NAME pkill java
+
+Getting POD name using selector:
+	POD_NAME=$(kubectl --namespace jenkins  get pods --selector=app=jenkins -o jsonpath="{.items[*].metadata.name}")
+
+
+======================== Creating AWS Volumes ================================
+
+* If we want to persist a state that will survive even server failures, we have two options to choose.
+	- Local storage#	
+		* We could, for example, store data locally and replicate it to multiple servers. This way, a container could use local storage, knowing that the files are available on all the servers. Such a setup would be too complicated if we’d like to implement the process ourselves. We could use one of the volume drivers for that. However, we’ll opt for a more commonly used method to persist the state across failures. We’ll use external storage.
+
+	- External storage#
+		* We’ll choose Elastic Block Store (EBS) for our storage needs. Jenkins depends heavily on IO, and we need data access to be as fast as possible. However, there is another reason for such a choice. EBS is fully supported by Kubernetes. EFS will come but it is still in the experimental stage. As a bonus advantage, EBS is much cheaper than EFS
+
+		* Elastic Block Store (EBS) is the fastest storage we can use in AWS. Its data access latency is very low, therefore making it the best choice when performance is the primary concern. The downside is availability. It doesn’t work in multiple availability zones. Failure of one will mean downtime, at least until the zone is restored to its operational state.
+
+
+* The command that filters and retrieves the availability zones of the worker nodes is as follows:
+
+	* aws ec2 describe-instances | jq -r ".Reservations[].Instances[] | select(.SecurityGroups[]\.GroupName==\"nodes.$NAME\")\.Placement.AvailabilityZone" | tee zones		
+	* AZ_1=$(cat zones | head -n 1)
+	* AZ_2=$(cat zones | tail -n 1)
+
+* Volume creation at availability zones:
+	* gp2 is usually the best choice for EBS volumes.
+
+	VOLUME_ID_1=$(aws ec2 create-volume \
+    --availability-zone $AZ_1 \
+    --size 10 \
+    --volume-type gp2 \
+    --tag-specifications "ResourceType=volume,Tags=[{Key=KubernetesCluster,Value=$NAME}]" \
+    | jq -r '.VolumeId')
+
+* Describe volume:
+	aws ec2 describe-volumes --volume-ids $VOLUME_ID_1
+
+
+============================ Creating Kubernetes Persistent Volumes ===================================
+
+* PersistentVolumes allow us to abstract details of how storage is provided (e.g., EBS) from how it is consumed. Just like volumes, PersistentVolumes are resources in a Kubernetes cluster. The main difference is that their lifecycle is independent of individual Pods that are using them.
+	kind: PersistentVolume
+	apiVersion: v1
+	metadata:
+	  name: manual-ebs-01
+	  labels:
+	    type: ebs
+	spec:
+	  storageClassName: manual-ebs
+	  capacity:
+	    storage: 5Gi
+	  accessModes:
+	    - ReadWriteOnce
+	  awsElasticBlockStore:
+	    volumeID: REPLACE_ME_1
+	    fsType: ext4
+
+* Replace volume ID
+	cat pv/pv.yml \
+    | sed -e \
+    "s@REPLACE_ME_1@$VOLUME_ID_1@g" \
+    | sed -e \
+    "s@REPLACE_ME_2@$VOLUME_ID_2@g" \
+    | sed -e \
+    "s@REPLACE_ME_3@$VOLUME_ID_3@g" \
+    | kubectl create -f - \
+    --save-config --record
+
+* Commands:	
+	 kubectl get pv
+
+* The persistent volumes are Available. We created them, but no one is using them. They just sit there waiting for someone to claim them.
+
+
+========================= Claiming Persistent Volumes ==========================
+
+* Just like Pods that can request specific resources like memory and CPU, PersistentVolumeClaims can request particular sizes and access modes. Both are, in a way, consuming resources, even though of different types. Just as Pods should not specify on which node they should run, PersistentVolumeClaims cannot define which volume they should mount. Instead, the Kubernetes scheduler will assign them a volume depending on the claimed resources.
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: jenkins
+  namespace: jenkins
+spec:
+  storageClassName: manual-ebs
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+We can see that one of the volumes (manual-ebs-02) changed the status from available to bound. That is the volume bound to the claim we created a moment ago. 
+
+* commands:
+	kubectl --namespace jenkins get pvc      	 
+
+* Note: If a PersistentVolumeClaim cannot find a matching volume, it will remain unbound indefinitely unless we add a new PersistentVolume with the matching specifications.
+
+============================ Creating Deployment for Attaching Claimed Volumes to Pods =================================
+
+* The next step is to attach these claimed volumes to pods.
+
+...
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins
+  namespace: jenkins
+spec:
+  ...
+  template:
+    ...
+    spec:
+      containers:
+      - name: jenkins
+        ...
+        volumeMounts:
+        - name: jenkins-home
+          mountPath: /var/jenkins_home
+        ...
+      volumes:
+      - name: jenkins-home
+        persistentVolumeClaim:
+          claimName: jenkins
+      ...
+
+We executed the kubectl command.
+The kubectl sends a request to kube-apiserver to create the resources defined in pv/jenkins-pv.yml.
+Among others, the jenkins Pod is created in one of the worker nodes.
+Since the jenkins container in the Pod has a PersistentVolumeClaim, it mounted it as a logical volume.
+The PersistentVolumeClaim is already bound to one of the PersistentVolumes.
+The PersistentVolume is associated with one of the EBS volumes.
+The EBS volume is mounted as a physical volume to the jenkins Pod.      
+
+
+======================== Verifying State Persistence and Exploring Failures =========================
+
+What if a node gets terminated?
+	If instead of destroying the container, we terminate the server where the Pod is running, the result would be the same from the functional perspective. The Pod would be rescheduled to a healthy node. Jenkins would start again and restore its state from the EBS volume. However, such behavior is not guaranteed to happen in our cluster.
+
+	We have only two worker nodes distributed in two (out of three) availability zones. If the node that hosted Jenkins failed, we’d be left with only one node. To be more precise, we’d have only one worker node running in the cluster until the Auto Scaling Group detects that an EC2 instance is missing and recreates it. During those few minutes, the single node we’re left with is not in the same zone. As we already mentioned, each EBS instance is tied to a zone, and the one we mounted to the Jenkins Pod would not be associated with the zone where the other EC2 instance is running.
+
+What if the availability zone fails?
+
+	There is still one more situation we might encounter. A whole availability zone (data center) might fail. Kubernetes will continue operating correctly. It’ll have two instead of three primary nodes, and the failed worker nodes will be recreated in healthy zones. However, we’d run into trouble with our stateful services. Kubernetes would be unable to reschedule those that were mounted to EBS volumes from the failed zone. We’d need to wait for the availability zone to come back online, or we’d need to move the EBS volume to a healthy zone manually. The chances are that, in such a case, the EBS would not be available and, therefore, could not be moved.
+
+=================================== Removing Resources and Exploring Effects =====================================
+
+kubectl --namespace jenkins delete deploy jenkins
+kubectl --namespace jenkins delete pvc jenkins
+kubectl delete -f pv/pv.yml	
+aws ec2 delete-volume --volume-id $VOLUME_ID_1
+
+ReclaimPolicy:
+	Note: The ReclaimPolicy defines what should be done with a volume after it’s released from its claim.
+
+	* The Retain reclaim policy enforces manual reclamation of the resource. When the PersistentVolumeClaim is deleted, the PersistentVolume still exists, and the volume is considered released. But it is not yet available for other claims because the previous claimant’s data remains on the volume. In our case, that data is Jenkins state. If we’d like this PersistentVolume to become available, we’d need to delete all the data on the EBS volume.
+
+	* The other two reclaim policies are Recycle and Delete. Recycle is considered deprecated so we won’t waste time explaining it. The Delete policy requires dynamic provisioning
+
+=============================== Using Storage Classes to Dynamically Provision PersistentVolumes ===========================
+
+	

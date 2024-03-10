@@ -1,0 +1,6 @@
+
+create repo
+------------
+mvn archetype:generate -DgroupId=thread -DartifactId=concurrency-project -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+
+

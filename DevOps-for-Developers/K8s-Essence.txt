@@ -21,6 +21,13 @@ emptydir vs persistence volume:
 
 
 
+Persistent Volume (PV) and Persistent Volume Claim(PVC):
+	kubectl get pv
+	kubectl get pvc --namespace jenkins  
+	kubectl --namespace jenkins delete deploy jenkins
+	kubectl --namespace jenkins delete pvc jenkins
+	kubectl delete -f pv/pv.yml
+	
 Creating User and Groups, Service Account(SA):
 	
 Switching context (user/namespace/cluster):

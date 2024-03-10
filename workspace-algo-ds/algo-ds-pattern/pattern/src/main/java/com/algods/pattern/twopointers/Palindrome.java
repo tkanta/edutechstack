@@ -20,6 +20,7 @@ public class Palindrome {
 	public static void main(String[] args) {
 		String[] strs = new String[] {"kayak","hello","RACEACAR","A","ABCDABCD","DCBAABCD","ABCBA"};
 		for(String s : strs) {
+			System.out.println(new String(new char[50]).replace("\0", "-"));
 			System.out.println(s + " is palindrom ? "+ isPalindrome(s));
 		}
 	}

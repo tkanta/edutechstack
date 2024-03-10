@@ -6,7 +6,8 @@ import java.util.Arrays;
  * Given an array of integers, nums, and an integer value, target, determine if
  * there are any three integers in nums whose sum equals the target. Return TRUE
  * if three such integers are found in the array. Otherwise, return FALSE
- * 
+ * Time complexity = O(nlogn + n^2) ~ O(n^2)
+ * Space complexity O(1)
  * @author tarin
  *
  */
@@ -14,9 +15,10 @@ public class SumOfThree {
 	public static boolean findSumOfThree(int nums[], int target) {
 		// Sorting the input list
 		Arrays.sort(nums);
-		int low, high, triples;
+		int low, high, tripleSum;
 
 		// Fix one element at a time and find the other two
+		// move the fix element till it reaches just before last but 2nd
 		for (int i = 0; i < nums.length - 2; i++) {
 			// Set the indexes of the two pointers
 
@@ -28,14 +30,14 @@ public class SumOfThree {
 
 			while (low < high) {
 				// Check if the sum of the triple is equal to the sum
-				triples = nums[i] + nums[low] + nums[high];
+				tripleSum = nums[i] + nums[low] + nums[high];
 				// Found a triple whose sum equals the target
-				if (triples == target) {
+				if (tripleSum == target) {
 					return true;
 				}
 				// Move low pointer forward if the triple sum is less
 				// than the required sum
-				else if (triples < target) {
+				else if (tripleSum < target) {
 					low++;
 				} // Move the high pointer backwards if the triple
 					// sum is greater than the required sum
@@ -60,10 +62,12 @@ public class SumOfThree {
                          {8, 11, 15}};
 
 		
-		for (int i=0; i<testList.length; i++) {
+		for (int i=0; i < testList.length; i++) {
+			
 			System.out.print(i+1);
 			System.out.println(".\tInput array: " + Arrays.toString(numsList[i]));
-			for(int j=0 ;j<testList[i].length; j++){
+			
+			for(int j=0 ;j < testList[i].length; j++){
               if (findSumOfThree(numsList[i], testList[i][j])) {
 				System.out.println("\tSum for " + testList[i][j] + " exists ");
 			  } else {

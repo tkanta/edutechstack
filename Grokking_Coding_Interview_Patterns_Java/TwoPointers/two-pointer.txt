@@ -1,5 +1,29 @@
 
+============================ Two Pointers: Introduction ===========================
+
+* Whenever there’s a requirement to find two data elements in an array that satisfy a certain condition, the two pointers pattern should be the first strategy to come to mind.Essentially, the two pointers pattern is an application of the prune-and-search strategy, in which, at every step, we’re able to safely prune—that is, eliminate—a set of possible solutions.
+
+- Reversing numbers in an Arrays
+- Pair with Given Sum in a Sorted Array
+- Find any three values in a sorted array that sum up to 825.
+	* sort the array
+	* fix a element in sorted array and move up until before last but 2nd element
+	* calculate sum of fix+low+high
+	* if sum is less than target low++ else high--
+
+- Remove the nth node from end of linked list
+	Two pointers, right and left, are set at the head node.
+	Move the right pointer n steps forward.
+	If right reaches NULL, return head's next node.
+	Move both right and left pointers forward till right reaches the last node.
+	Relink the left node to the node at left's next to the next node.
+	Return head.	
+	
 - Given an array of unsorted numbers, find all unique triplets in it that add up to zero.
 - Reverse a word in a string
 - Valid Palindrome II
 	* A palindrome number is a number that is same after reverse.
+- Memory management: 
+- Transmission errors
+- Product suggestions
+

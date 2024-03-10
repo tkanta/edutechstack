@@ -1,0 +1,119 @@
+
+
+-------------------- Routing Module import ------------
+
+* The home routing module needs to be imported in a module. The home module imports it. Then, we import the home module in the app module. In the app component’s template file, we use the router-outlet directive to load the component registered by the path.
+
+* Linking the modules together will result in the HomeMainComponent loading on the page. One important point to make is that the HomeMainComponent can’t be used in the app component’s template file because it’s not exported anymore. Instead, the router is loading the component for us with the placeholder.
+
+* Commands:
+	ng generate component contact/contact-main
+	ng generate component about/about-main
+
+* Add child routing module to its child module and import those child module to app module	
+
+
+------------------- The RouterLink Directive -----------------
+
+Bootstarp navigation: 
+	https://getbootstrap.com/docs/5.0/components/navbar/
+
+Js History API:
+	https://developer.mozilla.org/en-US/docs/Web/API/History_API
+	* The history API enables us to visit different pages without having to reload the assets. This is achieved using the history.pushState() method. It exposes the browser’s navigation history to JavaScript.
+
+Base Path:
+	One additional thing I want to mention is how Angular constructs paths. It uses what’s known as a base URL. In the src/index.html file, you’ll find the following:	
+
+
+------------------- Active Link Styles ---------------------------
+
+* The next objective is to add the active class to the link the user is currently visiting. While not required, it can help the user identify where they are. In Bootstrap, the active class can be applied to the <li> element wrapped around the <a> element.
+
+Here’s the problem, though: we want to dynamically add the class. The active class shouldn’t be applied to the element if the URLs don’t match. Angular comes with a directive for this called routerLinkActive.
+
+
+---------------- Wildcard Routes --------------------------------
+
+* ng generate component PageNotFound
+* Wildcard routes are routes that can capture any route. This is useful for capturing routes that don’t exist in our application. A wildcard route can be added using two asterisks (**).
+* The order in which the modules are listed in the imports option is the order in which the routes will be registered
+* All we have to do is change the order of modules in the imports option of the app.module.ts file. We’ll move the AppRoutingModule, that contains the wild card route to the bottom of the array.
+
+
+----------------- Lazy Loading Modules ----------------------------
+
+* remove direct module import in app.module	
+
+* Include lazy loading in app.routing.module as shown below
+	- {path:'about', loadChildren: () => import('./about/about.module').then(m => m.AboutModule)}
+
+* Include empty string in path:'' in each routing module to be lazy loaded, as the route path in app.module will decide the route path
+
+----------------- The NgContent Directive -----------------------------
+
+* The <ng-content> element will be replaced with whatever is passed down from the parent component. It’s an element that gives us the power to determine where to load the content, which makes the AlertComponent reusable.
+
+* ng generate module base
+* ng generate component base/alert
+* Alert component:	
+	<div class="alert alert-primary">
+	  <ng-content></ng-content>
+	</div>
+* Home component:
+	<app-alert>
+	  This is an alert. Learn more about alerts
+	  <a href="https://getbootstrap.com/docs/4.5/components/alerts/">here</a>.
+	</app-alert>
+
+
+----------------------- Selecting Content ---------------------------
+
+* The value for the select attribute can be any valid CSS selector. In this example, we’re selecting an element that has the heading attribute.
+  As for the other <ng-content> element, Angular will replace it with any content that wasn’t selected. They are the leftovers. Let’s update the home-main.component.html file to use the new location.
+
+* Parent:
+	<app-alert>
+	  <div heading>Example Title!</div>  *or* <ng-container heading>Example Title!</ng-container>
+
+	  This is an alert. Learn more about alerts
+	  <a href="https://getbootstrap.com/docs/4.5/components/alerts/">here</a>.
+	</app-alert>  
+
+* Child:
+	<div class="alert alert-primary">
+	  <h4 class="alert-heading">
+	    <ng-content select="[heading]"></ng-content>
+	  </h4>
+
+	  <ng-content></ng-content>
+	</div>	
+
+
+----------------------- child routes for existing route ----------------------------------
+
+* Sample:
+	const routes: Routes = [
+	  {
+	    path: '',
+	    component: AboutMainComponent,
+	    children: [
+	      { path: '', component: BioComponent },
+	      { path: 'team', component: TeamComponent },
+	      { path: 'clients', component: ClientsComponent },
+	    ]
+	  }
+	];
+
+* The last piece of the puzzle is to load the components for the child route. We can do so using the <router-outlet> placeholder
+
+
+------------------- RouterLink Configuration for child routes -----------------------------
+
+* routerLinkActive is used for partial match of URI path
+* routerLinkActiveOptions is used for exact match of URI path
+	<a class="nav-link" [routerLink]="['./', 'clients']" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+	  Clients
+	</a>
+* For child route to be appended to parent route path, we need to './' in the routerLink
+	routerLink="./team"

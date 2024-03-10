@@ -1,5 +1,11 @@
 package com.algods.patterns.firstandslowpointer;
 
+/**
+ * Time complexity O(logn)
+ * Space complexity O(1)
+ * @author tarin
+ *
+ */
 public class FindHappyNumber_self {
 	
 	
@@ -28,7 +34,7 @@ public class FindHappyNumber_self {
 	
 	public static void main(String[] args) {
 		System.out.println(isHappyNumber(2));
-//		System.out.println(2345/10);
-//		System.out.println(2345%10);
+		System.out.println(2345/10);
+		System.out.println(2345%10);
 	}
 }

@@ -1,0 +1,72 @@
+
+
+------------------- submitting form -----------------
+
+* ng new cocktails
+* npm i bootstrap
+* @import "bootstrap/dist/css/bootstrap.css"
+* ng generate component form
+* ng generate component results
+
+--------------- generating services ---------------
+
+* ng generate service cocktail
+* service class needs to be injected into constructor of a component class for use
+
+-------------- Understanding Dependency Injection --------------
+
+* constructor(private el: ElementRef) { }
+	- We weren’t creating an instance of the ElementRef class. Angular saw that we wanted an instance of the ElementRef class and took care of providing one for us that was automatically connected to the element on which we had the directive.
+
+* constructor(private cocktail: CocktailService) { }
+	- During the compilation process, Angular scans our components for the dependencies it needs. Specifically, it will look at a component’s constructor() function. It will notice that we want an instance of the CocktailService because we annotated the parameter with it. It will then take care of injecting the dependency for you
+
+* Steps for dependency injection:
+	1.	Define a class to be used as a dependency. Most of the time, it’s a service. (create service)
+	2.	Register it with Angular. (@Injectable)
+	3.	Declare it as a dependency in a component (constructor injection)
+			
+
+------------------ HTTP Requests ---------------------
+
+* The HttpClientModule can be imported via the @angular/common/http package.
+* Use HttpClient in Service class for get request
+* Use service class in component class to make http call that returns a observable that needs to be subscribed to get the result.			
+
+------------------ Displaying the Results ----------------
+
+* passing a property from parent to child using @Input decorator
+	<app-results [drinks]="drinks"></app-results>
+	 @Input() drinks:any = [];
+
+------------------ Highlighting Keywords ---------------------
+
+const reg = new RegExp('(' + this.query + ')', 'gi');
+return str.replace(reg, '<span class="font-weight-bold">$1</span>');	
+
+* If we run the example, we’ll see the highlighted keywords, but the browser is not making them bold. This is not a problem with the browser. It’s a problem with Angular. Angular is purposely escaping the output. We’ll learn why this is in the next couple of lessons. 
+
+------------------ Understanding XSS Attacks --------------------
+
+Various attack:
+	https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html
+
+html chars:
+	https://html.spec.whatwg.org/multipage/named-characters.html
+
+* 	let xss = `<img src="" onerror="console.log('XSS')">`;
+	xss = xss.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+	document.body.innerHTML = xss;
+
+* This is more or less what’s going on internally in Angular. It’s escaping the strings before they get inserted into the document to prevent XSS attacks. You can think of it as purifying the HTML.	
+
+---------------- Inserting Raw HTML -------------------------
+
+<td [innerHTML]="boldStr(drink.strDrink)"></td>
+<td [innerHTML]="boldStr(drink.strInstructions)"></td>
+
+* We can do so by binding the innerHTML property on the element. Let’s update the results.component.html template file to see what that looks like.
+
+
+=================== Tricky CSS ===========================
+* If we run the example, we’ll see that the keyword gets underlined. This is important to keep in mind to prevent headaches. If you’re dynamically adding elements and they have styles, try applying them on a global level instead of using component-specific CSS.

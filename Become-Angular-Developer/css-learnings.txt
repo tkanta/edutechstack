@@ -1,0 +1,86 @@
+
+==================== cheet sheet ====================================
+
+CSS cheet sheet:
+    https://www.codecademy.com/learn/intro-to-css/modules/learn-css-selectors-visual-rules/cheatsheet
+
+
+=================================== CSS samples ========================
+
+padding Title author
+---------------------------
+.author{
+    padding: 10px;
+    color: #6c757d;
+  }
+
+
+border thickness
+-----------------
+ .post{ 
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25rem;
+    display: block;
+  }
+
+
+wrapping images
+----------------------
+:host{ 
+    display: flex;  
+    flex-wrap: wrap;  
+    justify-content: center;
+  }
+
+
+@media 
+------------------
+
+* The @media rule is used in media queries to apply different styles for different media types/devices. Media queries can be used to check many things, such as: width and height of the viewport. width and height of the device.
+
+
+empty CSS selector:
+--------------------
+It will applied if the h4.alert-heading css on an element has no content. It is siutable in ng-content directive
+
+h4.alert-heading:empty{
+  display: none;
+}
+
+
+======================== Bootstrap  ====================================
+
+Reusable/base component
+--------------------------
+https://getbootstrap.com/docs/5.0/components/alerts/
+
+
+Navs TABS 
+----------------
+https://getbootstrap.com/docs/5.0/components/navs-tabs/#javascript-behavior
+
+
+
+======================== Browser CSS debugging ================================================
+
+* The styles tab will display CSS from current selected element to its outer/inherited elements
+
+
+=================== Tricky CSS ===========================
+
+* boldStr(str: string){
+    if (this.query.length < 3) {
+      return str;
+    }
+    const regex = new RegExp('(' + this.query + ')', 'gi');
+    return str.replace(regex, '<span class="font-weight-bold">$1</span>')
+  }
+
+* .font-weight-bold{
+    text-decoration: underline;
+    font-weight: bold;
+  }
+    
+* If we run the example, we’ll see that the keyword gets underlined. This is important to keep in mind to prevent headaches. If you’re dynamically adding elements and they have styles, try applying them on a global level instead of using component-specific CSS.
+
+* The component level css can't be applied if the CSS is not applied during initialization of component, So to make it available it should be global 

@@ -1,0 +1,24 @@
+============================================ training Neural Networks ================================================
+
+Optimization:
+-------------
+* In the case of machine learning, optimization refers to minimizing the loss function by systematically updating the network weights. Mathematically, this is expressed as:
+
+* Intuitively, it can be thought of as descending a high-dimensional landscape. If we could project it in 2D plot, the height of the landscape would be the value of the loss function, and the horizontal axis would be the values of our weights w. Ultimately, the goal is to reach the bottom of the landscape by iteratively exploring the space around us.
+
+* Types of gradient Decent
+	- Batch Gradient Descent
+		The equation and code presented above actually referred to batch gradient descent. In this variant, we calculate the gradient for the entire dataset on each training step before updating the weights.
+	- Stochastic Gradient Descent
+		Stochastic Gradient Descent (SGD) was introduced to address this exact issue. Instead of calculating the gradient over all training examples and updating the weights, SGD updates the weights for each training example xi,yi
+		for t in range(steps):
+		  for example in data:
+		    dw = gradient(loss, example, w)
+		    w = w - learning_rate *dw
+		    
+	- Mini-batch Stochastic Gradient Descent : 
+		Mini-batch SGD sits right in the middle of the two previous ideas and combines the best of both worlds. It randomly selects n training examples — the so-called mini-batch — from the whole dataset and computes the gradients only from them
+		for t in range(steps):
+		  for mini_batch in get_batches(data, batch_size):
+		    dw = gradient(loss, mini_batch, w)
+		    w = w - learning_rate *dw
