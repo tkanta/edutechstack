@@ -1,0 +1,105 @@
+
+
+
+String access:
+	 0
+String reverse:
+	-1	
+String slice	
+	0,1, (i)inclusive,(i) inclusive
+string slice reverse
+	0,0, (i)inclusive, (e) exclusive
+
+====================== Data types and conditionals statement ===================================
+
+Booleans:
+------------
+* In Python, we can simply use True or False to represent a bool:
+	f_bool = False
+	print(f_bool)
+
+String:
+----------
+* String
+	- string varable
+		got = 'Game of Thrones...'
+	
+	- multiline
+		multiple_lines = '''Triple quotes allows
+		multi-line string.'''
+
+	- string length
+		print(len(random_string))
+
+	- string access
+		* start index is 0 based and end index is 1 based. Both are inclusive.
+		batman = "Bruce Wayne"
+		first = batman[0]
+		last = batman[len(batman) - 1]
+		print(last)
+
+	- Reverse indexing starts with -1 and forward indexing starts with 0
+		batman = "Bruce Wayne"
+		print(batman[-1])
+
+* String Immutability
+	- Once we assign a value to a string, we can’t update it later. How about verifying it with an executable below?
+		string = "Immutability"
+		string[0] = 'O' # Will give error
+
+	- Remember, assigning a new value to string variable doesn’t mean that you’ve changed the value. Let’s verify it with the id() method below.
+		str1 = "hello"
+		print(id(str1))
+
+		str1 = "bye"
+		print(id(str1))		
+
+* ASCII Versus Unicode
+	- In Python 3.x, all strings are unicode. But, older versions of Python (Python 2.x) support only ASCII characters. To use unicode in Python 2.x, preceding the string with a u is must. For example:
+		string = u"This is unicode"
+
+String slicing
+-------------
+* Slicing is the process of obtaining a portion (substring) of a string by using its indices.
+	* start index is 0 based and end index is 1 based. Both are inclusive.
+	my_string = "This is MY string!"
+	print(my_string[8:len(my_string)]) # From the 8th index till the end
+
+* slicing start index is 0 based and end index is 1 based. step index is 1 based. All indexes are inclusive.
+
+* Reverse Slicing 
+	* Both start and end index are 0 based. end index is excluding.
+	my_string = "This is MY string!"
+	print(my_string[13:2:-1])
+		Ans: rts YM si s
+	print(my_string[17:0:-2]) # Take 2 steps back. The opposite of what happens in the slide above
+		Ans: !nrsY ish
+
+Partial Slicing
+--------------
+One thing to note is that specifying the start and end indices is optional.
+If start is not provided, the substring will have all the characters until the end index.
+If end is not provided, the substring will begin from the start index and go all the way to the end.
+
+	my_string = "This is MY string!"
+	print(my_string[:8])  # All the characters before 'M'
+	print(my_string[8:])  # All the characters starting from 'M'
+	print(my_string[:])  # The whole string
+	print(my_string[::-1])  # The whole string in reverse (step is -1)
+
+
+============================== The if-elif-else Statement =================================
+
+num1 = 10
+num2 = 20
+result = 4000
+
+if (num1 > 50 or not num2 <= 5):
+    result = num1 * num2
+else:
+    result = num1 + num2
+A)
+200
+Explanation
+The if condition is fulfilled because not num2 <=5 is true. num2 is in fact greater than 5. Hence, num1 and num2 are multiplied.
+	
