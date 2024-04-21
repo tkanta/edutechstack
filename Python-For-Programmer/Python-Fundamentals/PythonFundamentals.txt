@@ -1,29 +1,5 @@
 
 
-================= System Python ===================
-
-C:\Python\Python37-32
-
-============================== pycharm IDE ============================================
-
-Create Python Project:
-	- https://www.jetbrains.com/pycharm/ (download community edition of Jetbrain PyCharm)
-	- https://www.jetbrains.com/help/pycharm/creating-and-running-your-first-python-project.html#summary
-	- https://www.simplilearn.com/tutorials/python-tutorial/pycharm#:~:text=To%20install%20NumPy%20on%20PyCharm,package%20and%20click%20Install%20Package.
-
-Virtual ENV:
-	- venv (for Python 3) and virtualenv (for Python 2) allow you to manage separate package installations for different projects. They essentially allow you to create a “virtual” isolated Python installation and install packages into that virtual installation
-	- virtualenv avoids the need to install Python packages globally. When a virtualenv is active, pip will install packages within the environment, which does not affect the base Python installation in any way.
-	- https://stackoverflow.com/questions/41972261/what-is-a-virtualenv-and-why-should-i-use-one ****
-
-project setup:
-	- select new project (project name is folder name)
-	- select path for project folder
-	- select path for venv
-	- select default python runtime
-	- create project
-
-
 ======================= Module 1: Python Fundamentals ==========================
 
 
