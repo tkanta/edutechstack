@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wardle-server
+  namespace: wardle
+  labels:
+    apiserver: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      apiserver: "true"
+  template:
+    metadata:
+      labels:
+        apiserver: "true"
+    spec:
+      serviceAccountName: apiserver
+      containers:
+      - name: wardle-server
+        image: dixudx/pwk:sample-apiserver-v0.24.8
+        args: [ "--etcd-servers=http://localhost:2379" ]
+      - name: etcd
+        image: gcr.io/etcd-development/etcd:v3.5.5

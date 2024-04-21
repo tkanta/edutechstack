@@ -1,0 +1,36 @@
+
+
+
+========================================= What is Kubernetes =========================
+
+k8s design principle
+------------------------
+* Declarative API
+* Self healing
+* Abstraction and decoupling
+* Immutable infrastructure
+
+
+Kubernetes architecture
+---------------------------
+
+* Thus, a highly available etcd cluster is usually deployed with an odd number of nodes, communicated by the Raft algorithm.
+
+* kubectl taint nodes --all node-role.kubernetes.io/control-plane- node-role.kubernetes.io/master-
+	* The command above will remove the taints node-role.kubernetes.io/control-plane and node-role.kubernetes.io/master from any nodes, including the control plane nodes. Legacy taint name node-role.kubernetes.io/master is officially removed starting from version 1.25 (click this tracking issue to learn more).
+
+
+========================== The Heart of Kubernetes: The kube-apiserver ===========================
+
+Kube-apiserver does below tasks:
+	- Authentication
+	- Authorization
+	- admission control
+
+watch 
+	kubectl get pod -n kube-system -w
+
+
+================== The Conductor of Kubernetes: The kube-scheduler =================================
+
+		

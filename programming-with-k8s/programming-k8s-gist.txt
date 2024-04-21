@@ -1,0 +1,5 @@
+
+=================== Buzz words: ==========================
+
+scaffold framework : Refer a tool that generates basic structure of a project or specific part of it.
+clusterIP 		   : Type of service in k8s that provides a single/stable IP for accessing set of pods in a cluster
