@@ -135,4 +135,10 @@ Grouping Values:
 
 ------------- Conditional statement ------------
 
-	
+if statement:
+
+if else statement:
+	output_value1 if condition else output_value2
+
+The if-elif-else Statement:
+			

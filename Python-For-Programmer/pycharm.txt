@@ -17,11 +17,13 @@ Virtual ENV:
 	- https://stackoverflow.com/questions/41972261/what-is-a-virtualenv-and-why-should-i-use-one ****
 
 project setup:
+	- open pycharm
 	- select new project (project name is folder name)
 	- select path for project folder
 	- select path for venv
 	- select default python runtime
 	- create project
+	- .idea folder will be created inside the project folder
 
 
 
