@@ -30,7 +30,9 @@ DataTypes and variables:
 
 		- Complex Number : A complex number usually takes up 32 bytes of memory. It is a combination of (real+imaginary+integer+floating+negetive+positive)
 			* Note: In normal mathematics, the imaginary part of a complex number is denoted by i. However, in the code above, it is denoted by j. This is because Python follows the electrical engineering convention which uses j instead of i. Don’t let that confuse you.
-			* A complex number usually takes up 32 bytes of memory.	
+			* A complex number usually takes up 32 bytes of memory.
+			* Just like the print() statement is used to print values, complex() is used to create complex numbers.
+				complex_1 = complex(0, 2)	
     
     Boolean:
     	* The Boolean (also known as bool) data type allows us to choose between two values: true and false.
@@ -116,6 +118,15 @@ Logical Operator:
 	In bit terms, the value of True is 1. False corresponds to 0:	
 
 Bitwise Operator:
+	&	Bitwise AND	         In-fix
+	|	Bitwise OR	         In-fix
+	^	Bitwise XOR	         In-fix
+	~	Bitwise NOT	         Prefix
+	<<	Shift Bits Left		 In-fix
+	>>	Shift Bits Right	 In-fix
+
+	* In simple terms, AND can be thought of as a multiplication between the two operands.
+	* 0 OR 1 gives us 1. 1 OR 1 also produces 1 (binary numbers do not go beyond 1). However, 0 OR 0 will give us 0 (0 + 0 is still 0).
 
 String Operation:
 	Strings are compatible with the comparison operators. Each character has a Unicode value.This allows strings to be compared on the basis of their Unicode values.When two strings have different lengths, the string which comes first in the dictionary is said to have the smaller value.		
@@ -141,4 +152,145 @@ if else statement:
 	output_value1 if condition else output_value2
 
 The if-elif-else Statement:
+	
+	light = "Red"
+
+	if light == "Green":
+	    print("Go")
+	elif light == "Yellow":
+	    print("Caution")
+	elif light == "Red":
+	    print("Stop")
+	else:
+	    print("Incorrect light signal")
 			
+
+======================================================= Functions ==========================================================
+
+What are Functions?
+	len(), min(), and print() are examples of built-in functions.
+
+
+argument to function
+	 pass by reference (list ) is mutable
+	 pass by value (int, float etc) is immutable				
+
+Built-in string function:
+	str.function()
+	find(), join(), replace(), upper(), lower(), format()	 
+
+Lambdas:
+	* A lambda cannot have a multi-line expression. This means that our expression needs to be something that can be written in a single line.
+	* concat_strings = lambda a, b, c: a[0] + b[0]
+	  print(concat_strings("World", "Wide", "Web"))	
+
+Functions as Arguments:
+	def multiply(n1, n2):
+    return n1 * n2
+
+    def calculator(operation, n1, n2):
+    return operation(n1, n2)  # Using the 'operation' argument as a function
+
+    ----- func as arg ----
+	result = calculator(multiply, 10, 20)		
+	print(result)
+
+	------lambda as func arg ------
+	result = calculator(lambda n1, n2: n1 * n2, 10, 20)
+	# The lambda multiplies them.
+	print(result)
+
+	# ----- built-in map() function with lambda
+	num_list = [1, 2, 3, 4, 5]
+	double_list = map(lambda n: 2 * n, num_list)
+	print(list(double_list))
+
+	# ---- built-in filter() func with lambda
+	gr_thn_1_list = list(filter(lambda n: n > 1, num_list))
+	print(gr_thn_1_list)
+
+Recursion:
+	def factorial(n):
+    # Base case
+    if n == 0 or n == 1:
+        return 1
+
+    if n < 0:
+        return -1
+    # Recursive call
+    return n * factorial(n - 1)
+
+
+	print(factorial(5))
+
+	This problem can easily be solved using recursion. The base case is when n is 1 or 0 since it’s the minimum we can go. In either case, we return 1, since it is the factorial for both these values.
+
+	Other than that, the only special case is if n is negative. That can be handled with a simple if statement.
+
+	The final and most important step is the recursive call. Each call returns a product back to the previous call where the product is multiplied with the current value of n in that particular call.
+
+String repeat and concat:
+	If a string value is multipied by a number it will be repeated. The number can be converted to string using str(num)
+		def rep_cat(x, y):
+	    return str(x) * 10 + str(y) * 5
+		print(rep_cat(3, 4))		
+	To convert the integers into strings, we can use the str() method.
+	The * operator is perfect for replicating the value of a string a certain number of times.
+	Two strings can easily be concatenated using the + operator.	
+
+
+
+========================================= Loops ===================================================
+
+* There are two types of loops that we can use in Python:
+
+	The for loop
+	The while loop
+
+* The range exclude the last number
+
+	for i in range(1, 11):  # A sequence from 1 to 10
+    if i % 2 == 0:
+        print(i, " is even")
+    else:
+        print(i, " is odd")	
+
+* For loop:
+	float_list = [2.5, 16.42, 10.77, 8.3, 34.21]
+	print(float_list)
+
+	for i in range(0, len(float_list)):  # Iterator traverses to the last index of the list
+	    float_list[i] = float_list[i] * 2
+
+	print(float_list)	
+
+* Nested for loops:
+	keywords : break, continue, pass
+	
+	* brek: Sometimes, we need to exit the loop before it reaches the end. This can happen if we have found what we were looking for and don’t need to make any more computations in the loop.
+	* pass : In all practical meaning, the pass statement does nothing to the code execution
+	* continue: When the continue keyword is used, the rest of that particular iteration is skipped. The loop continues on to the next iteration. We can say that it doesn’t break the loop, but it skips all the code in the current iteration and moves to the next one.
+
+	print("---------------")
+	list_no = list(range(5))
+	for i in list_no:
+	    for j in range(1, 3):
+	        if i != j:
+	            continue
+	        if i == j:
+	            break
+
+	    print(i,j)	
+
+* while loops
+	- The break, continue, and pass keywords work with while loops.
+	- Like for loops, we can also nest while loops. Furthermore, we can nest the two types of loops with each other.
+
+	Sample:
+		n = 2  # Could be any number
+		power = 0
+		val = n
+		while val < 1000:
+		    power += 1
+		    val *= n
+		print(power)	    

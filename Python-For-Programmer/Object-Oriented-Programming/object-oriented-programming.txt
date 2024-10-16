@@ -1,0 +1,260 @@
+
+
+--------------------------- Object-oriented programming ----------------------------------
+
+Eagle view:
+	real-world scenarios into code
+
+* Programming isn’t much use if you can’t model real-world scenarios using code, right? This is where object-oriented programming comes
+
+* Objects are a collection of data and their behaviors
+* A class can be thought of as a blueprint for creating objects
+* It can be inferred from the discussion above that classes are user-defined data types implemented using primitive data types, e.g., boolean, int, char, etc. While primitive data types only focus on modeling the state of the object, user-defined data types can encapsulate the state and its behaviors into a unit
+
+
+-------------------------- Introduction to Objects and Classes --------------------------
+
+Eagle view:
+	compartmentalizing code
+	components
+	Reusability of components
+	easier to maintain
+
+Benefits of objects and classes:
+
+Objects and classes allow us to create complex applications in Python. This is why they are considered the building blocks of OOP principles.
+
+* Objects and classes are also instrumental for compartmentalizing code. Different components can become separate classes that would interact through interfaces. These ready-made components will also be available for use in future applications.
+ 
+* The use of classes makes it easier to maintain different parts of an application since it is easier to make changes in classes.
+
+
+------------------------ Declaring a Class in Python ---------------------------------
+
+Create class
+------------
+	class MyClass:
+	    pass
+
+	obj = MyClass()  # creating a MyClass Object
+	print(obj)
+
+
+------------------- Implementing Properties in a Class ------------------------
+
+class Employee:
+    # defining the properties and assigning them None
+    ID = None
+    salary = None
+    department = None
+
+
+# cerating an object of the Employee class
+Steve = Employee()
+
+# assigning values to properties of Steve - an object of the Employee class
+Steve.ID = 3789
+Steve.salary = 2500
+Steve.department = "Human Resources"
+
+# Printing properties of Steve
+print("ID =", Steve.ID)
+print("Salary", Steve.salary)
+print("Department:", Steve.department)
+
+------------------ Initializing Objects ----------------------------
+
+* The initializer is a special method because it does not have a return type. The first parameter of __init__ is self, which is a way to refer to the object being initialized.
+
+class Employee:
+    # defining the properties and assigning None to them
+    def __init__(self, ID=None, salary=0, department=None):
+        self.ID = ID
+        self.salary = salary
+        self.department = department
+
+
+# creating an object of the Employee class with default parameters
+Steve = Employee()
+
+# creating an object of the Employee class with parameters
+Mark = Employee("3789", 2500, "Human Resources")
+
+
+
+---------------------- Class and Instance Variables ----------------------
+
+* The class variables are shared by all instances or objects of the classes. A change in the class variable will change the value of that property in all the objects of the class.
+
+* The instance variables are unique to each instance or object of the class. A change in the instance variable will change the value of the property in that specific object only.
+
+
+class Player:
+    teamName = 'LiverPool'
+    teamMembers = []
+
+    def __init__(self, name):
+        self.name = name
+        self.teamMembers.append(name)
+
+
+player1 = Player("Tarun")
+player2 = Player("Itu")
+player2 = Player("Rattan")
+
+print(player1.name)
+print(player1.teamMembers)
+print(player2.name)
+print(player2.teamMembers)
+
+
+----------------------- Implementing Methods in a Class ------------------------
+
+* There are three types of methods in Python:
+
+	instance methods
+	class methods
+	static methods
+
+* Method parameters make it possible to pass values to the method. In Python, the first parameter of the method should ALWAYS be self (discussed below) and which followed by the remaining parameters. 
+
+* One of the major differences between functions and methods in Python is the first argument in the method definition. Conventionally, this is named self.The self argument only needs to be passed in the method definition and not when the method is called.
+
+	class Employee:
+	    # defining the initializer
+	    def __init__(self, ID=None, salary=None, department=None):
+	        self.ID = ID
+	        self.salary = salary
+	        self.department = department
+
+	    def tax(self):
+	        return (self.salary * 0.2)
+
+	    def salaryPerDay(self):
+	        return (self.salary / 30)
+
+
+	# initializing an object of the Employee class
+	Steve = Employee(3789, 2500, "Human Resources")
+
+	# Printing properties of Steve
+	print("ID =", Steve.ID)
+	print("Salary", Steve.salary)
+	print("Department:", Steve.department)
+	print("Tax paid by Steve:", Steve.tax())
+	print("Salary per day of Steve", Steve.salaryPerDay())
+
+* Unlike in other programming languages, methods cannot be explicitly overloaded in Python but can be implicitly overloaded.
+	class Employee:
+	    # defining the properties and assigning them None to the
+	    def __init__(self, ID=None, salary=None, department=None):
+	        self.ID = ID
+	        self.salary = salary
+	        self.department = department
+
+	    # method overloading
+	    def demo(self, a, b, c, d=5, e=None):
+	        print("a =", a)
+	        print("b =", b)
+	        print("c =", c)
+	        print("d =", d)
+	        print("e =", e)
+
+	    def tax(self, title=None):
+	        return (self.salary * 0.2)
+
+	    def salaryPerDay(self):
+	        return (self.salary / 30)
+
+
+	# cerating an object of the Employee class
+	Steve = Employee()
+
+	# Printing properties of Steve
+	print("Demo 1")
+	Steve.demo(1, 2, 3)
+	print("\n")
+
+	print("Demo 2")
+	Steve.demo(1, 2, 3, 4)
+	print("\n")
+
+	print("Demo 3")
+	Steve.demo(1, 2, 3, 4, 5)
+
+* If we redefine a method several times and give it different arguments, Python uses the latest method definition for its implementation.overloading saves us memory in the system
+
+
+------------------------- Class Methods and Static Methods --------------------------
+
+* class method
+
+	class Player:
+    teamName = 'Liverpool'  # class variables
+
+    def __init__(self, name):
+        self.name = name  # creating instance variables
+
+    @classmethod
+    def getTeamName(cls):
+        return cls.teamName
+
+	print(Player.getTeamName())
+
+* Static method
+	
+	class Player:
+    teamName = 'Liverpool'  # class variables
+
+    def __init__(self, name):
+        self.name = name  # creating instance variables
+
+    @staticmethod
+    def demo():
+        print("I am a static method.")
+
+
+		p1 = Player('lol')
+		p1.demo()
+		Player.demo()	
+	------------------
+	class BodyInfo:
+
+    @staticmethod
+    def bmi(weight, height):
+        return weight / (height**2)
+
+
+	weight = 75
+	height = 1.8
+	print(BodyInfo.bmi(weight, height))	
+
+
+---------------------------------- Access Modifiers --------------------------------------	
+
+* Private variable / Methods have prefix (__) before them
+* Protected properties and methods in other languages can be accessed by classes and their subclasses. Python does not have a strict rule for accessing properties and methods, so it does not have the protected access modifier.
+
+Private Variable / Method:
+----------------------------
+
+class Employee:
+    def __init__(self, ID, salary):
+        self.ID = ID
+        self.__salary = salary  # salary is a private property
+
+    def displaySalary(self):  # displaySalary is a public method
+        print("Salary:", self.__salary)
+
+    def __displayID(self):  # displayID is a private method
+        print("ID:", self.ID)
+
+
+Steve = Employee(3789, 2500)
+Steve.displaySalary()
+Steve.__displayID()  			  # this will generate an error
+print("Salary:", Steve.__salary)  # this will cause an error
+
+print(Steve._Employee__salary)  # accessing a private property
+
+

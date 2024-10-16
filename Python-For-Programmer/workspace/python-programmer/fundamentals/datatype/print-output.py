@@ -1,5 +1,5 @@
 print("------------- Comments ----------------------")
-#print("Hello world")
+# print("Hello world")
 """
 print(50, 1000, 3.142, "Hello World")
 print("Hello", end="")
@@ -32,8 +32,8 @@ print(multiple_lines)
 print(len(multiple_lines))
 print(multiple_lines[len(multiple_lines) - 1])
 
-#string = "Immutability"
-#string[0] = 'O' # Will give error
+# string = "Immutability"
+# string[0] = 'O' # Will give error
 
 str1 = "hello"
 print("hello string id - >", id(str1))
@@ -42,7 +42,5 @@ str1 = "test"
 print("test string id - >", id(str1))
 
 testStr = "Tarini Kanta Negi"
-#print(testStr[::2])
+# print(testStr[::2])
 print(testStr[len(testStr):1:-1])
-
-

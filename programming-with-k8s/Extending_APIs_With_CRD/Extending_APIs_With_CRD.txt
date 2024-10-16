@@ -1,0 +1,18 @@
+
+
+================= Extending APIs with CustomResourceDefinition (CRD) ====================================
+
+* Every resource in Kubernetes has its own kind to indicate itself and is grouped by the group name. They can have multiple versions as well. Below is a YAML file of a Deployment.
+
+* The kind is declared as Deployment with version v1 in group apps. Above, the whole YAML file is actually an interpretation of the struct below:
+
+* For every group, like apps, the resources defined in that group will be registered into the schema. The code below shows exactly how this is done
+
+* It’s worth noting that CRDs themselves don’t contain any logic. What a CRD does is provide a way to create, store, and expose Kubernetes-style APIs for custom objects, and that’s enough for us to make up our own logic by consuming these RESTful APIs.
+
+
+============================= Understanding CRD's =================================================
+
+* First of all, ConfigMaps are used to provide configurations for various resources, such as Pods. They can be mounted as volume or injected as environment variables into the Pods. Rolling updates will be performed when ConfigMaps are updated. For CRDs, no Kubernetes components are sensitive.
+
+* CRDs have different purposes than ConfigMaps. They aren’t meant to provide configurations for Pods, but instead extend the Kubernetes API to build our own custom logic. Normally, we would have a custom controller to handle updates to custom objects.
