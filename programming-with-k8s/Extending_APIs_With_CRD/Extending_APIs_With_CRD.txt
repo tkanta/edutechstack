@@ -2,6 +2,10 @@
 
 ================= Extending APIs with CustomResourceDefinition (CRD) ====================================
 
+* Kubernetes is well designed to orchestrate, deploy, and manage containers.
+
+* What makes these components work coherently is the API schema, which is the metadata of Kubernetes resources (like Pods, Namespaces, etc.), that defines the specifications and maps the relationships between them.
+
 * Every resource in Kubernetes has its own kind to indicate itself and is grouped by the group name. They can have multiple versions as well. Below is a YAML file of a Deployment.
 
 * The kind is declared as Deployment with version v1 in group apps. Above, the whole YAML file is actually an interpretation of the struct below:
@@ -13,6 +17,121 @@
 
 ============================= Understanding CRD's =================================================
 
+
+* CRD Sample:
+	apiVersion: apiextensions.k8s.io/v1
+	kind: CustomResourceDefinition
+	metadata:
+	  name: crontabs.stable.example.com
+	spec:
+	  group: stable.example.com
+	  versions:
+	    - name: v1
+	      served: true
+	      storage: true
+	      schema:
+	        openAPIV3Schema:
+	          type: object
+	          properties:
+	            spec:
+	              type: object
+	              properties:
+	                cronSpec:
+	                  type: string
+	                image:
+	                  type: string
+	                replicas:
+	                  type: integer
+	  scope: Namespaced
+	  names:
+	    plural: crontabs
+	    singular: crontab
+	    kind: CronTab
+	    shortNames:
+	    - ct
+
+
+* Now, let’s try to break down the definitions above so that we can better understand every field in a CRD. These fields are quite different in other built-in Kubernetes objects, and some of them are quite important and worth discussing.
+
+apiVersion (line 1): This field specifies the apiVersion that we’ll use for the CustomResourceDefinition. The CustomResourceDefinition is a Kubernetes built-in API, which has its own API versions. Normally, we use the apiextensions.k8s.io/v1 API. If you’re using a lower version of Kubernetes, it could be apiextensions.k8s.io/v1beta1 instead.
+
+kind (line 2): This field indicates the resource kind. Of course, here, we want to create a CustomResourceDefinition.
+
+metadata.name (line 4): This field is quite important, because it specifies the name of the resource. It must match the spec fields below and be in <plural>.<group> form.
+
+spec.group (line 6): Every resource has a group. Just like Deployment in group apps, we need to specify a group name for our CRD.
+
+spec.versions (lines 7–23): In this field, we can list all the versions supported by this CRD. Every version can be served. Just like Deployment, we have versions v1 and v1beta1. For CRDs, we could have multiple versions as well. The version that serves will be used in the API URL.
+
+spec.versions.served (line 9): This field indicates whether this version should be enabled or disabled.
+
+spec.verisons.storage (line 10): Only one version must be marked as the storage version.
+
+spec.versions.schema (lines 11–23): This field specifies a structural schema that we want to validate the CRD of using the openAPIV3Schema validation. We can mark some custom object fields as required, specify the value type, set the default values, or apply regex matching rules for each field. In our example, we specify that the field spec.replicas must be an integer. Additionally, we could set the default integer value for this field. If we’re applying a custom object with non-integer spec.replicas, the kube-apiserver will reject the request due to the validation failure.
+
+spec.scope (line 24): This field is quite important, which specifies if the custom object is namespaced or cluster-wide. In Kubernetes, resources are either one of them. For example, Deployment is namespace-scoped, while PersistentVolume is cluster-scoped. For namespace-scoped resources, we need to specify a namespace for them when we perform operations, such as creating, listing, or deleting. If we don’t set the spec.scope, it will be defaulted to Cluster, which stands for cluster-scoped.
+
+spec.names (line 25–30):
+
+spec.names.plural (line 26) and spec.names.singular (line 27) specify the plural and singular names of the CRD. The plural name will be used in the serving URL /apis/<group>/<version>/<plural>.
+spec.names.kind: This specifies the type of the custom object. It’s normally the CamelCased singular type, such as Deployment, StatefulSet, or CronTab.
+spec.names.shortNames: With this, we can specify the short string or aliases when we use the CLI. For example, we can use kubectl get deploy to list deployments. Of course, we could use the plural form kubectl get deployments. With the alias, we can type faster and usage becomes easier, especially when the kind has got a long name and is hard to spell.
+For the CRD in the example above, the serving URL will be /apis/stable.example.com/v1/namespaces/<some-namespace>/crontabs.
+
+All CRD APIs work natively as other built-in APIs. They’re both Kubernetes-style with a consistent user experience for the CLI.
+
+Now, let’s dive deeper to find out what happens behind the scenes to the kube-apiserver when we create this kind of a CRD.
+
+
+
 * First of all, ConfigMaps are used to provide configurations for various resources, such as Pods. They can be mounted as volume or injected as environment variables into the Pods. Rolling updates will be performed when ConfigMaps are updated. For CRDs, no Kubernetes components are sensitive.
 
 * CRDs have different purposes than ConfigMaps. They aren’t meant to provide configurations for Pods, but instead extend the Kubernetes API to build our own custom logic. Normally, we would have a custom controller to handle updates to custom objects.
+
+
+
+===================================  How to Use Kubernetes CRDs =================================
+
+* kubectl get foo -n default -v 7 (debug)
+
+apiVersion: pwk.educative.io/v1alpha1
+kind: Foo
+metadata:
+  name: example-foo
+spec:
+  deploymentName: example-foo
+  replicas: 10
+
+
+
+kubectl apply -f ./crd.yml
+kubectl apply -f example-foo.yml (Create custom objects)
+kubectl get foo -n default -v 7 (debug)
+kubectl get crds | grep foo
+kubectl api-resources | grep
+
+* All custom resources of a kind will be pruned when we delete that CRD for that kind. For example, if we delete CRD foos.pwk.educative.io, all the Foo objects will be deleted, no matter what namespaces they’re in. This is also true for cluster-scoped CRDs.
+
+============================= How to Generate Scaffold CRDs =========================================
+
+* It is the own custom CRD that is other than the K8s provided CRD  
+
+	- Create a project:
+			mkdir -p ./projects/pwk
+			cd ./projects/pwk
+			kubebuilder init --domain educative.io --repo educative.io/pwk
+
+	- Create an API:
+			kubebuilder create api --group apps --version v1beta1 --kind Foo --controller=false --make --resource
+
+* Now, we can see the Foo struct in api/v1beta1/foo_types.go, and we can insert more fields there. After we finish our new API, let’s run the following commands in the terminal above to automatically generate the manifests (e.g. CRDs, CRs, etc). Let’s see the magic!
+
+		- make manifests
+
+* Test it out:
+		- make install
+		- kubectl get crds
+
+* Great! We’ve successfully installed our own CRD into the cluster. Now let’s create custom resources of kind Foo.
+		- kubectl apply -f config/samples/
+		- kubectl get foo -A

@@ -22,15 +22,139 @@ Kubernetes architecture
 
 ========================== The Heart of Kubernetes: The kube-apiserver ===========================
 
+* It sits in the center of Kubernetes as the primary management point, receiving and handling all RESTful requests, such as creating/updating/deleting a Pod, querying a group of resources, etc
+
+* The kube-apiserver provides authentications and authorizations for all requests, including those from other Kubernetes components, such as kube-scheduler, kube-controller-manager, etc.
+
+* After the request passes through the above stage, the kube-apiserver can validate the object, such as port range, string length, and qualified domain name, and then store it in etcd and return a response.
+
+* The kube-apiserver will also create and maintain RESTful APIs for every CRD (Custom Resource Definition).
+
+* The kube-apiserver is the heart of Kubernetes that all the other components talk to and fetch needed data from to process. The kube-apiserver provides a WATCH mechanism, which is the most charming feature design. The kube-apiserver doesn’t tell all the other components/controllers what to do. All it does is enable those components/controllers to observe changes in their interested objects. As mentioned in the previous lesson, all the components are running in their own ways, which is one of the golden rules for designing and writing a good controller/operator.
+
 Kube-apiserver does below tasks:
 	- Authentication
 	- Authorization
 	- admission control
 
 watch 
-	kubectl get pod -n kube-system -w
+	kubectl get pod -n kube-system -w (watch the pod status)
+	* Kubernetes also provides a native programmable library client-go that can be used to watch resources. We’ll demonstrate this in later lessons.
 
 
 ================== The Conductor of Kubernetes: The kube-scheduler =================================
+
+* etc. Normally, we’ll taint master nodes with node-role.kubernetes.io/control-plane so that other Pod objects won’t be scheduled.
+
+* In the kube-scheduler, various built-in plugins and strategies are provided, such as:
+
+Node affinity
+Pod affinity
+Pod anti-affinity
+Pod priority
+Pod topology spread
+
+* In addition to these, external schedulers with distinct scheduler names can be used as well. We can specify the desired scheduler to schedule our Pod objects by setting the schedulerName in podSpec.
+
+* There should be a component that can transform high-level abstraction objects, like from Deployment to Pods. This is handled by another key component of the control plane, the kube-controller-manager.
+
+* The kube-apiserver, kube-scheduler, kube-controller-manager, and etcd comprise the whole control plane of Kubernetes. They control the cluster, manage the cluster state, and work in perfect harmony.		
+
+
+====================== The Manufactory of Kubernetes: The kube-controller-manager ===============================
+
+** The kube-controller-manager has 30 controllers that will for e.g replicasetController takes care of replica count of pods
+
+* As we discussed previously, the control plane is responsible for driving the actual state of the system toward the desired state. However, the kube-apiserver focuses on storing resources and providing RESTful services for all clients. The kube-scheduler assigns unassigned pods with the best-matched nodes. In the control plane, we need a component that can do the convergences. This is done by the kube-controller-manager.
+
+* The kube-controller-manager performs cluster-level functions. Primarily, it manages a group of controllers that’s responsible for reconciling the state of objects, such as Deployment and Service, and performing routine tasks. For instance, a replication controller ensures that the desired number of Pod objects are running healthily in the cluster by scaling up or down when the desired number isn’t met.
+
+* More than 30 controllers are running inside the kube-controller-manager. It’s evident what each of these controllers does from its name. We can enable or disable some controllers as needed. This can be done with the flag --controllers of the kube-controller-manager.
+
+		// Codes from <https://github.com/kubernetes/kubernetes/blob/master/cmd/kube-controller-manager/app/controllermanager.go#L406-L456>
+		// NewControllerInitializers is a public map of named controller groups (you can start more than one in an init func)
+		// paired to their InitFunc.  This allows for structured downstream composition and subdivision.
+		func NewControllerInitializers(loopMode ControllerLoopMode) map[string]InitFunc {
+			controllers := map[string]InitFunc{}
+			controllers["endpoint"] = startEndpointController
+			controllers["endpointslice"] = startEndpointSliceController
+			controllers["endpointslicemirroring"] = startEndpointSliceMirroringController
+			controllers["replicationcontroller"] = startReplicationController
+			controllers["podgc"] = startPodGCController
+			controllers["resourcequota"] = startResourceQuotaController
+			controllers["namespace"] = startNamespaceController
+			controllers["serviceaccount"] = startServiceAccountController
+			controllers["garbagecollector"] = startGarbageCollectorController
+			controllers["daemonset"] = startDaemonSetController
+			controllers["job"] = startJobController
+			controllers["deployment"] = startDeploymentController
+			controllers["replicaset"] = startReplicaSetController
+			controllers["horizontalpodautoscaling"] = startHPAController
+			controllers["disruption"] = startDisruptionController
+			controllers["statefulset"] = startStatefulSetController
+			controllers["cronjob"] = startCronJobController
+			controllers["csrsigning"] = startCSRSigningController
+			controllers["csrapproving"] = startCSRApprovingController
+			controllers["csrcleaner"] = startCSRCleanerController
+			controllers["ttl"] = startTTLController
+			controllers["bootstrapsigner"] = startBootstrapSignerController
+			controllers["tokencleaner"] = startTokenCleanerController
+			controllers["nodeipam"] = startNodeIpamController
+			controllers["nodelifecycle"] = startNodeLifecycleController
+			if loopMode == IncludeCloudLoops {
+				controllers["service"] = startServiceController
+				controllers["route"] = startRouteController
+				controllers["cloud-node-lifecycle"] = startCloudNodeLifecycleController
+				// TODO: volume controller into the IncludeCloudLoops only set.
+			}
+			controllers["persistentvolume-binder"] = startPersistentVolumeBinderController
+			controllers["attachdetach"] = startAttachDetachController
+			controllers["persistentvolume-expander"] = startVolumeExpandController
+			controllers["clusterrole-aggregation"] = startClusterRoleAggregrationController
+			controllers["pvc-protection"] = startPVCProtectionController
+			controllers["pv-protection"] = startPVProtectionController
+			controllers["ttl-after-finished"] = startTTLAfterFinishedController
+			controllers["root-ca-cert-publisher"] = startRootCACertPublisher
+			controllers["ephemeral-volume"] = startEphemeralVolumeController
+			if utilfeature.DefaultFeatureGate.Enabled(genericfeatures.APIServerIdentity) &&
+				utilfeature.DefaultFeatureGate.Enabled(genericfeatures.StorageVersionAPI) {
+				controllers["storage-version-gc"] = startStorageVersionGCController
+			}
+
+			return controllers
+		}
+
+
+* This controller runs as a standalone goroutine to perform actual work for deployed Services. From here, we see that the kube-controller-manager starts multiple, distinct goroutines in the background. This is to watch the kube-apiserver for changes (including creating, updating, and deleting) to separate resources and perform operations for each change.
+
+* Every controller uses the WATCH mechanism to get every change from the informer. Controllers also run a reconciliation loop that keeps reconciling the actual state with the desired state. Then, it will report back the newest status to the kube-apiserver. In general, controllers never talk to each other. Each controller watches the kube-apiserver to get changes purely on self-interested and responsible resources. This is a very illustrative example on how to design and write a good controller and/or operator. The golden rule for this is “Each one does things in their own way.”
+
+
+=============================== Kubernetes Worker Nodes ===========================================================
+
+** kubelet specifically takes care of containers inside a pod
+** kube-proxy keep watching Service/Endpoints/EndpointSlice and create appropriate rules on each node that can route requests to the backend Pod matching those services. The kube-proxy itself doesn’t route these packets. there are four varieties of the ProxyMode in the kube-proxy.It can be configured with a different mode on start-up.
+
+* Nodes heartbeats are reported periodically by the kubelet. The status of the nodes can be determined by observing their STATUS column in the terminal.When a node crashes or stops reporting heartbeats for a while, it will be tainted and marked as NotReady by the NodeLifecycleController in the kube-controller-manager. This helps the kube-scheduler avoid scheduling Pods to unhealthy kubelet nodes.
+
+* We can modify this monitor period of the kube-controller-manager with the flag --node-monitor-grace-period.This flag specifies the amount of duration marking an unresponsive node as unhealthy.
+
+* Steps to create a Pod in the kubelet
+	The kubelet continuously watches the kube-apiserver for Pods (including creating, updating, and deleting) that have been successfully scheduled to itself.
+
+	The kubelet regularly monitors all the managed containers, and ensures those Pods and their containers are healthy and running in the desired state. This is done by calling the CRI (Container Runtime Interface). There are different implementations, such as containerd, runc, Kata Containers, gVisor, etc.
+
+	The healthy states, events, and resource consumption of these containers are reported back to the kube-apiserver. The kubelet also supports running liveness and readiness probes against the containers. When containers fail, the kubelet will restart them to bring them back to life. Once the Pod is deleted from the kube-apiserver, it will terminate all the containers that belong to this Pod.
+
+* As long as we need to visit another Service in a Pod, we only need to configure it with the desired Service. In the case above, we only need to provide a back-end Service for the frontend Pod.
+
+Now, the kube-proxy comes into play. Its job is to keep watching Service/Endpoints/EndpointSlice and create appropriate rules on each node that can route requests to the backend Pod matching those services. The kube-proxy itself doesn’t route these packets.
+
+Currently, there are four varieties of the ProxyMode in the kube-proxy.
+
+		userspace
+		iptables
+		ipvs
+		kernelspace
 
 		

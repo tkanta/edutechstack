@@ -1,0 +1,131 @@
+
+
+========================== location of CNI specification file in linux box ? =========================
+
+a CNI runtime implementation libcni (which is written with Go) is provided as well. So, all the container runtimes written with Go (such as containerd) can directly import this module and interact with CNI plugins
+
+The configuration files for CNI plugins are generally located in: 
+	/etc/cni/net.d/
+
+CNI Plugin Binaries:  /opt/cni/bin/
+	
+	This directory contains the executables for various CNI plugins (e.g., bridge, host-local, flannel, etc.).
+	Example: /opt/cni/bin/bridge	
+
+A typical CNI configuration file in /etc/cni/net.d/ might look like this (Single plugin):
+	{
+	  "cniVersion": "0.4.0",
+	  "name": "my-network",
+	  "type": "bridge",
+	  "bridge": "cni0",
+	  "isGateway": true,
+	  "ipMasq": true,
+	  "ipam": {
+	    "type": "host-local",
+	    "ranges": [
+	      [
+	        { "subnet": "192.168.1.0/24" }
+	      ]
+	    ],
+	    "routes": [
+	      { "dst": "0.0.0.0/0" }
+	    ]
+	  }
+	}
+
+
+A typical CNI configuration file in /etc/cni/net.d/ might look like this (Multiple plugin):
+
+			{
+			  "cniVersion": "1.0.0",
+			  "name": "dbnet",
+			  "plugins": [
+			    {
+			      "type": "bridge",
+			      // plugin specific parameters
+			      "bridge": "cni0",
+			      "keyA": ["some more", "plugin specific", "configuration"],
+			      
+			      "ipam": {
+			        "type": "host-local",
+			        // ipam specific
+			        "subnet": "10.1.0.0/16",
+			        "gateway": "10.1.0.1",
+			        "routes": [
+			            {"dst": "0.0.0.0/0"}
+			        ]
+			      },
+			      "dns": {
+			        "nameservers": [ "10.1.0.1" ]
+			      }
+			    },
+			    {
+			      "type": "tuning",
+			      "capabilities": {
+			        "mac": true
+			      },
+			      "sysctl": {
+			        "net.core.somaxconn": "500"
+			      }
+			    },
+			    {
+			        "type": "portmap",
+			        "capabilities": {"portMappings": true}
+			    }
+			  ]
+			}
+
+
+If using Kubernetes, the kubelet often passes the CNI configuration location as part of its startup arguments:
+	--cni-conf-dir=/etc/cni/net.d
+	--network-plugin=cni
+
+
+============================= Can we update the IP address in CNI spec ? =====================================
+
+
+Steps to Update the IPAM Configuration
+
+Locate the CNI Configuration File:
+
+	The file is usually located in /etc/cni/net.d/ (e.g., /etc/cni/net.d/10-bridge.conf).
+
+Open the Configuration File:
+
+	Use a text editor like vi, nano, or cat to view or edit the file. For example:
+	sudo vi /etc/cni/net.d/10-bridge.conf
+
+Find the IPAM Section:
+
+	Look for the ipam field, which manages IP addressing. A typical ipam section looks like this:
+
+	"ipam": {
+	  "type": "host-local",
+	  "ranges": [
+	    [
+	      { "subnet": "192.168.1.0/24" }
+	    ]
+	  ],
+	  "routes": [
+	    { "dst": "0.0.0.0/0" }
+	  ]
+	}
+
+	Update the IP Range or Subnet:
+
+	Modify the "subnet" value to your desired range. For example:
+		"ranges": [
+		  [
+		    { "subnet": "10.10.0.0/16" }
+		  ]
+		]
+	
+	Save the File:
+	Save the changes and exit the editor.
+
+Restart Services:
+
+	If Kubernetes is running, restart the kubelet or the corresponding pod network by deleting and recreating pods. For standalone containers, restart the container runtime (e.g., containerd, CRI-O).
+
+	Example for kubelet restart:
+		sudo systemctl restart kubelet

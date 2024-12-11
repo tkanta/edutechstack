@@ -1,0 +1,103 @@
+
+
+===================================== Reverse Proxy ========================
+
+Definition:
+	A reverse proxy is a server that sits between clients (e.g., browsers) and backend servers. It intercepts client requests and forwards them to one or more backend servers.
+
+Key Features
+	Request Forwarding:
+		Acts as an intermediary, receiving client requests and forwarding them to the appropriate backend server.
+	TLS Termination:
+		For HTTPS traffic, the reverse proxy can handle SSL/TLS encryption and decryption, offloading this CPU-intensive task from backend servers.
+	Caching:
+		Can cache responses from backend servers to improve performance and reduce backend load.
+	Security:
+		Hides the identity and IP addresses of backend servers.
+		Protects backend servers by filtering malicious traffic (e.g., DDoS mitigation, WAF integration).
+	Routing:
+		Can route traffic based on rules (e.g., URL path, headers, cookies).
+
+Use Cases
+	Offloading HTTPS encryption/decryption (TLS termination).
+	Routing traffic to microservices based on URL paths (e.g., /api to Service A, /app to Service B).
+	Acting as a single public entry point for multiple backend services.
+
+Example (Using Nginx as a Reverse Proxy):
+	server {
+	    listen 80;
+
+	    location / {
+	        proxy_pass http://backend-server;
+	        proxy_set_header Host $host;
+	        proxy_set_header X-Real-IP $remote_addr;
+	    }
+	}
+
+
+
+=========================== Load Balancer ==================
+
+Definition:
+	A load balancer distributes incoming HTTP or HTTPS requests across multiple backend servers to ensure no single server is overwhelmed and to provide redundancy.
+
+Key Features:
+	Traffic Distribution:
+		Uses algorithms like round robin, least connections, or IP hash to balance the load across servers.
+	Health Monitoring:
+		Regularly checks the health of backend servers and removes unhealthy servers from the rotation.
+	Scalability:
+		Enables horizontal scaling by adding or removing servers as needed.
+	Session Persistence:
+		Also called sticky sessions, ensures subsequent requests from a client are directed to the same server.
+	SSL Offloading:
+		Like a reverse proxy, a load balancer can handle SSL/TLS termination.
+
+Use Cases
+	Distributing traffic across multiple application servers to ensure high availability.
+	Scaling web applications horizontally.
+	Providing failover when a server goes down.
+
+Example (Using HAProxy as an HTTP Load Balancer):	
+	frontend http_front
+	    bind *:80
+	    default_backend http_back
+
+	backend http_back
+	    balance roundrobin
+	    server app1 192.168.1.101:80 check
+	    server app2 192.168.1.102:80 check
+
+
+Reverse Proxy vs. Load Balancer:
+
+Feature										Reverse Proxy												Load Balancer
+----------------------------------------------------------------------------------------------------------------------------------
+Primary Role				Intermediary between client and backend servers						Distributes traffic across multiple servers
+Focus						Security, caching, routing, SSL termination							Traffic distribution, redundancy, scalability
+Location in Workflow		Single entry point, forwards to one or more servers					Typically sits between client and multiple servers
+TLS/SSL Termination								Supported														Supported
+Health Checks									Basic															Advanced
+Traffic Algorithms					Simple rules-based forwarding										Sophisticated balancing algorithms
+
+
+
+
+
+
+==================================== Combined Use of Reverse Proxy and Load Balancer ==========================
+
+In many architectures, reverse proxies and load balancers are used together:
+
+Reverse Proxy as a Frontend:
+	Acts as the public-facing entry point.
+	Handles TLS termination, security, and routing.
+
+Load Balancer Behind Reverse Proxy:
+	Balances the forwarded traffic among a group of backend servers.
+
+Example Workflow:
+	Client sends an HTTPS request.
+	The reverse proxy decrypts the traffic (TLS termination).
+	The reverse proxy forwards the request to the load balancer.
+	The load balancer distributes the request to the appropriate backend server.

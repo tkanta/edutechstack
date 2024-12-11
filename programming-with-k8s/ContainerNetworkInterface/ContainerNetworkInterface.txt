@@ -1,0 +1,379 @@
+
+======================== CNI Introduction =============================
+
+Overview:
+	* Container Runtime --> libcni modules --> CNI plugin
+
+	* Container runtime can interact with CNI plugin by importing CNI runtime implementation libcni modules. The plugin will creates necessary network
+	  functions (bridges, network devices/taps, and VLANs) etc, assign IP addresses, set routing rules and so on. The routing happens at kernel space.
+
+	* CNI defines a generic plugin-based networking solution, where a set of plugins and libraries are provided as well. It makes an abstract layer between the container execution and networking.
+	
+	* One major part of the CNI project is the CNI specification. The specification outlines the interface between the container runtimes and CNI plugins
+
+	* A group of interface creating plugins are built-in, such as bridge, macvlan, vlan, ptp, and so on. With these plugins, we can easily create bridges, network devices/taps, and VLANs. In addition, IPAM plugins (dhcp, host-local, and static) ensure a clear picture of the IP addresses in use. Some chained plugins, such as portmap, bandwidth, tuning, etc., are shipped together as well.
+
+	* To facilitate the container runtime interacting with CNI plugins, a CNI runtime implementation libcni (which is written with Go) is provided as well. So, all the container runtimes written with Go (such as containerd) can directly import this module and interact with CNI plugins.
+
+
+
+* Before we talk about CNI, let’s see how Pods in Kubernetes communicate with each other. These Pods could be placed on the same node or different nodes. The nodes could also be in the same subnet, different subnets, and even different datacenters. As the image below shows, regardless of the kind of network, Kubernetes aims to connect these Pods in a seamless, agnostic, and routable way.
+
+* Kubernetes community initiates the open source CNI project to make container networking solutions integratable with various orchestrators and runtimes (such as containerd, CRI-O, gVisor, etc.). CNI defines a generic plugin-based networking solution, where a set of plugins and libraries are provided as well. It makes an abstract layer between the container execution and networking
+
+* Like other distributed systems, Kubernetes relies on the container network to provide connectivity between Pods and services, as well as for exposing endpoints for external access. As long as Kubernetes vendors and developers follow the CNI specification, the IP-per-Pod network model can be assured within Kubernetes clusters. We can access every Pod, assign IP addresses, set routing rules, visit in-cluster services, and so on.
+
+* The CNI project comes with two major parts.
+	
+	- The CNI specification
+		* One major part of the CNI project is the CNI specification. The specification outlines the interface between the container runtimes and CNI plugins. Below is an example networking configuration file containing directives for both the container runtime and the CNI plugins to consume
+			{
+			  "cniVersion": "1.0.0",
+			  "name": "dbnet",
+			  "plugins": [
+			    {
+			      "type": "bridge",
+			      // plugin specific parameters
+			      "bridge": "cni0",
+			      "keyA": ["some more", "plugin specific", "configuration"],
+			      
+			      "ipam": {
+			        "type": "host-local",
+			        // ipam specific
+			        "subnet": "10.1.0.0/16",
+			        "gateway": "10.1.0.1",
+			        "routes": [
+			            {"dst": "0.0.0.0/0"}
+			        ]
+			      },
+			      "dns": {
+			        "nameservers": [ "10.1.0.1" ]
+			      }
+			    },
+			    {
+			      "type": "tuning",
+			      "capabilities": {
+			        "mac": true
+			      },
+			      "sysctl": {
+			        "net.core.somaxconn": "500"
+			      }
+			    },
+			    {
+			        "type": "portmap",
+			        "capabilities": {"portMappings": true}
+			    }
+			  ]
+			}
+		* To facilitate the container runtime interacting with CNI plugins, a CNI runtime implementation libcni (which is written with Go) is provided as well. So, all the container runtimes written with Go (such as containerd) can directly import this module and interact with CNI plugins
+		
+		* Likewise, a reference plugin scaffold/library skel is provided as well. By building on top of this scaffold, writing CNI plugins becomes easier.
+			
+	- A set of reference and example plugins
+		The other major part of the CNI project is a set of reference and example plugins, which are provided.A group of interface creating plugins are built-in, such as bridge, macvlan, vlan, ptp, and so on. With these plugins, we can easily create bridges, network devices/taps, and VLANs. In addition, IPAM plugins (dhcp, host-local, and static) ensure a clear picture of the IP addresses in use. Some chained plugins, such as portmap, bandwidth, tuning, etc., are shipped together as well.
+
+
+
+========================== Understanding the Kubernetes Networking Model =================================
+
+Pause container:	
+	How It Works
+		Network Namespace Creation:
+			When the Pod is created, Kubernetes launches the pause container.
+			This container creates and holds the network namespace for the Pod, assigning it an IP address.
+		IP Sharing:
+			All subsequent containers in the Pod (e.g., app containers) share the same network namespace.
+			They use the pause container's network setup, including the Pod's IP address, virtual Ethernet interfaces, and routes.
+		Stability:
+			The IP address is tied to the Pod's network namespace managed by the pause container.
+			Even if individual app containers are restarted, the pause container remains active, ensuring the Pod's IP remains unchanged.		
+
+
+
+
+K8s Networking model:
+	* Every Pod gets its own IP address. The IP address that a Pod sees itself as is exactly the same IP that other Pods see it as. This is the most important and fundamental design philosophy in the Kubernetes networking model. Moreover, this IP is unique in a whole cluster. All the containers of this Pod share this IP. They can run with different ports. To achieve this IP sharing for multiple containers in a Pod, there is a pause container (also called a sandbox container) for each Pod. This pause container’s purpose is to hold a network namespace (netns), which is shared by all the other containers in this Pod. In this way, the IP address of a Pod doesn’t change even if containers are killed and recreated in place. This is the so called IP-per-Pod model.
+
+	* Pods can use Pod IP addresses to communicate with all other Pods on other nodes without network address translation (NAT).
+
+	* Agents (such as system daemons, kubelet, etc.) on a node can communicate with all the Pods on it.
+
+
+Container to container communication:
+	* In Linux, every process is attached to the root network namespace by default. The main network interface eth0 is in this root network namespace. Similarly, every Pod has such a self-owned network namespace. Containers within a Pod share the network namespace, such as the IP address, ports, etc. They can communicate with each other via the localhost since they reside in the same network namespace.	
+
+	* 	ip netns add ns1
+	  	ls /var/run/netns
+		# or we can run
+		ip netns	
+
+	* Once the namespace is created, a corresponding mount point for it is created under /var/run/netns, where the namespace is persisted even if we have no processes attached to it.
+	
+
+Intra-node Pod to Pod communication:
+	Thus, when we send a packet from pod1 to pod2, the network flow is as follows:
+	The pod1 traffic flows through eth0 to the virtual interface vethxxx in the root network namesapce.
+	The traffic is then passed on to the virtual bridge cbr0, which resolves the destination using an ARP request saying “who has this IP?”
+	The virtual interface vethyyy says it has that IP, so cbr0 knows exactly where to forward the packet.
+	When the packet reaches the virtual interface vethyyy, it is piped to the pod2 network namespace eth0.		
+
+
+Inter-node Pod to Pod communication:	
+	The packet leaves from pod1 at eth0 and directly enters the root netns at vethxxx.
+	It is then passed on to the virtual bridge cbr0, which sends an ARP request to find who owns the destination IP address.
+	On failure, the virtual bridge cbr0 sends the packet out the default eth0 device in the root network namespace. At this point, the packet enters the network.
+	Assuming that the network can route the packet to the target node based on the CIDR blocks to each node, it routes the packet to the node whose CIDR block has the pod4 IP address.
+	Now, the packet arrives at node2 at the main network interface eth0 in the root network namespace. But how do we let the packet be forwarded to the virtual network bridge cbr0, since the interface eth0 doesn’t have the IP address of pod4? We need to configure the node with enabling IP forwarding, so that the packet will be forwarded to any routes matching the pod4 IP. For now, it can find the virtual bridge cbr0.
+	The virtual bridge receives the packet and makes an ARP request that has the IP address of pod4. Finally, it finds out this IP belongs to vethbbb.
+	The packet flows across the pipe-pair and enters the network namespace of pod4.
+
+
+
+Service to Pod communication:	
+	Kubernetes introduces a concept service to describe a group of Pods. With service, we can do the following.
+
+	We can assign a static virtual IP address that can be used for in-cluster accessing. This virtual IP address associates with multiple back-end Pods’ IPs. The Endpoints controller (or the EndpointSlice controller for Kubernetes with a higher version) takes care of the IP changes of matching Pods.
+
+	The traffic addressed to this virtual IP can be load balanced to the set of back-end Pods.
+
+	Normally, in-cluster load balancing occurs in two ways: iptables and ipvs. This part is handled by the kube-proxy. A series of routing rules will be created to interpret this virtual IP address to a matching back-end Pod.
+
+
+
+External to service networking:
+
+	In Kubernetes, we have multiple ways to expose our services for external accessing.
+
+	We can create a service with type=LoadBalancer, which is backed by external cloud providers. The cloud provider is responsible for provisioning a load balancer for this service. One of the most widely used methods for mapping this load balancer to back-end Pods is NodePort.
+
+	Using Ingress is another popular and recommended way to expose our services to the outside of the cluster. The Ingress controller acts as a reverse proxy and load balancer for HTTP and HTTPS. It intercepts all incoming requests to our cluster and routes to different services, based on the rules of the requesting path.Ingress controller can be assigned to Public IP(EXTERNAL_IP) for exposing to outside world.
+
+		An Ingress controller in Kubernetes is a component that manages access to services within a cluster from external sources. It functions as a reverse proxy by receiving HTTP/HTTPS requests from outside the cluster and forwarding them to the appropriate services based on predefined rules. Additionally, it acts as a load balancer by distributing incoming traffic across multiple instances of a service, ensuring efficient handling of requests and improving the reliability and availability of applications.
+
+		In the context of the lesson, the Ingress controller is highlighted as a key method for exposing services to the external world. It intercepts all incoming HTTP and HTTPS requests to the cluster and routes them to the correct services, based on the path requested by the user. This allows for more sophisticated routing and management of traffic than simple port-based methods, making it a recommended approach for external access to services in Kubernetes.		
+
+
+
+
+======================================== How the CNI Works ====================================
+
+* The Kubernetes networking model is implemented by the container runtime on each node, instead of kubelet. Just as the graph below shows, the container runtime (e.g. containerd) calls the executable CNI plugin to configure the network and add or remove a network interface to or from the container’s networking namespace (netns). As we mentioned previously, every Pod gets its own unique IP address, and it is the CNI plugin that has the responsibility to allocate the IP address and assign it to a Pod.
+
+* When the container runtime (e.g. containerd) performs network operations on a container, such as creating or deleting a container, it calls the CNI plugin with the desired command. These CNI plugins are executable. Usually, we put them in the folder /opt/cni/bin by default. Below is such a sample command. Here, the CNI_COMMAND could be either ADD, DEL, CHECK, or VERSION.
+
+* Here, the container runtime also needs to provide related network configuration and container-specific data. The configuration file is in JSON format, as shown below. By default, we put the configuration file in the folder /etc/cni/net.d. In the configuration file, we specify the cniVersion to indicate which version the caller is using. Multiple chaining plugins can be configured here. The container runtime caller will look for matching plugins by the specified plugin type, such as flannel and portmap, and call each one in turn.
+
+
+
+=============================== Implementing a CNI plugin ==================================
+
+
+main.go
+--------
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"os"
+
+	"github.com/containernetworking/cni/pkg/skel"
+	"github.com/containernetworking/cni/pkg/types"
+	type100 "github.com/containernetworking/cni/pkg/types/100"
+	"github.com/containernetworking/cni/pkg/version"
+)
+
+type NetConf struct {
+	types.NetConf
+	CNIOutput string `json:"cniOutput,omitempty"`
+}
+
+func main() {
+	skel.PluginMain(cmdAdd, cmdCheck, cmdDel, version.All, fmt.Sprintf("CNI %s plugin %s", "educative", type100.ImplementedSpecVersion))
+}
+
+func outputCmdArgs(fp io.Writer, subcommand string, args *skel.CmdArgs) {
+	fmt.Fprintf(fp, `
+CNI Command: %s
+ContainerID: %s
+Netns: %s
+IfName: %s
+Args: %s
+Path: %s
+StdinData: %s
+----------------------
+`,
+		subcommand,
+		args.ContainerID,
+		args.Netns,
+		args.IfName,
+		args.Args,
+		args.Path,
+		string(args.StdinData))
+}
+
+func parseConf(data []byte) (*NetConf, error) {
+	conf := &NetConf{}
+	if err := json.Unmarshal(data, &conf); err != nil {
+		return nil, fmt.Errorf("failed to parse")
+	}
+
+	return conf, nil
+}
+
+func getResult(netConf *NetConf) *type100.Result {
+	if netConf.RawPrevResult == nil {
+		return &type100.Result{}
+	}
+
+	version.ParsePrevResult(&netConf.NetConf)
+	result, _ := type100.NewResultFromResult(netConf.PrevResult)
+	return result
+}
+
+func cmdAdd(args *skel.CmdArgs) error {
+	return addDebugLog("ADD", args)
+}
+
+func cmdDel(args *skel.CmdArgs) error {
+	return addDebugLog("DEL", args)
+}
+
+func cmdCheck(args *skel.CmdArgs) error {
+	return addDebugLog("CHECK", args)
+}
+
+func addDebugLog(subcommand string, args *skel.CmdArgs) error {
+	netConf, _ := parseConf(args.StdinData)
+	// add debug log
+	if netConf.CNIOutput != "" {
+		fp, _ := os.OpenFile(netConf.CNIOutput, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+		defer fp.Close()
+		outputCmdArgs(fp, subcommand, args)
+	}
+
+	result := &type100.Result{}
+	if subcommand == "ADD" {
+		result = getResult(netConf)
+	}
+	return types.PrintResult(result, netConf.CNIVersion)
+}
+
+
+10-educative-plugin.conflist
+-----------------------------
+{
+  "cniVersion": "0.3.1",
+  "name": "cbr0",
+  "plugins": [
+    {
+      "type": "flannel",
+      "delegate": {
+        "hairpinMode": true,
+        "isDefaultGateway": true
+      }
+    },
+    {
+      "type": "educative",
+      "cniOutput": "/tmp/cni_output.log"
+    },
+    {
+      "type": "portmap",
+      "capabilities": {
+        "portMappings": true
+      }
+    }
+  ]
+}
+
+
+------------- before change ------------
+root@ed4679602:/usercode# cat /etc/cni/net.d/10-flannel.conflist 
+{
+  "name": "cbr0",
+  "cniVersion": "0.3.1",
+  "plugins": [
+    {
+      "type": "flannel",
+      "delegate": {
+        "hairpinMode": true,
+        "isDefaultGateway": true
+      }
+    },
+    {
+      "type": "portmap",
+      "capabilities": {
+        "portMappings": true
+      }
+    }
+  ]
+}
+
+------------- after change ------------
+{
+  "cniVersion": "0.3.1",
+  "name": "cbr0",
+  "plugins": [
+    {
+      "type": "flannel",
+      "delegate": {
+        "hairpinMode": true,
+        "isDefaultGateway": true
+      }
+    },
+    {
+      "type": "educative",
+      "cniOutput": "/tmp/cni_output.log"
+    },
+    {
+      "type": "portmap",
+      "capabilities": {
+        "portMappings": true
+      }
+    }
+  ]
+}
+
+commands:
+-----------------
+root@ed4679602:/usercode# ls
+10-educative-plugin.conflist  __ed_stderr.txt  go.mod  lost+found  main.sh
+__ed_script.sh                __ed_stdout.txt  go.sum  main.go     output
+
+root@ed4679602:/usercode# ls /opt/cni/bin/
+bandwidth  dhcp   firewall  host-device  ipvlan    macvlan  ptp  static  vlan
+bridge     dummy  flannel   host-local   loopback  portmap  sbr  tuning  vrf
+
+root@ed4679602:/usercode# go build -o /opt/cni/bin/educative main.go
+go: downloading github.com/containernetworking/cni v1.1.1		
+
+root@ed4679602:/usercode# ls /opt/cni/bin/
+bandwidth  dhcp   educative  flannel      host-local  loopback  portmap  sbr     tuning  vrf
+bridge     dummy  firewall   host-device  ipvlan      macvlan   ptp      static  vlan
+
+
+run commands:
+-----------
+go build -o /opt/cni/bin/educative main.go
+cp /etc/cni/net.d/10-flannel.conflist /usercode/
+cp /usercode/10-educative-plugin.conflist /etc/cni/net.d/10-flannel.conflist
+kubectl taint node --all node-role.kubernetes.io/master-
+kubectl run nginx --image=nginx
+
+
+
+
+
+---------------- cni output -----------------
+
+root@ed4679602:/usercode# cat /tmp/cni_output.log 
+
+CNI Command: ADD
+ContainerID: c35d9f6cfbe0e3431368bea347a540f2a39f0b1e97d0d6a6b9415c800824943a
+Netns: /proc/7839/ns/net
+IfName: eth0
+Args: IgnoreUnknown=1;K8S_POD_NAMESPACE=default;K8S_POD_NAME=nginx;K8S_POD_INFRA_CONTAINER_ID=c35d9f6cfbe0e3431368bea347a540f2a39f0b1e97d0d6a6b9415c800824943a
+Path: /opt/cni/bin
+StdinData: {"cniOutput":"/tmp/cni_output.log","cniVersion":"0.3.1","name":"cbr0","prevResult":{"cniVersion":"0.3.1","interfaces":[{"name":"cni0","mac":"36:12:98:e1:79:a9"},{"name":"veth3087984f","mac":"72:61:d5:fe:13:6d"},{"name":"eth0","mac":"7e:24:fb:de:4e:fa","sandbox":"/proc/7839/ns/net"}],"ips":[{"version":"4","interface":2,"address":"10.244.0.4/24","gateway":"10.244.0.1"}],"routes":[{"dst":"10.244.0.0/16"},{"dst":"0.0.0.0/0","gw":"10.244.0.1"}],"dns":{}},"type":"educative"}
+----------------------

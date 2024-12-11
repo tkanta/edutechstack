@@ -1,0 +1,203 @@
+
+
+==================== Introduction to the Container Runtime Interface (CRI) ==============================
+
+* It is kubelet that makes Pods into a group of running containers. However, kubelet itself doesn’t directly manage the lifecycle of containers. A container engine, also known as a container runtime, is invoked to do low-level container management, such as loading container images from a registry, mounting a volume to a container, assigning network interfaces, and so on.
+
+* Some common container runtimes are containerd, CRI-O, and Docker.
+
+* The Container Runtime Interface (CRI) defines the main gRPC protocol that is used for communications between kubelet and a container runtime
+
+	// Runtime service defines the public APIs for remote container runtimes
+	service RuntimeService {
+	    // Version returns the runtime name, runtime version, and runtime API version.
+	    rpc Version(VersionRequest) returns (VersionResponse) {}
+
+	    // RunPodSandbox creates and starts a pod-level sandbox. Runtimes must ensure
+	    // the sandbox is in the ready state on success.
+	    rpc RunPodSandbox(RunPodSandboxRequest) returns (RunPodSandboxResponse) {}
+	    // StopPodSandbox stops any running process that is part of the sandbox and
+	    // reclaims network resources (e.g., IP addresses) allocated to the sandbox.
+	    // If there are any running containers in the sandbox, they must be forcibly
+	    // terminated.
+	    // This call is idempotent, and must not return an error if all relevant
+	    // resources have already been reclaimed. kubelet will call StopPodSandbox
+	    // at least once before calling RemovePodSandbox. It will also attempt to
+	    // reclaim resources eagerly, as soon as a sandbox is not needed. Therefore,
+	    // multiple StopPodSandbox calls are expected.
+	    rpc StopPodSandbox(StopPodSandboxRequest) returns (StopPodSandboxResponse) {}
+	    // RemovePodSandbox removes the sandbox. If there are any running containers
+	    // in the sandbox, they must be forcibly terminated and removed.
+	    // This call is idempotent, and must not return an error if the sandbox has
+	    // already been removed.
+	    rpc RemovePodSandbox(RemovePodSandboxRequest) returns (RemovePodSandboxResponse) {}
+	    // PodSandboxStatus returns the status of the PodSandbox. If the PodSandbox is not
+	    // present, returns an error.
+	    rpc PodSandboxStatus(PodSandboxStatusRequest) returns (PodSandboxStatusResponse) {}
+	    // ListPodSandbox returns a list of PodSandboxes.
+	    rpc ListPodSandbox(ListPodSandboxRequest) returns (ListPodSandboxResponse) {}
+
+	    // CreateContainer creates a new container in specified PodSandbox
+	    rpc CreateContainer(CreateContainerRequest) returns (CreateContainerResponse) {}
+	    // StartContainer starts the container.
+	    rpc StartContainer(StartContainerRequest) returns (StartContainerResponse) {}
+	    // StopContainer stops a running container with a grace period (i.e., timeout).
+	    // This call is idempotent, and must not return an error if the container has
+	    // already been stopped.
+	    // The runtime must forcibly kill the container after the grace period is
+	    // reached.
+	    rpc StopContainer(StopContainerRequest) returns (StopContainerResponse) {}
+	    // RemoveContainer removes the container. If the container is running, the
+	    // container must be forcibly removed.
+	    // This call is idempotent, and must not return an error if the container has
+	    // already been removed.
+	    rpc RemoveContainer(RemoveContainerRequest) returns (RemoveContainerResponse) {}
+	    // ListContainers lists all containers by filters.
+	    rpc ListContainers(ListContainersRequest) returns (ListContainersResponse) {}
+	    // ContainerStatus returns status of the container. If the container is not
+	    // present, returns an error.
+	    rpc ContainerStatus(ContainerStatusRequest) returns (ContainerStatusResponse) {}
+	    // UpdateContainerResources updates ContainerConfig of the container synchronously.
+	    // If runtime fails to transactionally update the requested resources, an error is returned.
+	    rpc UpdateContainerResources(UpdateContainerResourcesRequest) returns (UpdateContainerResourcesResponse) {}
+	    // ReopenContainerLog asks runtime to reopen the stdout/stderr log file
+	    // for the container. This is often called after the log file has been
+	    // rotated. If the container is not running, container runtime can choose
+	    // to either create a new log file and return nil, or return an error.
+	    // Once it returns error, new container log file MUST NOT be created.
+	    rpc ReopenContainerLog(ReopenContainerLogRequest) returns (ReopenContainerLogResponse) {}
+
+	    // ExecSync runs a command in a container synchronously.
+	    rpc ExecSync(ExecSyncRequest) returns (ExecSyncResponse) {}
+	    // Exec prepares a streaming endpoint to execute a command in the container.
+	    rpc Exec(ExecRequest) returns (ExecResponse) {}
+	    // Attach prepares a streaming endpoint to attach to a running container.
+	    rpc Attach(AttachRequest) returns (AttachResponse) {}
+	    // PortForward prepares a streaming endpoint to forward ports from a PodSandbox.
+	    rpc PortForward(PortForwardRequest) returns (PortForwardResponse) {}
+
+	    // ContainerStats returns stats of the container. If the container does not
+	    // exist, the call returns an error.
+	    rpc ContainerStats(ContainerStatsRequest) returns (ContainerStatsResponse) {}
+	    // ListContainerStats returns stats of all running containers.
+	    rpc ListContainerStats(ListContainerStatsRequest) returns (ListContainerStatsResponse) {}
+
+	    // PodSandboxStats returns stats of the pod sandbox. If the pod sandbox does not
+	    // exist, the call returns an error.
+	    rpc PodSandboxStats(PodSandboxStatsRequest) returns (PodSandboxStatsResponse) {}
+	    // ListPodSandboxStats returns stats of the pod sandboxes matching a filter.
+	    rpc ListPodSandboxStats(ListPodSandboxStatsRequest) returns (ListPodSandboxStatsResponse) {}
+
+	    // UpdateRuntimeConfig updates the runtime configuration based on the given request.
+	    rpc UpdateRuntimeConfig(UpdateRuntimeConfigRequest) returns (UpdateRuntimeConfigResponse) {}
+
+	    // Status returns the status of the runtime.
+	    rpc Status(StatusRequest) returns (StatusResponse) {}
+
+	    // CheckpointContainer checkpoints a container
+	    rpc CheckpointContainer(CheckpointContainerRequest) returns (CheckpointContainerResponse) {}
+
+	    // GetContainerEvents gets container events from the CRI runtime
+	    rpc  GetContainerEvents(GetEventsRequest) returns (stream ContainerEventResponse) {}
+
+	}
+
+	// ImageService defines the public APIs for managing images.
+	service ImageService {
+	    // ListImages lists existing images.
+	    rpc ListImages(ListImagesRequest) returns (ListImagesResponse) {}
+	    // ImageStatus returns the status of the image. If the image is not
+	    // present, returns a response with ImageStatusResponse.Image set to
+	    // nil.
+	    rpc ImageStatus(ImageStatusRequest) returns (ImageStatusResponse) {}
+	    // PullImage pulls an image with authentication config.
+	    rpc PullImage(PullImageRequest) returns (PullImageResponse) {}
+	    // RemoveImage removes the image.
+	    // This call is idempotent, and must not return an error if the image has
+	    // already been removed.
+	    rpc RemoveImage(RemoveImageRequest) returns (RemoveImageResponse) {}
+	    // ImageFSInfo returns information of the filesystem that is used to store images.
+	    rpc ImageFsInfo(ImageFsInfoRequest) returns (ImageFsInfoResponse) {}
+	}
+
+
+* The Protocol Buffers API above defines two gRPC services—RuntimeService (lines 1–93) and ImageService (lines 95–111). The RuntimeService provides RPCs to manage the whole lifecycle of Pods and containers, such as creating a sandbox container or deleting a container. Other interactions (exec/attach/port-forward) with containers are supported as well. On the other hand, the ImageService contains RPCs to manage container images, such as pulling an image from a registry or deleting an image. Any container runtimes that implement the CRI can be used together with kubelet.
+
+
+* With the CRI, Kubernetes has the flexibility to run with a variety of container runtimes. Thus, we can choose one that best meets our business needs. Some companies choose to use containerd as the runtime, while some use the Kata runtime to isolate the containers from the host machine due to operational requirements.
+
+
+================================ How the CRI Works ========================================
+
+* With the CRI, kubelet can talk to any container runtimes that are compliant with the Open Container Initiative (OCI). The OCI currently defines three specifications—OCI image format, runtime specification, and distribution specification. A seed low-level container runtime called runc is also provided. Most container runtimes, such as containerd and CRI-O, build on top of it. For container runtimes other than runc, it can also be used for a compatibility measure. At a high level, when a container runtime receives the gRPC request, it will download an OCI image and unpack into an OCI Runtime filesystem bundle. This bundle will then be run by an OCI runtime.
+
+* In the OCI specifications, the Kubernetes concept Pod, where we can create and start a Pod-level sandbox, is introduced as well. Container runtimes are responsible for managing the whole lifecycle of these sandbox containers, such as creating, reclaiming network resources (such as IP addresses), and so on. When creating an application container, the corresponding sandbox ID is needed. Below is a code snippet illustrating how kubelet calls a CreateContainer gRPC request to the container runtime. By specifying such a podSandBoxID, the container runtimes will make sure that all the containers in a Pod share the same network namespace.
+
+	// From pkg/kubelet/cri/remote/remote_runtime.go
+
+	// CreateContainer creates a new container in the specified PodSandbox.
+	func (r *remoteRuntimeService) CreateContainer(podSandBoxID string, config *runtimeapi.ContainerConfig, sandboxConfig *runtimeapi.PodSandboxConfig) (string, error) {
+		klog.V(10).InfoS("[RemoteRuntimeService] CreateContainer", "podSandboxID", podSandBoxID, "timeout", r.timeout)
+		ctx, cancel := getContextWithTimeout(r.timeout)
+		defer cancel()
+
+		if r.useV1API() {
+			return r.createContainerV1(ctx, podSandBoxID, config, sandboxConfig)
+		}
+
+		return r.createContainerV1alpha2(ctx, podSandBoxID, config, sandboxConfig)
+	}
+
+	func (r *remoteRuntimeService) createContainerV1alpha2(ctx context.Context, podSandBoxID string, config *runtimeapi.ContainerConfig, sandboxConfig *runtimeapi.PodSandboxConfig) (string, error) {
+		resp, err := r.runtimeClientV1alpha2.CreateContainer(ctx, &runtimeapiV1alpha2.CreateContainerRequest{
+			PodSandboxId:  podSandBoxID,
+			Config:        v1alpha2ContainerConfig(config),
+			SandboxConfig: v1alpha2PodSandboxConfig(sandboxConfig),
+		})
+		if err != nil {
+			klog.ErrorS(err, "CreateContainer in sandbox from runtime service failed", "podSandboxID", podSandBoxID)
+			return "", err
+		}
+
+		klog.V(10).InfoS("[RemoteRuntimeService] CreateContainer", "podSandboxID", podSandBoxID, "containerID", resp.ContainerId)
+		if resp.ContainerId == "" {
+			errorMessage := fmt.Sprintf("ContainerId is not set for container %q", config.Metadata)
+			err := errors.New(errorMessage)
+			klog.ErrorS(err, "CreateContainer failed")
+			return "", err
+		}
+
+		return resp.ContainerId, nil
+	}
+
+	func (r *remoteRuntimeService) createContainerV1(ctx context.Context, podSandBoxID string, config *runtimeapi.ContainerConfig, sandboxConfig *runtimeapi.PodSandboxConfig) (string, error) {
+		resp, err := r.runtimeClient.CreateContainer(ctx, &runtimeapi.CreateContainerRequest{
+			PodSandboxId:  podSandBoxID,
+			Config:        config,
+			SandboxConfig: sandboxConfig,
+		})
+		if err != nil {
+			klog.ErrorS(err, "CreateContainer in sandbox from runtime service failed", "podSandboxID", podSandBoxID)
+			return "", err
+		}
+
+		klog.V(10).InfoS("[RemoteRuntimeService] CreateContainer", "podSandboxID", podSandBoxID, "containerID", resp.ContainerId)
+		if resp.ContainerId == "" {
+			errorMessage := fmt.Sprintf("ContainerId is not set for container %q", config.Metadata)
+			err := errors.New(errorMessage)
+			klog.ErrorS(err, "CreateContainer failed")
+			return "", err
+		}
+
+		return resp.ContainerId, nil
+	}
+
+
+
+* The OCI standardizes the use of container image formats, container runtimes, and distribution specification. In Kubernetes, kubelet only works with container runtimes that are compliant with the OCI standard. The CRI lets kubelet work with a variety of container runtimes; it’s quite flexible. We can run kubelet on different infrastructures only if we’ve got a compatible container runtime. There are a variety of mature container runtimes that support the CRI, such as containerd, CRI-O, Kata, gVisor, and so on.
+
+
+
+
+==================================== Run Multiple Container Runtimes ==================================
+

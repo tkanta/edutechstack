@@ -1,0 +1,94 @@
+
+=============== Network Namespace =============
+
+A network namespace provides isolated network environments for processes or containers. Each network namespace has its own set of network resources, 
+such as:
+
+IP Addresses:
+
+	Each namespace can have its own IP address(es).
+	Processes in different namespaces can have overlapping IPs without conflicts.
+
+Routing Tables:
+
+	Each namespace maintains its own routing rules, meaning traffic routing can differ between namespaces.
+
+Network Interfaces:
+
+	Physical (e.g., eth0) or virtual interfaces (e.g., veth pairs) are assigned to a namespace.
+	Interfaces in different namespaces are isolated unless explicitly connected.
+
+Firewall Rules:
+
+	Each namespace can have independent iptables or firewall configurations.
+
+Sockets:
+
+	Applications within a namespace can bind sockets without interfering with those in another namespace.
+
+Use Cases:
+
+	Containers: Docker, Kubernetes Pods.
+	Multi-tenant systems: Isolating tenants' network traffic in cloud environments.
+	Testing: Simulating network conditions without affecting the host.
+
+Example:
+
+	# Create a new network namespace
+	ip netns add my-namespace
+
+	# Add a virtual interface to the namespace
+	ip link add veth1 type veth peer name veth2
+	ip link set veth1 netns my-namespace
+
+	# Assign IP and bring the interface up
+	ip netns exec my-namespace ip addr add 192.168.1.2/24 dev veth1
+	ip netns exec my-namespace ip link set veth1 up
+
+================ IPC Namespace ==============
+
+An IPC (Inter-Process Communication) namespace isolates communication mechanisms such as shared memory, message queues, and semaphores between processes.
+
+Shared Memory Segments:
+
+	Processes in the same IPC namespace can share memory for efficient data exchange.
+	Shared memory is often used in high-performance applications, such as databases.
+
+Message Queues:
+
+	Processes use message queues to send and receive messages.
+	Isolation ensures that message queues in one namespace are not visible to others.
+
+Semaphores:
+
+	Semaphores are used for synchronization between processes.
+	Each namespace has its own set of semaphores.
+
+Use Cases:
+
+	Containers: Isolating IPC resources between containers.
+	Testing: Running applications with independent shared memory or queues.
+
+Example:
+
+	A Pod in Kubernetes might share the same IPC namespace so that its containers can use shared memory to exchange data.
+	Multiple Pods will typically have separate IPC namespaces to ensure isolation.
+
+How These Are Used in Containers:
+
+	Network Namespace:
+
+		Containers (or Pods in Kubernetes) use a network namespace to have independent networking environments, like isolated IPs, routing tables, and interfaces.
+		The pause container in Kubernetes holds the shared network namespace for all containers in a Pod, enabling them to share the same IP.
+
+	IPC Namespace:
+
+		Containers in a Pod can share an IPC namespace to facilitate inter-process communication, such as using shared memory for fast data sharing.
+
+Key Differences
+	
+		Feature						Network Namespace													IPC Namespace
+	---------------------------------------------------------------------------------------------------------------------------------------------
+	Resource Isolation		Networking components (IP, routes)							Inter-process communication (shared memory, semaphores)
+	Shared by Default?		Shared by all containers in a Pod (via pause container)		Not shared by default unless explicitly configured
+	Use Case				Networking isolation or sharing								Efficient communication between processes in the same environment
