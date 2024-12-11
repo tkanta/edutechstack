@@ -1,0 +1,20 @@
+
+
+===================== Python String formatting ==============================
+
+https://docs.python.org/3/tutorial/inputoutput.html
+
+* To use formatted string literals, begin a string with f or F before the opening quotation mark or triple quotation mark. Inside this string, you can write a Python expression between { and } characters that can refer to variables or literal values.
+
+	year = 2016
+	event = 'Referendum'
+	print(f'Results of the {year} {event}')
+	'Results of the 2016 Referendum'
+
+* Percentage format
+	https://www.askpython.com/python/built-in-methods/format-2-decimal-places
+	num = 7.123456
+	print("%1.2f " % num)         
+	print("{:.2f}".format( num )) 	
+
+	Ans: 7.12
