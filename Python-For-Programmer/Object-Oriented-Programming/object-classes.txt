@@ -49,7 +49,7 @@ class Employee:
     department = None
 
 
-# cerating an object of the Employee class
+# creating an object of the Employee class
 Steve = Employee()
 
 # assigning values to properties of Steve - an object of the Employee class
@@ -86,7 +86,7 @@ Mark = Employee("3789", 2500, "Human Resources")
 
 * The class variables are shared by all instances or objects of the classes. A change in the class variable will change the value of that property in all the objects of the class.
 
-* The instance variables are unique to each instance or object of the class. A change in the instance variable will change the value of the property in that specific object only.
+* The instance variables are unique to each instance or object of the class. A change in the instance variable will change the value of the property in that specific object only. Instance method can access class variable.
 
 
 class Player:
@@ -188,6 +188,7 @@ print(player2.teamMembers)
 ------------------------- Class Methods and Static Methods --------------------------
 
 * class method
+	Class methods work with class variables and are accessible using the class name rather than its object. Since all class objects share the class variables, class methods are used to access and modify class variables.
 
 	class Player:
     teamName = 'Liverpool'  # class variables
@@ -202,7 +203,8 @@ print(player2.teamMembers)
 	print(Player.getTeamName())
 
 * Static method
-	
+	Static methods are methods that are usually limited to class only and not their objects. They have no direct relation to class variables or instance variables. They are used as utility functions inside the class or when we do not want the inherited classes to modify a method definition.They can be called using class Name or object name.
+
 	class Player:
     teamName = 'Liverpool'  # class variables
 

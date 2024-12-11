@@ -1,0 +1,197 @@
+
+
+============================== What is Polymorphism ? ==========================================
+
+
+* The word Polymorphism is a combination of two Greek words, Poly meaning many and Morph meaning forms.
+
+* In programming, polymorphism refers to the same object exhibiting different forms and behaviors.
+
+* The base class declares a function without providing an implementation. Each derived class inherits the function declaration and can provide its own implementation	
+
+
+
+=========================== Method Overriding ================================================
+
+* In other words, if a subclass provides a specific implementation of a method that had already been defined in one of its parent classes, it is known as method overriding.
+
+	In method overriding:
+
+	The method in the parent class is called the overridden method.
+	The methods in the child classes are called the overriding methods.
+
+
+
+class Shape:
+    def __init__(self):  # initializing sides of all shapes to 0
+        self.sides = 0
+
+    def getArea(self):
+        pass
+
+
+class Rectangle(Shape):  # derived from Shape class
+    # initializer
+    def __init__(self, width=0, height=0):
+        self.width = width
+        self.height = height
+        self.sides = 4
+
+    # method to calculate Area
+    def getArea(self):
+        return (self.width * self.height)
+
+
+
+============================== Operator Overloading ==============================================
+
+* when the + operator is called, it invokes the special function, __add__, in Python, but this operator acts differently for different data types. For example, the + operator adds the numbers when it is used between two int data types and merges two strings when it is used between string data types.
+
+
++	__add__ (self, other)
+-	__sub__ (self, other)
+/	__truediv__ (self, other)
+*	__mul__ (self, other)
+<	__lt__ (self, other)
+>	__gt__ (self, other)
+==	__eq__ (self, other)
+
+class Complex:
+    def __init__(self, real=0, imaginary=0):
+        self.real = real
+        self.imaginary = imaginary
+
+    def __add__(self, other):
+        temp = Complex(self.real + other.real, self.imaginary + other.imaginary)
+        return temp
+
+    def __sub__(self, other):
+        temp = Complex(self.real - other.real, self.imaginary - other.imaginary)
+        return temp
+
+
+comp1 = Complex(2, 3)
+comp2 = Complex(4, 5)
+comp3 = comp1 + comp2
+comp4 = comp1 - comp2
+
+print("real :", comp3.real)
+print("imaginary :", comp3.imaginary)
+print("real :", comp4.real)
+print("imaginary :", comp4.imaginary)
+
+
+
+
+=================================== Dynamic typing ================================================
+
+* Due to the dynamic nature of Python, duck typing allows the user to use any object that provides the required behavior without the constraint that it has to be a subclass. In simple term method overriding functionality can be achieved without inheritance. This is how we have achieved polymorphism without inheritance.
+
+
+class Dog:
+    def Speak(self):
+        print("Woof woof")
+
+
+class Cat:
+    def Speak(self):
+        print("Meow meow")
+
+
+class AnimalSound:
+    def Sound(self, animal):
+        animal.Speak()
+
+
+sound = AnimalSound()
+dog = Dog()
+cat = Cat()
+
+sound.Sound(dog)
+sound.Sound(cat)
+
+
+
+================================= Abstract Base Classes ==========================================
+
+* Abstract methods must be defined in child classes for proper implementation of inheritance.
+
+
+from abc import ABC, abstractmethod
+
+
+class Shape(ABC):
+
+    @abstractmethod
+    def area(self):
+        pass
+
+
+class Square(Shape):
+    def __init__(self, length=0):
+        self.length = length
+
+    def area(self):
+        return self.length * self.length
+
+
+
+------------------ use super --------------------
+
+# Parent Class
+class Shape:
+    sname = "Shape"
+
+    def getName(self):
+        return self.sname
+
+
+# child class
+class XShape(Shape):
+    # initializer
+    def __init__(self, name):
+        self.xsname = name
+
+    def getName(self):  # overriden method
+        return (super().getName() + ", " + self.xsname)
+
+
+circle = XShape("Circle")
+print(circle.getName())
+
+---------------  Dog , Sheep > Animal  -----------------------
+class Animal:
+    def __init__(self, name, sound):
+        self.name = name
+        self.sound = sound
+
+    def Animal_details(self):
+        print("Name:", self.name)
+        print("Sound:", self.sound)
+
+
+class Dog(Animal):
+    def __init__(self, name, sound, family):
+        super().__init__(name, sound)
+        self.family = family
+
+    def Animal_details(self):
+        super().Animal_details()
+        print("Family:", self.family)
+
+
+class Sheep(Animal):
+    def __init__(self, name, sound, color):
+        super().__init__(name, sound)
+        self.color = color
+
+    def Animal_details(self):
+        super().Animal_details()
+        print("Color:", self.color)
+
+
+d = Dog("Pongo", "Woof Woof", "Husky")
+d.Animal_details()
+print("")
+s = Sheep("Billy", "Baa Baa", "White")
+s.Animal_details()

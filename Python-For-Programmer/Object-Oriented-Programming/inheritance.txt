@@ -1,0 +1,284 @@
+
+
+------------------- Inheritance ---------------------------
+
+* In Python, whenever we create a class, it is, by default, a subclass of the built-in Python object class. This makes it an excellent example of inheritance in Python. This class has very few properties and methods, but it does provide a strong basis for object-oriented programming in Python.
+
+
+
+-------------- The Syntax and Terminologies ------------------
+
+* A child class has all public attributes of the parent class.
+* We can call super class constructor from subclass, using super() or super class name
+	- super().__init__(make, color, model)
+	- Vehicle.__init__(self, make, color, model)
+
+class ParentClass:
+    # attributes of the parent class
+
+
+class ChildClass(ParentClass):
+    # attributes of the child class
+
+sample:
+-------
+class Vehicle:
+    def __init__(self, make, color, model):
+        self.make = make
+        self.color = color
+        self.model = model
+
+    def printDetails(self):
+        print("Manufacturer:", self.make)
+        print("Color:", self.color)
+        print("Model:", self.model)
+
+
+class Car(Vehicle):
+    def __init__(self, make, color, model, doors):
+        # calling the constructor from parent class
+        Vehicle.__init__(self, make, color, model)
+        self.doors = doors
+
+    def printCarDetails(self):
+        self.printDetails()
+        print("Doors:", self.doors)
+
+
+obj1 = Car("Suzuki", "Grey", "2015", 4)
+obj1.printCarDetails()    
+
+
+---------------------------- super function ------------------------------
+
+
+Use cases of the super() function
+* Accessing parent class properties
+	
+	class Vehicle:  # defining the parent class
+	    fuelCap = 90
+
+
+	class Car(Vehicle):  # defining the child class
+	    fuelCap = 50
+
+	    def display(self):
+	        # accessing fuelCap from the Vehicle class using super()
+	        print("Fuel cap from the Vehicle Class:", super().fuelCap)
+
+	        # accessing fuelCap from the Car class using self
+	        print("Fuel cap from the Car Class:", self.fuelCap)
+
+
+	obj1 = Car()  # creating a car object
+	obj1.display()  # calling the Car class method display()
+
+
+* Calling the parent class methods#
+	
+	class Vehicle:  # defining the parent class
+    def display(self):  # defining display method in the parent class
+        print("I am from the Vehicle Class")
+
+
+	class Car(Vehicle):  # defining the child class
+	    # defining display method in the child class
+	    def display(self):
+	        super().display()
+	        print("I am from the Car Class")
+
+
+	obj1 = Car()  # creating a car object
+	obj1.display()  # calling the Car class method display()
+
+
+* Calling the parent class initializers
+
+		class ParentClass():
+	    def __init__(self, a, b):
+	        self.a = a
+	        self.b = b
+
+
+		class ChildClass(ParentClass):
+		    def __init__(self, a, b, c):
+		        super().__init__(a, b)
+		        self.c = c
+
+
+		obj = ChildClass(1, 2, 3)
+		print(obj.a)
+		print(obj.b)
+		print(obj.c)
+
+
+------------------------ Types of inheritance --------------------------
+
+Single
+--------
+
+class Vehicle:  # parent class
+def setTopSpeed(self, speed):  # defining the set
+    self.topSpeed = speed
+    print("Top speed is set to", self.topSpeed)
+
+
+class Car(Vehicle):  # child class
+def openTrunk(self):
+    print("Trunk is now open.")
+
+
+corolla = Car()  # creating an object of the Car class
+corolla.setTopSpeed(220)  # accessing methods from the parent class
+corolla.openTrunk()  # accessing method from its own class
+
+
+Multi-level
+-----------
+* Let’s implement the three classes illustrated above:
+	A Car IS A Vehicle
+	A Hybrid IS A Car
+
+class Vehicle:  # parent class
+    def setTopSpeed(self, speed):  # defining the set
+        self.topSpeed = speed
+        print("Top speed is set to", self.topSpeed)
+
+
+class Car(Vehicle):  # child class of Vehicle
+    def openTrunk(self):
+        print("Trunk is now open.")
+
+
+class Hybrid(Car):  # child class of Car
+    def turnOnHybrid(self):
+        print("Hybrid mode is now switched on.")
+
+
+priusPrime = Hybrid()  # creating an object of the Hybrid class
+priusPrime.setTopSpeed(220)  # accessing methods from the parent class
+priusPrime.openTrunk()  # accessing method from the parent class
+priusPrime.turnOnHybrid()  # accessing method from the child class
+
+
+Hierarchical
+-----------
+* Example:
+	A Car IS A Vehicle
+	A Truck IS A Vehicle
+
+class Vehicle:  # parent class
+    def setTopSpeed(self, speed):  # defining the set
+        self.topSpeed = speed
+        print("Top speed is set to", self.topSpeed)
+
+
+class Car(Vehicle):  # child class of Vehicle
+    pass
+
+
+class Truck(Vehicle):  # child class of Vehicle
+    pass
+
+
+corolla = Car()  # creating an object of the Car class
+corolla.setTopSpeed(220)  # accessing methods from the parent class
+
+volvo = Truck()  # creating an object of the Truck class
+volvo.setTopSpeed(180)  # accessing methods from the parent class
+
+
+Multiple
+-------
+* HybridEngine IS A ElectricEngine. HybridEngine IS A CombustionEngine as well.
+
+class CombustionEngine():  
+    def setTankCapacity(self, tankCapacity):
+        self.tankCapacity = tankCapacity
+
+
+class ElectricEngine():  
+    def setChargeCapacity(self, chargeCapacity):
+        self.chargeCapacity = chargeCapacity
+
+# Child class inherited from CombustionEngine and ElectricEngine
+class HybridEngine(CombustionEngine, ElectricEngine):
+    def printDetails(self):
+        print("Tank Capacity:", self.tankCapacity)
+        print("Charge Capacity:", self.chargeCapacity)
+
+car = HybridEngine()
+car.setChargeCapacity("250 W")
+car.setTankCapacity("20 Litres")
+car.printDetails()
+
+
+Hybrid		
+-------
+* A type of inheritance which is a combination of Multiple and Multi-level inheritance is called hybrid inheritance.
+	CombustionEngine IS A Engine.
+	ElectricEngine IS A Engine.
+	HybridEngine IS A ElectricEngine and a CombustionEngine.
+
+
+class Engine:  # Parent class
+    def setPower(self, power):
+        self.power = power
+
+
+class CombustionEngine(Engine):  # Child class inherited from Engine
+    def setTankCapacity(self, tankCapacity):
+        self.tankCapacity = tankCapacity
+
+
+class ElectricEngine(Engine):  # Child class inherited from Engine
+    def setChargeCapacity(self, chargeCapacity):
+        self.chargeCapacity = chargeCapacity
+
+# Child class inherited from CombustionEngine and ElectricEngine
+
+
+class HybridEngine(CombustionEngine, ElectricEngine):
+    def printDetails(self):
+        print("Power:", self.power)
+        print("Tank Capacity:", self.tankCapacity)
+        print("Charge Capacity:", self.chargeCapacity)
+
+
+car = HybridEngine()
+car.setPower("2000 CC")
+car.setChargeCapacity("250 W")
+car.setTankCapacity("20 Litres")
+car.printDetails()
+
+
+
+--------------------------- Advantages of Inheritance ------------------------
+
+Reusability:
+-----------
+Inheritance makes the code reusable. Consider that you are up for designing a banking system using classes. Your model might have these:
+
+A parent class: BankAccount
+A child class: SavingsAccount
+Another child class: CheckingAccount
+
+
+Code modification:
+----------------
+Suppose you put the same code in different classes, but what happens when you have to make changes to a function and in several places? There is a high likelihood that you will forget some places and bugs will be introduced. You can avoid this with inheritance, which will ensure that all changes are localized, and inconsistencies are avoided.
+
+Extensibility:
+-------------
+In the example above, you realize at a later point that you have to diversify this banking application by adding another class for MoneyMarketAccount. So, rather than implementing this class from scratch, you can extend it from the existing BankAccount class as a starting point. You can also reuse its attributes that are common with MoneyMarketAccount.
+
+Data hiding:
+-------------
+The base class can keep some data private so that the derived class cannot alter it. This concept is called encapsulation.
+
+
+
+
+============================================== Method overriding ========================================
+
+* Super class method will be available to subclass. If subclass has similar method as super class, it will be called instead of super class method, when self is used to call the similar method

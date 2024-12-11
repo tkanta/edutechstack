@@ -10,11 +10,20 @@ pattern repo for educative
 -------------------------------------
 https://github.com/tkanta/algo-ds-pattern
 
+Location:
+--------------
+D:\TechnologyStack\Educative\workspace-pattern (STS-4)
+D:\TechnologyStack\Educative\edutechstack\workspace-algo-ds\algo-ds-pattern\pattern
 
-Topics:
----------------
+Topics In Progress:
+--------------------
 
 * two pointers
 	* Reverse words in a String
 		String split by one/multile space (https://www.tutorialkart.com/java/how-to-split-a-string-with-space-as-delimiter-in-java/)
 			String parts[] = str.split(" ");	
+
+
+* Sliding window:
+	- Intro
+	- 			

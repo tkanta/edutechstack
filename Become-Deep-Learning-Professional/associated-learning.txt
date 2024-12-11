@@ -4,6 +4,7 @@
 
 PythonForDatascience:
 	D:\TechnologyStack\Udemy\udemystack\PythonForDatascience
+	D:\TechnologyStack\Educative\edutechstack\Python-For-Programmer **
 
 open_AI:
 	D:\TechnologyStack\AI_ML_SKILL\AI	

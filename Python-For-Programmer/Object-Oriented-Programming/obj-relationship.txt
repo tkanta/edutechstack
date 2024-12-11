@@ -1,0 +1,9 @@
+
+
+================================= obj relationship ===============================
+
+Aggregation (has-a relation)
+	- The Country object c lives on even after we delete the Person object p. This creates a weaker relationship between the two classes.
+
+composition (is-a relation)
+	- We have created a Car class which contains the objects of Engine, Tires, and Doors classes. Car class is responsible for their lifetime, i.e., when Car dies, so does tire, engine, and doors too.

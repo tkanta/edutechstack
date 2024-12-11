@@ -1,0 +1,405 @@
+
+
+
+============================= Data structures in Python ===========================
+
+Python is equipped with several built-in data structures to help us efficiently handle large amounts of data. The four primary built-in data structures 
+
+offered in Python 3 are:
+
+List
+Tuple
+Dictionary
+Set
+
+
+
+============================== python List ======================================
+
+* Using list() to convert sequence to list
+	num_seq = range(0, 10)  # A sequence from 0 to 9
+	num_list = list(num_seq)  # The list() method casts the sequence into a list
+	print(num_list)
+
+	num_seq = range(3, 20, 3)  # A sequence from 3 to 19 with a step of 3
+	print(list(num_seq))
+
+* nested lists do not even need to be of the same size! This is not something we can find in many other languages.
+
+	# nested list
+	world_cup_winners = [[2006, "Italy"], [2010, "Spain"],
+	                     [2014, "Germany"], [2018, "France"]]
+	print(world_cup_winners)
+
+* Merging lists
+	part_A = [1, 2, 3, 4, 5]
+	part_B = [6, 7, 8, 9, 10]
+	merged_list = part_A + part_B
+	print(merged_list)	
+
+* Alternatively, we could use the extend() property of a list to add the elements of one list at the end of another:
+	part_A = [1, 2, 3, 4, 5]
+	part_B = [6, 7, 8, 9, 10]
+	part_A.extend(part_B)
+	print(part_A)	
+
+
+
+=========================== Common List Operations ==================================
+
+* a_list.append(newElement)
+
+ 	num_list = [1, 2, 3, 5, 6]
+	num_list.insert(3, 4)  # Inserting 4 at the 3rd index. 5 and 6 shifted ahead
+	print(num_list)	
+
+* Removing element
+	houses = ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"]
+	last_house = houses.pop()
+	print(last_house)
+	print(houses)
+	------
+	Slytherin
+	['Gryffindor', 'Hufflepuff', 'Ravenclaw']
+
+	----------- remove () ---------
+	populations = [["Winterfell", 10000], ["King's Landing", 50000],
+               ["Iron Islands", 5000]]
+	print(populations)
+	populations.remove(["King's Landing", 50000])
+
+* List slicing
+	num_list = [1, 2, 3, 4, 5, 6, 7, 8]
+	print(num_list[2:5])
+	print(num_list[0::2]) # get elements in step of 2 , calculated with 0 based index
+	------- result ----
+	[3, 4, 5]
+	[1, 3, 5, 7]
+
+* Retrieve element position in list
+	cities = ["London", "Paris", "Los Angeles", "Beirut"]
+	print(cities.index("Los Angeles"))  # It is at the index 2	
+
+* in / not in operator
+
+	cities = ["London", "Paris", "Los Angeles", "Beirut"]
+	print("London" in cities)
+	print("Moscow" not in cities)	
+
+* List sort
+	num_list = [20, 40, 10, 50.4, 30, 100, 5]
+	num_list.sort()
+	print(num_list)	
+
+* List method
+	
+	Method 						 Description
+----------------------------------------------
+extend(iterable) 	Extends the list by appending all items from the iterable.
+
+remove(x) 			Removes the first item from the list whose value is x.
+
+pop(i)			Removes and returns the item at position i (default last item).
+
+clear()				Removes all items from the list.
+
+count(x)  			Returns the number of times x appears in the list.
+
+reverse()			Reverses the elements of the list in place.
+
+copy() 				Returns a shallow copy of the list.	
+
+
+
+================================= List Comprehension ==========================================
+
+nums_double = [n * 2 for n in nums]
+
+nums_double = [n * 2 for n in nums if n % 4 == 0]
+
+sum_list = [[n1, n2] for n1 in list1 for n2 in list2 if n1 + n2 > 100]
+	* [[50, 60], [110, 10], [110, 60], [110, 20], [110, 50], [75, 60], [75, 50]]
+
+even = [n for n in nums if  n % 2 == 0]
+	* [2, 4, 6, 8, 10]
+
+fruits = ["apple", "banana", "cherry"]
+result = [fruit.upper() for fruit in fruits if "a" in fruit]
+	['APPLE', 'BANANA']
+
+
+
+================================= Tuples ========================================================
+
+* A tuple is very similar to a list, except for the fact that its contents cannot be changed. In other words, a tuple is immutable. However, it can contain mutable elements like a list. These elements can be altered. The contents of a tuple are enclosed in parentheses, ()—unlike lists that use []. They are also ordered and, hence, follow the linear index notation.
+
+* Since tuples are immutable, we can’t add or delete elements from them. Furthermore, it isn’t possible to append another tuple to an existing tuple. Tuples are used in scenarios where data is expected to remain constant and you want to ensure integrity of the data.
+
+	car = ("Ford", "Raptor", 2019, "Red")
+	print(car)
+
+	# Length
+	print(len(car))
+
+	# Indexing
+	print(car[1])
+
+	# Slicing
+	print(car[2:])
+
+* Merging tuples
+	hero_names = ("Batman", "Wonder Woman", "Superman")
+	hero_ages = (35, 80, 40)
+	hero_powers = ("Martial Arts", "Super Strength", "Flight")
+	merged_heroes_info = hero_names + hero_ages + hero_powers
+	print(merged_heroes_info)
+
+* Nested tuples
+	hero1 = ("Batman", "Bruce Wayne", 35, 85.5)
+	hero2 = ("Wonder Woman", "Diana Prince", 80, 99.9)
+	awesome_team = (hero1, hero2)
+	print(awesome_team)	
+
+* Search#
+	cities = ("London", "Paris", "Los Angeles", "Tokyo")
+	print("Tokyo" in cities)
+	print("Moscow" in cities)	
+
+* index function with list comprehension	
+	cities_set1 = ("London", "Paris", "Los Angeles", "Tokyo")
+	print(cities_set1.index("Tokyo"))
+
+	cities_set2 = (
+	    ("London", 8.9, "UK"),
+	    ("Paris", 2.1, "France"),
+	    ("Los Angeles", 3.9, "USA"),
+	    ("Tokyo", 14.0, "Japan")
+	)
+
+	tokyo_index = [city[0] for city in cities_set2].index("Tokyo")
+	print(f"Index of Tokyo: {tokyo_index}")	
+
+
+=============================== Dictionaries ==========================================
+
+* Accessing a_dictionary[key] raises a KeyError if the key is missing, while a_dictionary.get(key) returns None or a specified default value, preventing errors.
+
+	phone_book = {"Batman": 468426,
+              "Cersei": 237734,
+              "Ghostbusters": 44678}
+	print(phone_book["Cersei"])
+	print(phone_book.get("Ghostbusters"))
+
+
+
+
+============================ Dictionary Operations ================================
+
+Adding and updating entries:
+	phone_book = {"Batman": 468426,
+              "Cersei": 237734,
+              "Ghostbusters": 44678}
+	print(phone_book)
+
+	phone_book["Godzilla"] = 46394  
+	print(phone_book)
+
+	phone_book["Godzilla"] = 9000  
+	print(phone_book)	
+
+
+Removing entries
+	phone_book = {"Batman": 468426,
+              "Cersei": 237734,
+              "Ghostbusters": 44678}
+	print(phone_book)
+
+	del phone_book["Batman"]
+	print(phone_book)	
+
+	------ pop / popitem ----------
+	phone_book = {"Batman": 468426,
+              "Cersei": 237734,
+              "Ghostbusters": 44678}
+	print(phone_book)
+
+	cersei = phone_book.pop("Cersei")
+	print(phone_book)
+	print(cersei)
+
+	lastAdded = phone_book.popitem()
+	print(lastAdded)
+
+
+dictionary length:
+	phone_book = {"Batman": 468426,
+              "Cersei": 237734,
+              "Ghostbusters": 44678}
+	print(len(phone_book))
+
+
+
+Checking key existence:
+	phone_book = {"Batman": 468426,
+              "Cersei": 237734,
+              "Ghostbusters": 44678}
+	print("Batman" in phone_book)
+	print("Godzilla" in phone_book)	
+
+
+Copying/updating contents:
+	* The update() method allows you to copy the contents of one dictionary into another. It adds the key-value pairs from the source dictionary to the target dictionary. If a key already exists in the target dictionary, its value will be updated with the value from the source dictionary.
+
+	phone_book = {"Batman": 468426,
+              "Cersei": 237734,
+              "Ghostbusters": 44678}
+
+	second_phone_book = {"Catwoman": 67423, "Jaime": 237734, "Godzilla": 37623}
+	phone_book.update(second_phone_book)
+	print(phone_book)
+
+
+Dictionary comprehension:
+	houses = {1: "Gryffindor", 2: "Slytherin", 3: "Hufflepuff", 4: "Ravenclaw"}
+	new_houses = {n*2: house + "!" for (n, house) in houses.items()}
+	print(houses)
+	print(new_houses)	
+
+
+
+
+===================================== Sets =================================================
+
+* Mutable data structures like lists or dictionaries can’t be added to a set. However, adding a tuple is perfectly fine.But we can use list in update operation.
+
+* If we use {} for set than it must be initialized 
+	it can't be like test = {}, it should be test = {50} or if it is empty it should be empty_set = set()
+
+* Creating set":
+	random_set = {"Educative", 1408, 3.142,
+              (True, False)}
+	print(random_set)
+	print(len(random_set))  	
+	-----------
+	empty_set = set()
+	print(empty_set)
+
+	random_set = set({"Educative", 1408, 3.142, (True, False)})
+	print(random_set)
+
+
+* Creating lists, sets, tuples, and dictionaries
+	test_set = {"Educative", 1408, 3.142, (True, False)}
+	test_lst = ["Educative", 1408, 3.142, (True, False)]
+	test_dic = {1: "Educative", 2: 1408, 3: 3.142, 4: (True, False)}
+	test_tup = ("Educative", 1408, 3.142, (True, False))
+
+	print(type(test_set))  
+	print(type(test_lst))  
+	print(type(test_dic))  
+	print(type(test_tup))  	
+
+* Adding elements
+	- To add a single item, we can use the add() method. To add multiple items, we’d have to use update(). The input for update() must be another set, list, tuple, or string. Let’s add elements to an empty set
+
+
+	empty_set = set()
+	print(empty_set)
+
+	empty_set.add(1)
+	print(empty_set)
+
+	empty_set.update([2, 2, 3, 4, 5, 5, 5, 6])
+	print(empty_set)	
+
+* Deleting elements
+	The discard() or remove() operations can be used to delete a particular item from a set. The remove() method generates an error if the item is not found, unlike the discard() method.
+
+	random_set = set({"Educative", 1408, 3.142, (True, False)})
+	print(random_set)
+
+	random_set.discard(1408)
+	print(random_set)
+
+	random_set.remove((True, False))
+	print(random_set)	
+
+* Iterating a set
+	odd_list = [1, 3, 5, 7]
+	unordered_set = {9, 10, 11, 12, 13, 14, 15, 16, 17}
+
+	print(unordered_set)
+
+	for num in unordered_set:
+	    if(num % 2 == 0):
+	        odd_list.append(num)
+
+	print(odd_list)	
+
+* Set comprehension
+	squares_set = {x**2 for x in range(10)}
+	print(squares_set)	
+	-----------
+	even_set = {x for x in range(1, 11) if x % 2 == 0}
+	print(even_set)
+
+
+
+================================== Set Theory Operations ================================
+
+* The mathematical definition of sets assigns some inherent properties to sets, such as element uniqueness and unorderedness. It also specifies the operations allowed, such as union, intersection, difference, and symmetric difference. Python supports all of these, as we’ll now see	
+
+* Union: A union of two sets is the collection of all unique elements from both sets, and the order of the sets does not matter.
+	# Define two sets
+	set_A = {1, 2, 3, 4}
+	set_B = {'a', 'b', 'c', 'd',4}
+
+	# Find and print union of two set
+	print(set_A | set_B)
+	print(set_A.union(set_B))
+	print(set_B.union(set_A))
+
+* Intersection : The intersection of two sets is the collection of elements that are common to both sets, and the order of the sets does not matter. This means that the intersection will yield the same result regardless of which set is listed first.	
+
+	# Define two sets
+	set_A = {1, 2, 3, 4}
+	set_B = {2, 8, 4, 16}
+
+	# Find and print intersection of two set
+	print(set_A & set_B)
+	print(set_A.intersection(set_B))
+	print(set_B.intersection(set_A))
+
+* Difference: The difference between two sets is the collection of all unique elements present in the first set but not in the second.
+	# Define two sets
+	set_A = {1, 2, 3, 4}
+	set_B = {2, 8, 4, 16}
+
+	# Find and print difference of two set
+	print(set_A - set_B)
+	print(set_A.difference(set_B))
+
+	print(set_B - set_A)
+	print(set_B.difference(set_A))
+
+* Symmetric difference
+	- The symmetric difference of two sets is a set containing elements in either set but not in both.
+	
+	# Define two sets
+	set_A = {1, 2, 3, 4, 5}
+	set_B = {4, 5, 6, 7, 8}
+
+	# Using symmetric_difference() method
+	sym_diff_method = set_A.symmetric_difference(set_B)
+	print("Symmetric difference using symmetric_difference() method:", sym_diff_method)
+
+	# Using ^ operator
+	sym_diff_operator = set_A ^ set_B
+	print("Symmetric difference using ^ operator:", sym_diff_operator)
+
+	# Additional options
+	sym_diff_reverse_method = set_B.symmetric_difference(set_A)
+	sym_diff_reverse_operator = set_B ^ set_A
+
+	print("Symmetric difference using set_B.symmetric_difference(set_A):", sym_diff_reverse_method)
+	print("Symmetric difference using set_B ^ set_A:", sym_diff_reverse_operator)	
